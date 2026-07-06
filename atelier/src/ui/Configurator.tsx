@@ -6,7 +6,10 @@ import {
 } from "../lib/config";
 import { sfx } from "../lib/audio";
 
-function swatchFor(key: SectionKey, opt: string): string {
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+
+/* a swatch only where color is real information; otherwise a quiet tick */
+function swatchFor(key: SectionKey, opt: string): string | null {
   if (key === "caseMat") {
     const c = CASE_MATERIALS[opt as keyof typeof CASE_MATERIALS].color;
     return `linear-gradient(135deg, #fff 0%, ${c} 42%, ${c} 62%, #43403a 130%)`;
@@ -15,7 +18,7 @@ function swatchFor(key: SectionKey, opt: string): string {
     const c = DIAL_SWATCH[opt as keyof typeof DIAL_SWATCH];
     return `linear-gradient(140deg, ${c}, ${c} 55%, rgba(0,0,0,.45))`;
   }
-  return "linear-gradient(135deg,#7b756a,#3d3a34)";
+  return null;
 }
 
 export function Configurator() {
@@ -27,6 +30,7 @@ export function Configurator() {
 
   if (mode !== "studio") return null;
   const opts = OPTIONS[section] as readonly string[];
+  const sectionIdx = SECTIONS.findIndex((s) => s.key === section);
 
   return (
     <>
@@ -34,69 +38,95 @@ export function Configurator() {
       <motion.nav
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed left-[4vw] bottom-[6vh] z-30 select-none"
+        transition={{ duration: 1.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed left-[4.5vw] bottom-[7vh] z-30 select-none"
       >
-        <div className="label mb-4 opacity-70">Composition</div>
-        <ul className="space-y-[9px]">
+        <div className="label mb-4 opacity-60">Composition</div>
+        <ul className="space-y-[8px]">
           {SECTIONS.map((s, i) => (
             <li
               key={s.key}
               onClick={() => { setSection(s.key); sfx.click(); }}
-              className={`cursor-pointer flex items-baseline gap-3 transition-all duration-500 ${
-                section === s.key ? "text-bone" : "text-bone/35 hover:text-bone/70"
+              className={`cursor-pointer flex items-baseline gap-3 transition-all duration-700 ${
+                section === s.key ? "text-bone" : "text-bone/30 hover:text-bone/65"
               }`}
             >
-              <span className="font-display text-[11px] w-6 text-champagne/70">
-                {["I", "II", "III", "IV", "V", "VI", "VII"][i]}
+              <span className={`font-display text-[10.5px] w-6 transition-colors duration-700 ${
+                section === s.key ? "text-champagne" : "text-champagne/40"
+              }`}>
+                {ROMAN[i]}
               </span>
-              <span className="text-[12.5px] tracking-[0.22em] uppercase">{s.label}</span>
+              <span className="text-[12px] tracking-[0.24em] uppercase">{s.label}</span>
               {section === s.key && (
-                <motion.span layoutId="navline" className="h-px w-8 bg-champagne/80 self-center" />
+                <motion.span layoutId="navline" className="h-px w-9 bg-champagne/70 self-center" />
               )}
             </li>
           ))}
         </ul>
       </motion.nav>
 
-      {/* options — right */}
+      {/* options — right, beneath a ghosted editorial numeral */}
       <motion.aside
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1.6, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed right-[4vw] top-1/2 -translate-y-1/2 z-30 w-[212px] max-h-[72vh] select-none"
+        transition={{ duration: 1.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed right-[4.5vw] top-1/2 -translate-y-1/2 z-30 w-[210px] select-none"
       >
-        <div className="label mb-1 opacity-70">
-          {SECTIONS.find((s) => s.key === section)?.label}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={section + "-num"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="font-display absolute -top-16 -right-2 text-[86px] leading-none text-bone/[0.055] pointer-events-none"
+            >
+              {ROMAN[sectionIdx]}
+            </motion.div>
+          </AnimatePresence>
+          <div className="label mb-1 opacity-60">
+            {SECTIONS[sectionIdx]?.label}
+          </div>
+          <div className="h-px w-full bg-bone/10 mb-3" />
+          <AnimatePresence mode="wait">
+            <motion.ul
+              key={section}
+              initial="out"
+              animate="in"
+              exit="gone"
+              variants={{}}
+              className="overflow-y-auto scroll-thin pr-2 max-h-[56vh]"
+            >
+              {opts.map((opt, i) => {
+                const sel = config[section] === opt;
+                const sw = swatchFor(section, opt);
+                return (
+                  <motion.li
+                    key={opt}
+                    variants={{
+                      out: { opacity: 0, y: 10 },
+                      in: { opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.035, ease: [0.22, 1, 0.36, 1] } },
+                      gone: { opacity: 0, transition: { duration: 0.18 } },
+                    }}
+                    className={`opt ${sel ? "sel" : ""}`}
+                    onClick={() => {
+                      set(section, opt as WatchConfig[typeof section]);
+                      sfx.click();
+                    }}
+                  >
+                    {sw ? (
+                      <span className="dot" style={{ background: sw }} />
+                    ) : (
+                      <span className="tick" />
+                    )}
+                    <span className="nm">{opt}</span>
+                  </motion.li>
+                );
+              })}
+            </motion.ul>
+          </AnimatePresence>
         </div>
-        <div className="h-px w-full bg-bone/10 mb-3" />
-        <AnimatePresence mode="wait">
-          <motion.ul
-            key={section}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="overflow-y-auto scroll-thin pr-2 max-h-[62vh]"
-          >
-            {opts.map((opt) => {
-              const sel = config[section] === opt;
-              return (
-                <li
-                  key={opt}
-                  className={`opt ${sel ? "sel" : ""}`}
-                  onClick={() => {
-                    set(section, opt as WatchConfig[typeof section]);
-                    sfx.click();
-                  }}
-                >
-                  <span className="dot" style={{ background: swatchFor(section, opt) }} />
-                  <span className="nm">{opt}</span>
-                </li>
-              );
-            })}
-          </motion.ul>
-        </AnimatePresence>
       </motion.aside>
     </>
   );
