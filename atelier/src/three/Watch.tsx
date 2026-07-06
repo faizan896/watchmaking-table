@@ -226,14 +226,15 @@ function Bezel({ cfg, caseMat }: { cfg: WatchConfig; caseMat: THREE.Material }) 
 /* ---------- crystal ---------- */
 function Crystal({ cfg }: { cfg: WatchConfig }) {
   const smudge = useMemo(() => smudgeTexture(), []);
+  void smudge;
   const mat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        transmission: 1, thickness: 0.35, roughness: 0.04,
-        roughnessMap: smudge, ior: 1.52, envMapIntensity: 1.4,
-        clearcoat: 1, clearcoatRoughness: 0.03, transparent: true,
+        transmission: 1, thickness: 0.22, roughness: 0.02,
+        ior: 1.52, envMapIntensity: 0.5,
+        clearcoat: 0.4, clearcoatRoughness: 0.05, transparent: true,
       }),
-    [smudge]
+    []
   );
   switch (cfg.crystal) {
     case "Flat":
@@ -263,34 +264,92 @@ function Crystal({ cfg }: { cfg: WatchConfig }) {
   }
 }
 
-/* ---------- strap ---------- */
-function Strap({ cfg }: { cfg: WatchConfig }) {
+/* ---------- strap — tapered, stitched, buckled ---------- */
+function strapShape(wTop: number, wEnd: number, len: number): THREE.Shape {
+  const s = new THREE.Shape();
+  const hT = wTop / 2, hE = wEnd / 2, r = wEnd * 0.28;
+  s.moveTo(-hT, 0);
+  s.lineTo(hT, 0);
+  s.lineTo(hE, -len + r);
+  s.quadraticCurveTo(hE, -len, hE - r, -len);
+  s.lineTo(-hE + r, -len);
+  s.quadraticCurveTo(-hE, -len, -hE, -len + r);
+  s.closePath();
+  return s;
+}
+function Strap({ cfg, caseMat }: { cfg: WatchConfig; caseMat: THREE.Material }) {
   const t = useMemo(() => strapTexture(cfg.strap), [cfg.strap]);
   const metal = strapIsMetal(cfg.strap);
   const mat = useMemo(() => {
-    t.repeat.set(1, 1.6);
+    t.repeat.set(0.62, 0.38);
+    t.offset.set(0.19, 0);
     return new THREE.MeshPhysicalMaterial({
       map: t,
       metalness: metal ? (cfg.strap === "Milanese" ? 0.75 : 0.55) : 0.02,
-      roughness: metal ? 0.32 : cfg.strap === "Rubber" ? 0.55 : 0.72,
-      envMapIntensity: metal ? 1.1 : 0.4,
+      roughness: metal ? 0.28 : cfg.strap === "Rubber" ? 0.5 : 0.62,
+      clearcoat: metal ? 0 : cfg.strap === "Rubber" ? 0.25 : 0.18,
+      clearcoatRoughness: 0.5,
+      envMapIntensity: metal ? 1.15 : 0.32,
     });
   }, [t, metal, cfg.strap]);
-  const w = metal ? 1.62 : 1.46;
+  const w = metal ? 1.6 : 1.48;
+  const geoTop = useMemo(
+    () => new THREE.ExtrudeGeometry(strapShape(w, metal ? w : w * 0.84, 2.45), { depth: 0.1, bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.02, bevelSegments: 2 }),
+    [w, metal]
+  );
   return (
     <group>
-      <mesh material={mat} position={[0, 3.32, -0.28]} rotation-x={-0.22}>
-        <boxGeometry args={[w, 2.5, 0.13]} />
-      </mesh>
-      <mesh material={mat} position={[0, -3.32, -0.28]} rotation-x={0.22}>
-        <boxGeometry args={[w, 2.5, 0.13]} />
-      </mesh>
+      {/* top strap: wide at the lugs, tapering upward */}
+      <group position={[0, 2.08, -0.16]} rotation={[-0.18, 0, Math.PI]}>
+        <mesh material={mat} geometry={geoTop} />
+      </group>
+      {/* bottom strap: tapering down toward the buckle */}
+      <mesh material={mat} geometry={geoTop} position={[0, -2.08, -0.16]} rotation-x={0.18} />
       {!metal && (
-        <mesh material={mat} position={[0, -4.4, -0.14]} rotation-x={0.24}>
-          <boxGeometry args={[w + 0.18, 0.34, 0.16]} />
-        </mesh>
+        /* buckle at the end of the lower strap */
+        <group position={[0, -4.42, -0.22]} rotation-x={0.22}>
+          <mesh material={caseMat}>
+            <torusGeometry args={[0.52, 0.055, 12, 32]} />
+          </mesh>
+          <mesh material={caseMat} position-y={0.28} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.04, 0.04, 1.0, 12]} />
+          </mesh>
+          <mesh material={caseMat} position-y={-0.18} rotation-x={0.5}>
+            <boxGeometry args={[0.07, 0.5, 0.045]} />
+          </mesh>
+        </group>
       )}
     </group>
+  );
+}
+
+/* ---------- lugs — extruded trapezoids with bevelled edges ---------- */
+function Lugs({ caseMat }: { caseMat: THREE.Material }) {
+  const geo = useMemo(() => {
+    const s = new THREE.Shape();
+    // gentle horn: wide at case, narrowing outward
+    s.moveTo(-0.19, 0);
+    s.lineTo(0.19, 0);
+    s.lineTo(0.145, 0.66);
+    s.quadraticCurveTo(0.14, 0.73, 0.075, 0.74);
+    s.lineTo(-0.075, 0.74);
+    s.quadraticCurveTo(-0.14, 0.73, -0.145, 0.66);
+    s.closePath();
+    return new THREE.ExtrudeGeometry(s, {
+      depth: 0.21, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.045, bevelSegments: 3,
+    });
+  }, []);
+  return (
+    <>
+      {[
+        [1.06, 1.78, 0, -0.26], [-1.06, 1.78, 0, -0.26],
+        [1.06, -1.78, Math.PI, 0.26], [-1.06, -1.78, Math.PI, 0.26],
+      ].map(([x, y, rz, rx], i) => (
+        <group key={i} position={[x, y, -0.18]} rotation={[rx, 0, rz]}>
+          <mesh geometry={geo} material={caseMat} />
+        </group>
+      ))}
+    </>
   );
 }
 
@@ -299,7 +358,7 @@ function Caseback({ caseMat, rotationVel }: { caseMat: THREE.Material; rotationV
   const movement = useMemo(() => movementTexture(), []);
   const rotorTex = useMemo(() => rotorTexture(), []);
   const rotor = useRef<THREE.Mesh>(null);
-  const rotorVel = useRef(0);
+  const rotorVel = useRef(2.6); // a gentle first swing so the rotor is discovered alive
   const movMat = useMemo(
     () => new THREE.MeshStandardMaterial({ map: movement, metalness: 0.6, roughness: 0.38 }),
     [movement]
@@ -326,6 +385,11 @@ function Caseback({ caseMat, rotationVel }: { caseMat: THREE.Material; rotationV
       </mesh>
       <mesh material={movMat} position-z={0.3}>
         <circleGeometry args={[1.62, 96]} />
+      </mesh>
+      {/* shadow pool beneath the rotor for depth */}
+      <mesh position-z={0.38}>
+        <circleGeometry args={[1.27, 64]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.28} />
       </mesh>
       <mesh
         ref={rotor}
@@ -420,15 +484,8 @@ export function Watch({ rotationVel }: { rotationVel: React.MutableRefObject<num
     <group>
       {/* case body */}
       <mesh geometry={caseProfile} material={caseMat} rotation-x={Math.PI / 2} />
-      {/* lugs */}
-      {[
-        [1.02, 2.16, -0.2], [-1.02, 2.16, -0.2],
-        [1.02, -2.16, 0.2], [-1.02, -2.16, 0.2],
-      ].map(([x, y, rx], i) => (
-        <mesh key={i} material={caseMat} position={[x, y, -0.06]} rotation-x={rx}>
-          <boxGeometry args={[0.32, 0.72, 0.3]} />
-        </mesh>
-      ))}
+      {/* lugs — machined, bevelled, hugging the case */}
+      <Lugs caseMat={caseMat} />
       <Bezel cfg={cfg} caseMat={caseMat} />
       {/* dial + rehaut */}
       <mesh material={caseMat} position-z={0.2} scale-z={0.4}>
@@ -440,7 +497,7 @@ export function Watch({ rotationVel }: { rotationVel: React.MutableRefObject<num
       <Hands cfg={cfg} caseMat={caseMat} />
       <Crystal cfg={cfg} />
       <Crown caseMat={caseMat} />
-      <Strap cfg={cfg} />
+      <Strap cfg={cfg} caseMat={caseMat} />
       <Caseback caseMat={caseMat} rotationVel={rotationVel} />
     </group>
   );

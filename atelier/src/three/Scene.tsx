@@ -8,7 +8,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { useAtelier } from "../lib/store";
 import { LIGHT_RIGS, BG_COLORS, buildStory } from "../lib/config";
-import { stageTexture, shadowTexture } from "../lib/textures";
+import { stageTexture, shadowTexture, backdropTexture } from "../lib/textures";
 import { Watch } from "./Watch";
 import { sfx } from "../lib/audio";
 
@@ -26,18 +26,18 @@ function Env() {
   return null;
 }
 
-/* floating dust in the key light */
+/* a few motes drifting through the key light — not a starfield */
 function Dust() {
   const ref = useRef<THREE.Points>(null);
-  const N = 260;
+  const N = 70;
   const [positions, speeds] = useMemo(() => {
     const p = new Float32Array(N * 3);
     const s = new Float32Array(N);
     for (let i = 0; i < N; i++) {
-      p[i * 3] = (Math.random() - 0.5) * 10;
-      p[i * 3 + 1] = (Math.random() - 0.5) * 7;
-      p[i * 3 + 2] = (Math.random() - 0.5) * 5 + 1;
-      s[i] = 0.05 + Math.random() * 0.14;
+      p[i * 3] = (Math.random() - 0.5) * 5.5;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 5.5;
+      p[i * 3 + 2] = Math.random() * 2.6 - 0.4;
+      s[i] = 0.03 + Math.random() * 0.09;
     }
     return [p, s];
   }, []);
@@ -47,8 +47,8 @@ function Dust() {
     const t = st.clock.elapsedTime;
     for (let i = 0; i < N; i++) {
       arr[i * 3 + 1] += speeds[i] * dt;
-      arr[i * 3] += Math.sin(t * 0.35 + i) * 0.0009;
-      if (arr[i * 3 + 1] > 3.6) arr[i * 3 + 1] = -3.6;
+      arr[i * 3] += Math.sin(t * 0.3 + i * 2.1) * 0.0007;
+      if (arr[i * 3 + 1] > 2.9) arr[i * 3 + 1] = -2.9;
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
   });
@@ -58,11 +58,23 @@ function Dust() {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#ffe6c0" size={0.036} sizeAttenuation
-        transparent opacity={0.55} depthWrite={false}
+        color="#ffdfae" size={0.028} sizeAttenuation
+        transparent opacity={0.26} depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
     </points>
+  );
+}
+
+/* studio cyclorama behind the product (photo mode brings its own set) */
+function Backdrop() {
+  const t = useMemo(() => backdropTexture(), []);
+  const mode = useAtelier((s) => s.mode);
+  return (
+    <mesh position={[0, 1.5, -9]} visible={mode !== "photo"}>
+      <planeGeometry args={[70, 38]} />
+      <meshBasicMaterial map={t} fog={false} />
+    </mesh>
   );
 }
 
@@ -82,34 +94,34 @@ function Lights() {
     reveal.current = damp(reveal.current, target, 1.1, dt);
     const r = reveal.current;
     if (key.current) {
-      key.current.intensity = damp(key.current.intensity, rig.key * 60 * r, 3, dt);
+      key.current.intensity = damp(key.current.intensity, rig.key * 46 * r, 3, dt);
       key.current.color.lerp(new THREE.Color(rig.keyColor), dt * 3);
     }
     if (fill.current) {
-      fill.current.intensity = damp(fill.current.intensity, rig.fill * r, 3, dt);
+      fill.current.intensity = damp(fill.current.intensity, rig.fill * 0.7 * r, 3, dt);
       fill.current.color.lerp(new THREE.Color(rig.fillColor), dt * 3);
     }
     if (rim.current) {
-      rim.current.intensity = damp(rim.current.intensity, rig.rim * r, 3, dt);
+      rim.current.intensity = damp(rim.current.intensity, rig.rim * 1.5 * r, 3, dt);
       rim.current.color.lerp(new THREE.Color(rig.rimColor), dt * 3);
     }
-    if (amb.current) amb.current.intensity = damp(amb.current.intensity, 0.16 * rig.env * r + 0.012, 3, dt);
-    scene.environmentIntensity = damp(scene.environmentIntensity ?? 0, rig.env * r, 3, dt);
+    if (amb.current) amb.current.intensity = damp(amb.current.intensity, 0.12 * rig.env * r + 0.012, 3, dt);
+    scene.environmentIntensity = damp(scene.environmentIntensity ?? 0, rig.env * 0.75 * r, 3, dt);
   });
   return (
     <>
       <ambientLight ref={amb} intensity={0.01} />
       <spotLight
         ref={key}
-        position={[2.6, 6.5, 5.5]}
-        angle={0.5}
-        penumbra={0.85}
+        position={[3.4, 7.5, 6.2]}
+        angle={0.4}
+        penumbra={1}
         decay={1.6}
         intensity={0}
         castShadow={false}
       />
-      <directionalLight ref={fill} position={[-6, 2, 4]} intensity={0} />
-      <directionalLight ref={rim} position={[-3, 5, -6]} intensity={0} />
+      <directionalLight ref={fill} position={[-6, 1.5, 4.5]} intensity={0} />
+      <directionalLight ref={rim} position={[-4.5, 4, -7]} intensity={0} />
     </>
   );
 }
@@ -129,7 +141,7 @@ function Stage() {
   useEffect(() => {
     const c = new THREE.Color(BG_COLORS[bg].fog);
     scene.background = c;
-    scene.fog = new THREE.Fog(c, 9, 22);
+    scene.fog = new THREE.Fog(c, 17, 34);
   }, [bg, scene]);
   const glassy = bg === "Glass";
   return (
@@ -222,22 +234,23 @@ function WatchRig() {
   useFrame((st, dt) => {
     if (!group.current) return;
     if (!dragging.current) {
-      // inertia, then a gentle settle back to rest
+      // inertia first, then a slow, reluctant return — weight, not a spring
       dragY.current += vel.current * dt;
-      vel.current *= 1 - Math.min(1, dt * 2.2);
-      dragY.current = damp(dragY.current, 0, 0.55, dt);
-      dragX.current = damp(dragX.current, 0, 0.8, dt);
+      vel.current *= 1 - Math.min(1, dt * 1.6);
+      dragY.current = damp(dragY.current, 0, 0.28, dt);
+      dragX.current = damp(dragX.current, 0, 0.45, dt);
     }
     const flipTarget = flipped ? Math.PI : 0;
     const prev = group.current.rotation.y;
-    const targetY = flipTarget + dragY.current;
-    group.current.rotation.y = damp(prev, targetY, 4.2, dt);
-    rotationVel.current = (group.current.rotation.y - prev) / Math.max(dt, 0.001);
-    group.current.rotation.x = damp(group.current.rotation.x, dragX.current, 4, dt);
-    // slow cinematic idle drift + breathing
     const t = st.clock.elapsedTime;
-    group.current.rotation.z = Math.sin(t * 0.23) * 0.012;
-    group.current.position.y = Math.sin(t * 0.5) * 0.035 + (mode === "finale" ? 0.2 : 0);
+    const idleSway = Math.sin(t * 0.13) * 0.03; // the piece never sits perfectly still
+    const targetY = flipTarget + dragY.current + idleSway;
+    group.current.rotation.y = damp(prev, targetY, 3.2, dt);
+    rotationVel.current = (group.current.rotation.y - prev) / Math.max(dt, 0.001);
+    group.current.rotation.x = damp(group.current.rotation.x, dragX.current, 3.2, dt);
+    // slow cinematic breathing
+    group.current.rotation.z = Math.sin(t * 0.19) * 0.009;
+    group.current.position.y = Math.sin(t * 0.42) * 0.022 + (mode === "finale" ? 0.2 : 0);
   });
 
   return (
@@ -252,7 +265,7 @@ function CameraRig() {
   const { camera, gl } = useThree();
   const mode = useAtelier((s) => s.mode);
   const macro = useAtelier((s) => s.macro);
-  const zoom = useRef(8.2);
+  const zoom = useRef(13.6);
   const mouse = useRef({ x: 0, y: 0 });
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -262,7 +275,7 @@ function CameraRig() {
     const onWheel = (e: WheelEvent) => {
       if (useAtelier.getState().mode !== "studio") return;
       e.preventDefault();
-      zoom.current = THREE.MathUtils.clamp(zoom.current + e.deltaY * 0.004, 3.0, 10.5);
+      zoom.current = THREE.MathUtils.clamp(zoom.current + e.deltaY * 0.005, 3.0, 15.5);
     };
     window.addEventListener("pointermove", onMove);
     gl.domElement.addEventListener("wheel", onWheel, { passive: false });
@@ -273,15 +286,15 @@ function CameraRig() {
   }, [gl]);
   useFrame((st, dt) => {
     const landing = mode === "landing";
-    const targetZ = landing ? 10.8 : macro ? 3.1 : mode === "finale" ? 10.4 : zoom.current;
-    const px = landing ? 0 : mouse.current.x * 0.42;
-    const py = landing ? 0.7 : 0.35 - mouse.current.y * 0.28;
+    const targetZ = landing ? 16.2 : macro ? 3.2 : mode === "finale" ? 14.6 : zoom.current;
+    const px = landing ? 0 : mouse.current.x * 0.5;
+    const py = landing ? 0.7 : 0.42 - mouse.current.y * 0.34;
     const t = st.clock.elapsedTime;
-    const drift = landing ? Math.sin(t * 0.1) * 0.35 : Math.sin(t * 0.07) * 0.14;
-    camera.position.x = damp(camera.position.x, px + drift, 1.6, dt);
-    camera.position.y = damp(camera.position.y, py, 1.6, dt);
-    camera.position.z = damp(camera.position.z, targetZ, landing ? 0.35 : 1.8, dt);
-    camera.lookAt(0, 0, 0);
+    const drift = landing ? Math.sin(t * 0.09) * 0.4 : Math.sin(t * 0.055) * 0.16;
+    camera.position.x = damp(camera.position.x, px + drift, 1.4, dt);
+    camera.position.y = damp(camera.position.y, py, 1.4, dt);
+    camera.position.z = damp(camera.position.z, targetZ, landing ? 0.35 : 1.5, dt);
+    camera.lookAt(0, 0.05, 0);
   });
   return null;
 }
@@ -311,10 +324,11 @@ export default function Scene() {
     <Canvas
       dpr={[1, 2]}
       gl={{ antialias: true, preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}
-      camera={{ fov: 38, position: [0, 0.7, 11], near: 0.1, far: 60 }}
+      camera={{ fov: 38, position: [0, 0.7, 16.5], near: 0.1, far: 60 }}
     >
       <Env />
       <Lights />
+      <Backdrop />
       <Stage />
       <Dust />
       <WatchRig />
