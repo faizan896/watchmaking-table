@@ -34,15 +34,21 @@ function dialBase(g: CanvasRenderingContext2D, dial: DialType) {
   const solid = (col: string, sunburst = true, dark = true) => {
     g.fillStyle = col; g.fillRect(0, 0, S, S);
     if (sunburst) {
-      g.globalAlpha = 0.16;
-      for (let i = 0; i < 240; i++) {
-        const a = (i / 240) * Math.PI * 2;
-        g.strokeStyle = i % 2 ? (dark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.18)") : "rgba(0,0,0,.3)";
-        g.lineWidth = 2.2;
+      g.globalAlpha = 0.09;
+      for (let i = 0; i < 160; i++) {
+        const a = (i / 160) * Math.PI * 2;
+        g.strokeStyle = i % 2 ? (dark ? "rgba(255,255,255,.4)" : "rgba(0,0,0,.2)") : "rgba(0,0,0,.35)";
+        g.lineWidth = 2.6;
         g.beginPath(); g.moveTo(C, C);
         g.lineTo(C + Math.cos(a) * C, C + Math.sin(a) * C); g.stroke();
       }
       g.globalAlpha = 1;
+      // anisotropic sheen — one soft diagonal band, like brushed silk
+      const sheen = g.createLinearGradient(0, 0, S, S);
+      sheen.addColorStop(0.32, "rgba(255,255,255,0)");
+      sheen.addColorStop(0.5, dark ? "rgba(255,255,255,.075)" : "rgba(255,255,255,.16)");
+      sheen.addColorStop(0.68, "rgba(255,255,255,0)");
+      g.fillStyle = sheen; g.fillRect(0, 0, S, S);
     }
   };
 
@@ -235,13 +241,22 @@ export function dialTexture(cfg: WatchConfig): THREE.CanvasTexture {
   }
   g.restore();
 
-  // date window at 3
+  // date window at 3 — recessed aperture with a polished frame
   if (cfg.dial !== "Skeleton") {
     const dx = C + 398, dy = C;
-    g.fillStyle = "rgba(0,0,0,.55)";
-    g.fillRect(dx - 34, dy - 40, 72, 80);
+    const fr = g.createLinearGradient(dx - 38, dy - 44, dx + 42, dy + 44);
+    fr.addColorStop(0, idxA); fr.addColorStop(0.5, idxB); fr.addColorStop(1, idxA);
+    g.fillStyle = fr;
+    g.fillRect(dx - 38, dy - 44, 80, 88);
+    g.fillStyle = "rgba(0,0,0,.75)";
+    g.fillRect(dx - 33, dy - 39, 70, 78);
     g.fillStyle = light ? "#f6f3ea" : "#f2efe6";
-    g.fillRect(dx - 30, dy - 36, 64, 72);
+    g.fillRect(dx - 29, dy - 35, 62, 70);
+    const shade = g.createLinearGradient(dx, dy - 35, dx, dy + 35);
+    shade.addColorStop(0, "rgba(0,0,0,.32)"); shade.addColorStop(0.25, "rgba(0,0,0,0)");
+    shade.addColorStop(0.85, "rgba(0,0,0,0)"); shade.addColorStop(1, "rgba(0,0,0,.2)");
+    g.fillStyle = shade;
+    g.fillRect(dx - 29, dy - 35, 62, 70);
     g.fillStyle = "#17161a";
     g.font = "600 46px Georgia";
     g.textAlign = "center"; g.textBaseline = "middle";
@@ -268,80 +283,124 @@ export function movementTexture(): THREE.CanvasTexture {
   const [c, g] = canvas(S);
   const r = rand(31);
   g.beginPath(); g.arc(C, C, C, 0, 7); g.clip();
-  g.fillStyle = "#8d7546"; g.fillRect(0, 0, S, S);
-  // Geneva stripes
-  g.save(); g.translate(C, C); g.rotate(0.5); g.translate(-C, -C);
-  for (let i = -4; i < 22; i++) {
-    g.fillStyle = i % 2 ? "rgba(255,232,178,.32)" : "rgba(80,58,20,.30)";
-    g.fillRect(-200, i * 64, S + 400, 64);
+  // rhodium-gilt base
+  const base = g.createRadialGradient(C - 160, C - 200, 120, C, C, C * 1.15);
+  base.addColorStop(0, "#a58a54"); base.addColorStop(0.6, "#8a7143"); base.addColorStop(1, "#5e4c2b");
+  g.fillStyle = base; g.fillRect(0, 0, S, S);
+  // Geneva stripes — fine, subtle, correctly scaled
+  g.save(); g.translate(C, C); g.rotate(0.42); g.translate(-C, -C);
+  for (let i = -8; i < 40; i++) {
+    const y = i * 34;
+    const band = g.createLinearGradient(0, y, 0, y + 34);
+    band.addColorStop(0, "rgba(255,236,190,.16)");
+    band.addColorStop(0.45, "rgba(255,236,190,.02)");
+    band.addColorStop(0.55, "rgba(58,42,14,.14)");
+    band.addColorStop(1, "rgba(58,42,14,.03)");
+    g.fillStyle = band;
+    g.fillRect(-260, y, S + 520, 34);
   }
   g.restore();
-  // perlage border
-  for (let i = 0; i < 46; i++) {
-    const a = (i / 46) * Math.PI * 2;
-    g.strokeStyle = "rgba(255,240,200,.28)";
-    g.lineWidth = 5;
-    g.beginPath();
-    g.arc(C + Math.cos(a) * 452, C + Math.sin(a) * 452, 30, 0, 7);
-    g.stroke();
+  // perlage border — small overlapping circles, two rows
+  for (let row = 0; row < 2; row++) {
+    const R = 470 - row * 26, n = 68 - row * 8;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + row * 0.05;
+      const px = C + Math.cos(a) * R, py = C + Math.sin(a) * R;
+      const pg = g.createRadialGradient(px - 4, py - 4, 2, px, py, 15);
+      pg.addColorStop(0, "rgba(255,242,205,.32)"); pg.addColorStop(1, "rgba(60,44,16,.12)");
+      g.strokeStyle = "rgba(70,52,20,.35)"; g.lineWidth = 1.2;
+      g.fillStyle = pg;
+      g.beginPath(); g.arc(px, py, 14, 0, 7); g.fill(); g.stroke();
+    }
   }
-  // train wheels
+  // train wheels — shaded, seated in recesses
   const wheel = (x: number, y: number, R: number, teeth: number) => {
     g.save(); g.translate(x, y);
-    g.fillStyle = "#c9a445";
+    // recess shadow
+    const rs = g.createRadialGradient(0, 0, R * 0.6, 0, 0, R * 1.22);
+    rs.addColorStop(0, "rgba(20,12,2,.0)"); rs.addColorStop(0.8, "rgba(20,12,2,.42)"); rs.addColorStop(1, "rgba(20,12,2,0)");
+    g.fillStyle = rs; g.beginPath(); g.arc(0, 0, R * 1.25, 0, 7); g.fill();
+    // toothed rim
+    const gold = g.createRadialGradient(-R * 0.4, -R * 0.4, R * 0.2, 0, 0, R * 1.1);
+    gold.addColorStop(0, "#f0d489"); gold.addColorStop(0.55, "#c9a445"); gold.addColorStop(1, "#7c6023");
+    g.fillStyle = gold;
     g.beginPath();
     for (let i = 0; i <= teeth * 2; i++) {
       const a = (i / (teeth * 2)) * Math.PI * 2;
-      const rr = i % 2 ? R : R * 0.9;
+      const rr = i % 2 ? R : R * 0.92;
       g[i ? "lineTo" : "moveTo"](Math.cos(a) * rr, Math.sin(a) * rr);
     }
     g.closePath(); g.fill();
-    g.strokeStyle = "rgba(90,64,16,.7)"; g.lineWidth = 3; g.stroke();
-    g.fillStyle = "rgba(60,44,14,.55)";
+    g.strokeStyle = "rgba(70,50,12,.8)"; g.lineWidth = 2; g.stroke();
+    // crossing spokes (four-arm wheel)
+    g.fillStyle = "rgba(34,22,6,.78)";
     for (let s2 = 0; s2 < 4; s2++) {
-      const a = (s2 / 4) * Math.PI * 2 + 0.7;
-      g.beginPath(); g.arc(Math.cos(a) * R * 0.5, Math.sin(a) * R * 0.5, R * 0.24, 0, 7); g.fill();
+      const a = (s2 / 4) * Math.PI * 2 + 0.78;
+      g.beginPath();
+      g.ellipse(Math.cos(a) * R * 0.5, Math.sin(a) * R * 0.5, R * 0.27, R * 0.21, a, 0, 7);
+      g.fill();
     }
-    g.fillStyle = "#b3123a";
-    g.beginPath(); g.arc(0, 0, 10, 0, 7); g.fill();
-    g.fillStyle = "rgba(255,220,225,.8)";
-    g.beginPath(); g.arc(-3, -3, 3, 0, 7); g.fill();
+    g.strokeStyle = "rgba(255,238,196,.5)"; g.lineWidth = 1.4;
+    g.beginPath(); g.arc(0, 0, R * 0.88, 0, 7); g.stroke();
+    // chaton + jewel
+    g.fillStyle = "#d8bd77"; g.beginPath(); g.arc(0, 0, 17, 0, 7); g.fill();
+    g.strokeStyle = "rgba(70,50,12,.75)"; g.lineWidth = 1.6; g.stroke();
+    const ruby = g.createRadialGradient(-3, -3, 1, 0, 0, 10);
+    ruby.addColorStop(0, "#ff6a80"); ruby.addColorStop(0.55, "#b3123a"); ruby.addColorStop(1, "#5c0418");
+    g.fillStyle = ruby; g.beginPath(); g.arc(0, 0, 10, 0, 7); g.fill();
     g.restore();
   };
-  wheel(C + 170, C - 130, 110, 22);
-  wheel(C - 60, C - 220, 84, 18);
-  wheel(C - 210, C - 60, 72, 16);
-  // balance wheel
-  g.save(); g.translate(C - 170, C + 190);
-  g.strokeStyle = "#d8b45c"; g.lineWidth = 16;
-  g.beginPath(); g.arc(0, 0, 92, 0, 7); g.stroke();
-  g.lineWidth = 10; g.beginPath(); g.moveTo(-86, 0); g.lineTo(86, 0); g.stroke();
-  g.strokeStyle = "rgba(90,110,140,.9)"; g.lineWidth = 3;
+  wheel(C + 168, C - 128, 104, 22);
+  wheel(C - 58, C - 216, 80, 18);
+  wheel(C - 206, C - 56, 68, 16);
+  // balance — ring with screws + hairspring
+  g.save(); g.translate(C - 166, C + 188);
+  const bs = g.createRadialGradient(0, 0, 40, 0, 0, 108);
+  bs.addColorStop(0, "rgba(16,10,2,.0)"); bs.addColorStop(0.85, "rgba(16,10,2,.45)"); bs.addColorStop(1, "rgba(16,10,2,0)");
+  g.fillStyle = bs; g.beginPath(); g.arc(0, 0, 110, 0, 7); g.fill();
+  g.strokeStyle = "#e3c26e"; g.lineWidth = 13;
+  g.beginPath(); g.arc(0, 0, 86, 0, 7); g.stroke();
+  g.strokeStyle = "rgba(90,64,16,.55)"; g.lineWidth = 2;
+  g.beginPath(); g.arc(0, 0, 93, 0, 7); g.stroke();
+  g.strokeStyle = "#caa74e"; g.lineWidth = 9;
+  g.beginPath(); g.moveTo(-80, 0); g.lineTo(80, 0); g.stroke();
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + 0.4;
+    g.fillStyle = "#f0d489";
+    g.beginPath(); g.arc(Math.cos(a) * 86, Math.sin(a) * 86, 5, 0, 7); g.fill();
+  }
+  g.strokeStyle = "rgba(88,112,150,.95)"; g.lineWidth = 2.4;
   g.beginPath();
-  for (let a = 0; a < 24; a += 0.25) {
-    const rr = 6 + a * 3;
+  for (let a = 0; a < 26; a += 0.22) {
+    const rr = 5 + a * 2.6;
     g[a ? "lineTo" : "moveTo"](Math.cos(a) * rr, Math.sin(a) * rr);
   }
   g.stroke();
+  g.fillStyle = "#b3123a"; g.beginPath(); g.arc(0, 0, 8, 0, 7); g.fill();
   g.restore();
-  // blued screws
+  // blued screws — slotted, with polished rims
   for (let i = 0; i < 7; i++) {
-    const a = r() * Math.PI * 2, R = 180 + r() * 210;
+    const a = r() * Math.PI * 2, R = 190 + r() * 200;
     const x = C + Math.cos(a) * R, y = C + Math.sin(a) * R;
-    g.fillStyle = "#24406e";
-    g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill();
-    g.strokeStyle = "rgba(0,0,0,.6)"; g.lineWidth = 3.4;
-    g.beginPath(); g.moveTo(x - 9, y); g.lineTo(x + 9, y); g.stroke();
+    g.fillStyle = "#c9ad6a"; g.beginPath(); g.arc(x, y, 15.5, 0, 7); g.fill();
+    const bl = g.createRadialGradient(x - 4, y - 4, 1, x, y, 12);
+    bl.addColorStop(0, "#4a72b8"); bl.addColorStop(0.6, "#24406e"); bl.addColorStop(1, "#101d38");
+    g.fillStyle = bl;
+    g.beginPath(); g.arc(x, y, 12, 0, 7); g.fill();
+    g.strokeStyle = "rgba(0,0,0,.7)"; g.lineWidth = 3;
+    const sa = r() * Math.PI;
+    g.beginPath(); g.moveTo(x - Math.cos(sa) * 8, y - Math.sin(sa) * 8);
+    g.lineTo(x + Math.cos(sa) * 8, y + Math.sin(sa) * 8); g.stroke();
   }
   // engraving
-  g.fillStyle = "rgba(52,36,8,.9)";
+  g.fillStyle = "rgba(48,32,6,.85)";
   g.textAlign = "center";
-  g.font = "26px Georgia";
-  g.fillText("ATELIER  ·  CALIBRE A-01", C, C + 40);
-  g.font = "italic 19px Georgia";
-  g.fillText("twenty-one jewels · Genève", C, C + 78);
-  g.font = "13px Georgia";
-  g.fillText("designed by Faizan Farooq", C, C + 356);
+  g.font = "25px Georgia";
+  g.fillText("ATELIER  ·  CALIBRE A-01", C, C + 44);
+  g.font = "italic 18px Georgia";
+  g.fillText("twenty-one jewels · Genève", C, C + 80);
+  g.font = "12px Georgia";
+  g.fillText("designed by Faizan Farooq", C, C + 352);
   return tex(c);
 }
 
@@ -350,19 +409,61 @@ export function rotorTexture(): THREE.CanvasTexture {
   const [c, g] = canvas(512);
   g.clearRect(0, 0, 512, 512);
   g.beginPath(); g.arc(256, 256, 254, Math.PI, Math.PI * 2); g.closePath(); g.clip();
-  g.fillStyle = "#8f7846"; g.fillRect(0, 0, 512, 512);
-  g.save(); g.translate(256, 256); g.rotate(-0.35); g.translate(-256, -256);
-  for (let i = -4; i < 14; i++) {
-    g.fillStyle = i % 2 ? "rgba(255,232,178,.36)" : "rgba(78,56,18,.34)";
-    g.fillRect(-120, i * 44, 760, 44);
+  // body — soft gilt gradient
+  const body = g.createLinearGradient(80, 20, 400, 250);
+  body.addColorStop(0, "#b89a5e"); body.addColorStop(0.5, "#93794a"); body.addColorStop(1, "#6e5834");
+  g.fillStyle = body; g.fillRect(0, 0, 512, 512);
+  // fine stripes
+  g.save(); g.translate(256, 256); g.rotate(-0.3); g.translate(-256, -256);
+  for (let i = -6; i < 22; i++) {
+    const y = i * 26;
+    const band = g.createLinearGradient(0, y, 0, y + 26);
+    band.addColorStop(0, "rgba(255,236,190,.2)");
+    band.addColorStop(0.5, "rgba(255,236,190,.02)");
+    band.addColorStop(0.52, "rgba(58,42,14,.16)");
+    band.addColorStop(1, "rgba(58,42,14,.02)");
+    g.fillStyle = band; g.fillRect(-140, y, 800, 26);
   }
   g.restore();
-  g.strokeStyle = "rgba(60,42,10,.8)"; g.lineWidth = 5;
-  g.beginPath(); g.arc(256, 256, 250, Math.PI, Math.PI * 2); g.stroke();
-  g.fillStyle = "rgba(52,36,8,.95)";
+  // heavy tungsten weight rim
+  const rim = g.createRadialGradient(256, 256, 196, 256, 256, 254);
+  rim.addColorStop(0, "rgba(0,0,0,0)"); rim.addColorStop(0.12, "rgba(40,42,48,.92)");
+  rim.addColorStop(0.6, "rgba(96,100,110,.95)"); rim.addColorStop(1, "rgba(28,30,35,.98)");
+  g.fillStyle = rim;
+  g.beginPath(); g.arc(256, 256, 254, Math.PI, Math.PI * 2);
+  g.arc(256, 256, 196, Math.PI * 2, Math.PI, true); g.closePath(); g.fill();
+  // polished edges
+  g.strokeStyle = "rgba(255,244,210,.5)"; g.lineWidth = 2;
+  g.beginPath(); g.arc(256, 256, 196, Math.PI, Math.PI * 2); g.stroke();
+  g.strokeStyle = "rgba(0,0,0,.75)"; g.lineWidth = 3;
+  g.beginPath(); g.arc(256, 256, 252, Math.PI, Math.PI * 2); g.stroke();
+  // openwork slots
+  g.globalCompositeOperation = "destination-out";
+  for (const sa of [Math.PI * 1.18, Math.PI * 1.62]) {
+    g.beginPath();
+    g.arc(256, 256, 150, sa, sa + 0.34);
+    g.arc(256, 256, 92, sa + 0.34, sa, true);
+    g.closePath(); g.fill();
+  }
+  g.globalCompositeOperation = "source-over";
+  g.fillStyle = "rgba(48,32,6,.9)";
   g.textAlign = "center";
-  g.font = "34px Didot, Georgia, serif";
-  g.fillText("ATELIER", 256, 130);
+  g.font = "30px Didot, Georgia, serif";
+  g.fillText("ATELIER", 256, 96);
+  g.font = "italic 13px Georgia";
+  g.fillText("automatique", 256, 122);
+  return tex(c);
+}
+
+/* studio cyclorama — a warm falloff behind the product */
+export function backdropTexture(): THREE.CanvasTexture {
+  const [c, g] = canvas(1024);
+  const grd = g.createRadialGradient(512, 600, 60, 512, 620, 900);
+  grd.addColorStop(0, "#241c13");
+  grd.addColorStop(0.35, "#17110a");
+  grd.addColorStop(0.7, "#0b0806");
+  grd.addColorStop(1, "#050403");
+  g.fillStyle = grd; g.fillRect(0, 0, 1024, 1024);
   return tex(c);
 }
 
@@ -424,8 +525,21 @@ export function strapTexture(type: StrapType): THREE.CanvasTexture {
     }
     g.globalAlpha = 1;
   };
+  const stitch = (col: string) => {
+    g.setLineDash([13, 9]);
+    g.strokeStyle = col; g.lineWidth = 4; g.lineCap = "round";
+    for (const x of [26, 486]) {
+      g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 512); g.stroke();
+    }
+    g.setLineDash([]);
+    // edge burnish
+    for (const x of [3, 509]) {
+      g.strokeStyle = "rgba(0,0,0,.55)"; g.lineWidth = 7;
+      g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 512); g.stroke();
+    }
+  };
   switch (type) {
-    case "Leather": grain("#53341d", "#2a1708", 2600); break;
+    case "Leather": grain("#53341d", "#2a1708", 2600); stitch("rgba(235,214,170,.6)"); break;
     case "Alligator": {
       grain("#2c1a0d", "#180d04", 400);
       for (let y = 0; y < 8; y++)
@@ -439,6 +553,7 @@ export function strapTexture(type: StrapType): THREE.CanvasTexture {
             .roundRect(px, py, w, h, 18);
           g.fill(); g.stroke();
         }
+      stitch("rgba(226,202,158,.5)");
       break;
     }
     case "Rubber": {
@@ -454,6 +569,7 @@ export function strapTexture(type: StrapType): THREE.CanvasTexture {
           g.fillStyle = (x + ycoord) % 2 ? "rgba(255,250,230,.13)" : "rgba(0,0,0,.2)";
           g.fillRect(x * 4, ycoord * 4, 4, 4);
         }
+      stitch("rgba(240,235,214,.4)");
       break;
     }
     case "Milanese": {
