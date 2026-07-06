@@ -367,7 +367,9 @@ function Caseback({ caseMat, rotationVel }: { caseMat: THREE.Material; rotationV
     () =>
       new THREE.MeshStandardMaterial({
         map: rotorTex, metalness: 0.75, roughness: 0.3,
-        transparent: true, alphaTest: 0.4, side: THREE.DoubleSide,
+        // opaque + alpha clip: transparent materials are skipped by the
+        // transmission pass, which would hide the rotor behind the sapphire
+        transparent: false, alphaTest: 0.4, side: THREE.DoubleSide,
       }),
     [rotorTex]
   );
@@ -385,11 +387,6 @@ function Caseback({ caseMat, rotationVel }: { caseMat: THREE.Material; rotationV
       </mesh>
       <mesh material={movMat} position-z={0.3}>
         <circleGeometry args={[1.62, 96]} />
-      </mesh>
-      {/* shadow pool beneath the rotor for depth */}
-      <mesh position-z={0.38}>
-        <circleGeometry args={[1.27, 64]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.28} />
       </mesh>
       <mesh
         ref={rotor}
