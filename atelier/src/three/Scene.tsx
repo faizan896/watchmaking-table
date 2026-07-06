@@ -89,21 +89,23 @@ function Lights() {
   const rim = useRef<THREE.DirectionalLight>(null);
   const amb = useRef<THREE.AmbientLight>(null);
   const { scene } = useThree();
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05); // frame hiccups must never extrapolate
+    const ca = Math.min(1, dt * 3);   // color lerp alpha, clamped
     const target = mode === "landing" ? 0 : mode === "finale" ? 0.32 : 1;
     reveal.current = damp(reveal.current, target, 1.1, dt);
     const r = reveal.current;
     if (key.current) {
       key.current.intensity = damp(key.current.intensity, rig.key * 46 * r, 3, dt);
-      key.current.color.lerp(new THREE.Color(rig.keyColor), dt * 3);
+      key.current.color.lerp(new THREE.Color(rig.keyColor), ca);
     }
     if (fill.current) {
       fill.current.intensity = damp(fill.current.intensity, rig.fill * 0.7 * r, 3, dt);
-      fill.current.color.lerp(new THREE.Color(rig.fillColor), dt * 3);
+      fill.current.color.lerp(new THREE.Color(rig.fillColor), ca);
     }
     if (rim.current) {
       rim.current.intensity = damp(rim.current.intensity, rig.rim * 1.5 * r, 3, dt);
-      rim.current.color.lerp(new THREE.Color(rig.rimColor), dt * 3);
+      rim.current.color.lerp(new THREE.Color(rig.rimColor), ca);
     }
     if (amb.current) amb.current.intensity = damp(amb.current.intensity, 0.12 * rig.env * r + 0.012, 3, dt);
     scene.environmentIntensity = damp(scene.environmentIntensity ?? 0, rig.env * 0.75 * r, 3, dt);
