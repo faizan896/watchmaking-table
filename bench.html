@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Bench — A Watchmaking Simulator</title>
+<meta name="description" content="Assemble a mechanical watch, component by component, at a master watchmaker's bench.">
+<style>
+/* ═══════════════════════════════════════════════════════
+   THE BENCH — a luxury digital craft experience
+   ═══════════════════════════════════════════════════════ */
+:root{
+  --bone:#e9dfca; --champagne:#c9a24b; --ink:#0d0906;
+  --hairline:rgba(233,223,202,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:Georgia,'Times New Roman',serif;
+  background:#0d0906;color:var(--bone);
+  user-select:none;-webkit-user-select:none;
+}
+/* ───────── the workshop ───────── */
+#room{position:fixed;inset:0;overflow:hidden}
+#desk{position:absolute;inset:0;
+  background:
+    radial-gradient(130% 85% at 50% -6%, rgba(255,209,140,.17), rgba(255,190,110,.05) 44%, transparent 72%),
+    linear-gradient(177deg,#43301c 0%,#372513 30%,#281808 62%,#180e05 100%);
+  transition:filter 2.4s ease, opacity 2s ease;
+}
+#desk::before{content:"";position:absolute;inset:0;opacity:.5;
+  background:
+    repeating-linear-gradient(88.5deg, transparent 0 30px, rgba(0,0,0,.11) 31px 33px, transparent 34px 78px, rgba(255,222,170,.03) 79px 81px),
+    repeating-linear-gradient(91deg, transparent 0 11px, rgba(0,0,0,.05) 12px 13px);
+}
+#desk::after{content:"";position:absolute;inset:0;opacity:.22;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#lamp{position:absolute;left:50%;top:-16%;width:135vmin;height:100vmin;transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(ellipse at 50% 16%, rgba(255,206,132,.32), rgba(255,190,110,.10) 42%, transparent 70%);
+  transition:opacity 2.4s ease}
+#vig{position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 26vmin 9vmin rgba(6,3,1,.85);
+  background:radial-gradient(125% 125% at 50% 45%, transparent 40%, rgba(5,2,1,.6) 100%)}
+#dust{position:absolute;inset:0;pointer-events:none;z-index:30}
+
+/* ───────── masthead / hud ───────── */
+#mast{position:absolute;top:24px;left:0;right:0;text-align:center;z-index:20;pointer-events:none;
+  font-size:10.5px;letter-spacing:.44em;text-transform:uppercase;color:rgba(233,223,202,.6);transition:opacity 1.6s}
+#mast .rl{display:inline-block;width:50px;height:1px;background:rgba(201,162,75,.45);vertical-align:middle;margin:0 14px 3px}
+#step{position:absolute;top:48px;left:0;right:0;text-align:center;z-index:20;pointer-events:none;transition:opacity 1s}
+#stepName{font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--champagne)}
+#stepCount{font-size:9px;letter-spacing:.34em;color:rgba(233,223,202,.42);margin-top:5px;text-transform:uppercase}
+#tip{position:absolute;left:50%;bottom:132px;transform:translateX(-50%);z-index:40;max-width:min(560px,88vw);text-align:center;
+  font-style:italic;font-size:13.5px;line-height:1.7;color:rgba(233,223,202,.62);letter-spacing:.05em;
+  opacity:0;transition:opacity 1.4s ease;pointer-events:none}
+#tip.show{opacity:1}
+
+/* ───────── bench svg stage ───────── */
+#stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);z-index:10;
+  width:min(46vh,420px,88vw);aspect-ratio:480/760;transition:transform 2.6s cubic-bezier(.22,1,.3,1)}
+#mat{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150%;height:92%;border-radius:26px;z-index:-1;
+  background:radial-gradient(90% 90% at 42% 34%, #474030, #2c261a 66%, #201b10 100%);
+  box-shadow:0 24px 64px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,230,190,.08), inset 0 -16px 44px rgba(0,0,0,.42);
+  border:1px solid rgba(0,0,0,.55);outline:1.5px dashed rgba(214,190,140,.14);outline-offset:-12px;
+  transition:opacity 2s ease}
+#watch{width:100%;height:100%;overflow:visible}
+#watch .lay{opacity:0}
+#watch .lay.on{opacity:1;transition:opacity .45s ease}
+#watch .lay.set{animation:seat .6s cubic-bezier(.34,1.4,.5,1) both}
+@keyframes seat{0%{opacity:0;transform:scale(1.12)}60%{opacity:1;transform:scale(.99)}100%{opacity:1;transform:scale(1)}}
+#stage.jam #watch{animation:jamW .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes jamW{15%,85%{transform:translateX(-2px) rotate(-.35deg)}30%,70%{transform:translateX(3px) rotate(.4deg)}45%,55%{transform:translateX(-3px)}}
+#snap{position:absolute;width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(233,205,122,.9);
+  transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;z-index:44}
+#snap.go{animation:ring .65s ease-out both}
+@keyframes ring{0%{opacity:.95;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+
+/* ───────── desk props ───────── */
+.prop{position:absolute;z-index:6;pointer-events:none;opacity:.92;transition:opacity 1.8s, filter .4s}
+.prop.live{pointer-events:auto;cursor:pointer}
+.prop.live:hover{filter:drop-shadow(0 0 9px rgba(233,205,122,.45))}
+#pLoupe{left:16%;top:13%;width:min(7vw,86px);transform:rotate(-16deg)}
+#pTweez{right:14%;top:15%;width:min(9vw,110px);transform:rotate(24deg)}
+#pOil{right:8%;bottom:22%;width:min(6vw,72px)}
+#pDriver{left:8%;bottom:24%;width:min(10vw,120px);transform:rotate(-8deg)}
+#pTray1{left:4%;top:36%;width:min(9vw,104px)}
+#pTray2{right:4%;top:38%;width:min(9vw,104px)}
+@media (max-width:860px){#pTray1,#pTray2,#pDriver,#pTweez{display:none}}
+
+/* ───────── parts tray ───────── */
+#tray{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:50;width:min(980px,100vw);
+  padding:10px 16px 13px;transition:opacity 1.4s, transform 1.4s}
+#trayWood{position:absolute;inset:0;border-radius:13px 13px 0 0;
+  background-image:linear-gradient(180deg,#4c3418,#362310 32%,#261606);
+  box-shadow:0 -8px 36px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,225,175,.13), inset 0 -10px 26px rgba(0,0,0,.5);
+  border:1px solid rgba(0,0,0,.55);border-bottom:none}
+#trayIn{position:relative;display:flex;gap:8px;overflow-x:auto;overflow-y:visible;padding:8px 4px 4px;
+  scrollbar-width:thin;scrollbar-color:rgba(201,162,75,.3) transparent}
+#trayIn::-webkit-scrollbar{height:5px}
+#trayIn::-webkit-scrollbar-thumb{background:rgba(201,162,75,.28);border-radius:3px}
+.part{position:relative;flex:0 0 auto;width:76px;height:88px;border-radius:9px;cursor:grab;outline:none;touch-action:none;
+  background:radial-gradient(120% 100% at 50% 18%, rgba(0,0,0,.32), rgba(0,0,0,.56));
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.72), inset 0 -1px 0 rgba(255,222,170,.06);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:transform .26s cubic-bezier(.34,1.5,.5,1), box-shadow .26s, opacity .5s}
+.part svg{width:47px;height:47px;overflow:visible;filter:drop-shadow(0 4px 5px rgba(0,0,0,.55));transition:transform .3s cubic-bezier(.34,1.5,.5,1)}
+.part .lb{font-size:7.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(233,223,202,.45);text-align:center;line-height:1.3;padding:0 3px}
+.part:hover{transform:translateY(-7px);box-shadow:inset 0 2px 6px rgba(0,0,0,.72),0 12px 22px rgba(0,0,0,.5)}
+.part:hover svg{transform:scale(1.2)}
+.part:active{cursor:grabbing}
+.part.done{opacity:.13;pointer-events:none}
+.part.drag{opacity:.15}
+.part.next svg{animation:beck 2.6s ease-in-out infinite}
+@keyframes beck{0%,100%{filter:drop-shadow(0 4px 5px rgba(0,0,0,.55))}50%{filter:drop-shadow(0 0 11px rgba(233,205,122,.8))}}
+#ghost{position:fixed;left:0;top:0;z-index:220;pointer-events:none;display:none;will-change:transform}
+#ghost svg{width:70px;height:70px;overflow:visible;filter:drop-shadow(0 18px 22px rgba(0,0,0,.62))}
+
+/* ───────── naked links ───────── */
+.lnk{cursor:pointer;background:none;border:none;font-family:inherit;position:relative;
+  font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:rgba(233,223,202,.42);padding:8px 2px;transition:color .5s}
+.lnk::after{content:"";position:absolute;left:2px;right:8px;bottom:2px;height:1px;background:var(--champagne);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.lnk:hover{color:rgba(233,223,202,.95)}
+.lnk:hover::after,.lnk.on::after{transform:scaleX(1)}
+.lnk.on{color:var(--champagne)}
+.lnk.gold{color:var(--champagne)}
+.lnk.gold::after{transform:scaleX(1);background:rgba(201,162,75,.5)}
+#toolbar{position:absolute;right:4vw;top:22px;z-index:60;display:flex;gap:14px;transition:opacity 1.2s}
+
+/* ───────── commission (the blueprint phase) ───────── */
+#comm{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% 40%, rgba(20,12,5,.9), rgba(7,4,2,.98));
+  transition:opacity 1.8s ease;padding:4vh 4vw;overflow-y:auto}
+#comm.gone{opacity:0;pointer-events:none}
+#comm h1{font-family:Didot,'Bodoni MT',Georgia,serif;font-size:clamp(24px,4.4vw,44px);font-weight:normal;
+  letter-spacing:.34em;text-transform:uppercase;text-indent:.34em;margin-bottom:8px}
+#comm .tg{font-style:italic;color:var(--champagne);font-size:clamp(12px,1.6vw,16px);letter-spacing:.1em;margin-bottom:4vh}
+#commGrid{display:flex;gap:min(3.4vw,44px);flex-wrap:wrap;justify-content:center;max-width:1200px}
+.cCol{min-width:132px}
+.cCol h3{font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:rgba(233,223,202,.5);
+  border-bottom:1px solid var(--hairline);padding-bottom:7px;margin-bottom:9px}
+.cCol ul{list-style:none}
+.cCol li{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(233,223,202,.4);
+  padding:5.5px 0;cursor:pointer;transition:color .4s, transform .4s;display:flex;align-items:center;gap:8px}
+.cCol li:hover{color:rgba(233,223,202,.95);transform:translateX(3px)}
+.cCol li.sel{color:var(--champagne)}
+.cCol li .m{width:12px;height:1px;background:transparent;flex:0 0 auto;transition:background .4s}
+.cCol li.sel .m{background:var(--champagne)}
+#commGo{margin-top:5vh;font-size:11px;letter-spacing:.42em;padding:14px 30px 14px 34px;border:1px solid rgba(201,162,75,.5);
+  background:none;color:var(--champagne);font-family:inherit;text-transform:uppercase;cursor:pointer;transition:all .5s}
+#commGo:hover{background:var(--champagne);color:#140c04}
+#commSpec{margin-top:2.5vh;font-style:italic;font-size:12px;color:rgba(233,223,202,.45);letter-spacing:.08em;min-height:18px}
+
+/* ───────── intro ───────── */
+#intro{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#070402;cursor:pointer;transition:opacity 2.4s ease;text-align:center;padding:0 18px}
+#intro.gone{opacity:0;pointer-events:none}
+#intro h1{font-family:Didot,'Bodoni MT',Georgia,serif;font-size:clamp(30px,6vw,64px);font-weight:normal;
+  letter-spacing:.4em;text-transform:uppercase;text-indent:.4em;color:var(--bone)}
+#intro .tg{font-style:italic;font-size:clamp(13px,1.8vw,18px);color:var(--champagne);margin-top:16px;letter-spacing:.1em}
+#intro .orn{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--champagne),transparent);margin:30px auto}
+#intro .en{font-size:10px;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:rgba(233,223,202,.4);animation:brt 3.4s ease-in-out infinite}
+@keyframes brt{0%,100%{opacity:.3}50%{opacity:.9}}
+
+/* ───────── loupe lens ───────── */
+#lens{position:fixed;width:200px;height:200px;border-radius:50%;z-index:150;pointer-events:none;display:none;overflow:hidden;
+  border:7px solid #2b1c0c;outline:2px solid #c9a24b;outline-offset:-4px;background:#170e05;
+  box-shadow:0 24px 50px rgba(0,0,0,.7), inset 0 0 32px rgba(0,0,0,.5)}
+#lens::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(58% 58% at 32% 26%, rgba(255,250,235,.13), transparent 60%)}
+#lensIn{position:absolute;left:0;top:0;transform-origin:0 0}
+body.loupe #stage{cursor:none}
+
+/* ───────── finale studio ───────── */
+#studio{position:fixed;inset:0;z-index:90;opacity:0;pointer-events:none;transition:opacity 2.6s ease;
+  background:radial-gradient(120% 105% at 50% 34%, #2a2118 0%, #17110a 44%, #080503 100%)}
+#studio.on{opacity:1;pointer-events:auto}
+#studio .floor{position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:linear-gradient(180deg, transparent, rgba(0,0,0,.55));}
+#fin{position:fixed;left:0;right:0;bottom:6vh;z-index:95;display:flex;flex-direction:column;align-items:center;gap:14px;
+  opacity:0;pointer-events:none;transition:opacity 2s ease 1s}
+#fin.on{opacity:1;pointer-events:auto}
+#finName{font-family:Didot,Georgia,serif;font-size:clamp(17px,2.6vw,26px);letter-spacing:.24em;text-transform:uppercase;text-indent:.24em}
+#finSpec{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:rgba(233,223,202,.45)}
+#finBtns{display:flex;gap:22px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:300}
+#flash.go{animation:fl .6s ease-out}
+@keyframes fl{0%{opacity:.85}100%{opacity:0}}
+#stage.studioPose{transform:translate(-50%,-54%) scale(1.06)}
+#stage.studioPose #watch{animation:sway 9s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.6deg) translateY(0)}50%{transform:rotate(1.6deg) translateY(-6px)}}
+
+#srLive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){.part.next svg,#intro .en,#stage.studioPose #watch{animation:none}}
+</style>
+</head>
+<body>
+<div id="room">
+  <div id="desk"></div>
+  <div id="lamp"></div>
+
+  <!-- tools of the trade -->
+  <svg id="pLoupe" class="prop live" viewBox="0 0 90 90" role="button" tabindex="0" aria-label="Loupe">
+    <ellipse cx="45" cy="78" rx="32" ry="8" fill="rgba(0,0,0,.4)"/>
+    <circle cx="39" cy="39" r="29" fill="rgba(190,215,235,.15)" stroke="#c9a24b" stroke-width="5"/>
+    <circle cx="39" cy="39" r="29" fill="none" stroke="#7a5c22" stroke-width="1.5"/>
+    <path d="M29,25 a18,18 0 0 1 15,-6" stroke="rgba(255,255,255,.5)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="58" y="56" width="27" height="12" rx="6" transform="rotate(45 60 58)" fill="#38220f"/>
+  </svg>
+  <svg id="pTweez" class="prop" viewBox="0 0 110 70">
+    <path d="M6,10 L102,44 L8,20 Z" fill="#b9bdc6"/><path d="M6,14 L98,58 L8,24 Z" fill="#8f939c"/>
+    <ellipse cx="55" cy="62" rx="44" ry="6" fill="rgba(0,0,0,.35)"/>
+  </svg>
+  <svg id="pOil" class="prop" viewBox="0 0 70 90">
+    <ellipse cx="35" cy="82" rx="26" ry="7" fill="rgba(0,0,0,.38)"/>
+    <path d="M20,38 q-4,26 15,40 q19,-14 15,-40 l-8,-14 h-14 Z" fill="#23400f" opacity=".9"/>
+    <rect x="24" y="40" width="22" height="12" fill="#e8dcc0"/>
+    <text x="35" y="49" text-anchor="middle" font-size="7" font-style="italic" fill="#3a2a10" font-family="Georgia">huile</text>
+    <rect x="29" y="12" width="12" height="14" rx="2" fill="#191208"/><rect x="27" y="20" width="16" height="5" rx="2" fill="#c9a24b"/>
+  </svg>
+  <svg id="pDriver" class="prop" viewBox="0 0 120 60">
+    <ellipse cx="60" cy="52" rx="52" ry="7" fill="rgba(0,0,0,.35)"/>
+    <g transform="rotate(-6 60 28)">
+      <rect x="8" y="22" width="46" height="12" rx="6" fill="#6e2a1a"/>
+      <rect x="8" y="25" width="46" height="2.4" rx="1" fill="rgba(255,255,255,.22)"/>
+      <rect x="54" y="26" width="50" height="4" fill="#c6cad2"/><rect x="102" y="25.4" width="8" height="5.2" fill="#989ca6"/>
+    </g>
+  </svg>
+  <svg id="pTray1" class="prop" viewBox="0 0 104 74">
+    <rect x="4" y="8" width="96" height="60" rx="8" fill="#241708" stroke="#120b04" stroke-width="2"/>
+    <rect x="9" y="13" width="86" height="50" rx="5" fill="#33241286"/>
+    <g fill="#9a9ea8"><circle cx="30" cy="30" r="4.5"/><circle cx="46" cy="26" r="3.5"/><circle cx="62" cy="32" r="5"/><circle cx="78" cy="27" r="3"/>
+    <circle cx="36" cy="48" r="3.4"/><circle cx="54" cy="46" r="4.2"/><circle cx="72" cy="49" r="3.2"/></g>
+    <g fill="#c9a24b" opacity=".8"><circle cx="24" cy="44" r="2.6"/><circle cx="86" cy="42" r="2.4"/></g>
+  </svg>
+  <svg id="pTray2" class="prop" viewBox="0 0 104 74">
+    <rect x="4" y="8" width="96" height="60" rx="8" fill="#241708" stroke="#120b04" stroke-width="2"/>
+    <rect x="9" y="13" width="86" height="50" rx="5" fill="#33241286"/>
+    <g stroke="#8f939c" stroke-width="2.4" fill="none"><path d="M24,30 h18 M56,26 h22 M30,48 h14 M58,46 h20"/></g>
+    <g fill="#b3123a"><circle cx="50" cy="34" r="2.6"/><circle cx="72" cy="52" r="2.2"/><circle cx="34" cy="56" r="2"/></g>
+  </svg>
+
+  <!-- the watch under assembly -->
+  <div id="stage">
+    <div id="mat"></div>
+    <svg id="watch" viewBox="0 0 480 760" aria-label="Watch under assembly"></svg>
+    <div id="snap"></div>
+  </div>
+
+  <div id="tip"></div>
+
+  <header id="mast"><span class="rl"></span>The Bench<span class="rl"></span></header>
+  <div id="step"><div id="stepName"></div><div id="stepCount"></div></div>
+
+  <div id="toolbar">
+    <button class="lnk" id="btnSound">Sound</button>
+    <button class="lnk" id="btnRestart">Restart</button>
+  </div>
+
+  <div id="tray"><div id="trayWood"></div><div id="trayIn"></div></div>
+  <div id="vig"></div>
+  <canvas id="dust"></canvas>
+</div>
+
+<!-- finale -->
+<div id="studio"><div class="floor"></div></div>
+<div id="fin">
+  <div id="finName"></div>
+  <div id="finSpec"></div>
+  <div id="finBtns">
+    <button class="lnk gold" id="btnShot">Photograph · Wallpaper</button>
+    <button class="lnk gold" id="btnShotPhone">Phone Wallpaper</button>
+    <button class="lnk" id="btnAgain">Build Another</button>
+  </div>
+</div>
+<div id="flash"></div>
+
+<!-- commission -->
+<div id="comm">
+  <h1>The Commission</h1>
+  <div class="tg">Choose the architecture. Then build every piece of it.</div>
+  <div id="commGrid"></div>
+  <div id="commSpec"></div>
+  <button id="commGo">Take the bench</button>
+</div>
+
+<!-- intro -->
+<div id="intro">
+  <h1>The Bench</h1>
+  <div class="tg">Assemble it. Understand it. Wear it.</div>
+  <div class="orn"></div>
+  <div class="en">Sit down at the bench</div>
+</div>
+
+<div id="lens"><div id="lensIn"></div></div>
+<div id="ghost"></div>
+<div id="srLive" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ═══════════ helpers & svg builders ═══════════ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const P=(r,a)=>(r*Math.cos(a)).toFixed(2)+','+(r*Math.sin(a)).toFixed(2);
+
+function gearPath(r,teeth,th,esc){
+  th=th||r*.15; let p=''; const s=Math.PI*2/teeth;
+  for(let i=0;i<teeth;i++){const a=i*s;
+    if(esc){p+=(i?'L':'M')+P(r+th,a)+' L'+P(r*.92,a+s*.22)+' L'+P(r,a+s*.88)+' ';}
+    else{p+=(i?'L':'M')+P(r,a)+' L'+P(r+th,a+s*.13)+' L'+P(r+th,a+s*.37)+' L'+P(r,a+s*.5)+' ';}
+  } return p+'Z';
+}
+function spiralPath(turns,r0,r1,st){
+  st=st||.2; let p='M'+r0.toFixed(1)+',0'; const A=turns*Math.PI*2;
+  for(let a=st;a<=A;a+=st){const r=r0+(r1-r0)*a/A;
+    p+=' L'+(r*Math.cos(a)).toFixed(1)+','+(r*Math.sin(a)).toFixed(1);}
+  return p;
+}
+function screwG(x,y,ang,r){
+  r=r||4;
+  return `<g transform="translate(${x},${y}) rotate(${ang||0})">
+   <circle r="${r}" fill="url(#mSteel)" stroke="#3c3f46" stroke-width=".6"/>
+   <rect x="${-r*.85}" y="-.7" width="${r*1.7}" height="1.4" rx=".7" fill="#26418a"/>
+   </g>`;
+}
+function jewelG(x,y,r){
+  r=r||4;
+  return `<g transform="translate(${x},${y})">
+   <circle r="${r+2.3}" fill="none" stroke="url(#mGold)" stroke-width="1.5"/>
+   <circle r="${r}" fill="url(#mRuby)"/>
+   <circle cx="${-r*.33}" cy="${-r*.33}" r="${r*.27}" fill="rgba(255,220,225,.85)"/></g>`;
+}
+function wheelG(r,teeth,cls,hubJewel){
+  let m=`<g class="${cls||''}">
+   <path d="${gearPath(r,teeth)}" fill="url(#mGold)" stroke="#7a5c22" stroke-width=".6"/>
+   <circle r="${(r*.985).toFixed(1)}" fill="none" stroke="rgba(110,82,28,.55)" stroke-width="1.1"/>`;
+  for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4;
+    m+=`<circle cx="${(r*.52*Math.cos(a)).toFixed(1)}" cy="${(r*.52*Math.sin(a)).toFixed(1)}" r="${(r*.29).toFixed(1)}" fill="rgba(24,15,5,.5)"/>`;}
+  m+=`<circle r="${(r*.17).toFixed(1)}" fill="none" stroke="url(#mSteel)" stroke-width="${(r*.09).toFixed(1)}"/>`;
+  if(hubJewel) m+=`<circle r="${(r*.09).toFixed(1)}" fill="url(#mRuby)"/>`;
+  return m+'</g>';
+}
+function balanceG(cls,rr){
+  rr=rr||33; let sc='';
+  for(let i=0;i<8;i++){const a=i*Math.PI/4+.4;
+    sc+=`<circle cx="${(rr*Math.cos(a)).toFixed(1)}" cy="${(rr*Math.sin(a)).toFixed(1)}" r="1.8" fill="url(#mGold)"/>`;}
+  return `<g class="${cls}">
+   <path d="${spiralPath(5.5,2.4,rr*.78,.17)}" fill="none" stroke="#4a5c78" stroke-width="1.2"/>
+   <circle r="${rr}" fill="none" stroke="url(#mGold)" stroke-width="${rr*.19}"/>
+   <path d="M${-rr*.92},0 L${rr*.92},0" stroke="url(#mGold)" stroke-width="${rr*.13}"/>
+   ${sc}<circle r="4.4" fill="url(#mSteel)"/><circle r="1.6" fill="url(#mRuby)"/></g>`;
+}
+const DEFS=`<defs>
+ <radialGradient id="mPlate" cx=".4" cy=".33" r="1.05">
+  <stop offset="0" stop-color="#e0c48e"/><stop offset=".55" stop-color="#bd9557"/><stop offset="1" stop-color="#7c5b2d"/></radialGradient>
+ <linearGradient id="mGold" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#f2da92"/><stop offset=".5" stop-color="#cba43a"/><stop offset="1" stop-color="#8a6d1f"/></linearGradient>
+ <linearGradient id="mSteel" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#f2f3f5"/><stop offset=".5" stop-color="#b4b8c0"/><stop offset="1" stop-color="#6e727c"/></linearGradient>
+ <linearGradient id="mSteelV" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#e9eaee"/><stop offset=".5" stop-color="#a8acb4"/><stop offset="1" stop-color="#61656e"/></linearGradient>
+ <radialGradient id="mRuby" cx=".35" cy=".3" r="1">
+  <stop offset="0" stop-color="#ff5f76"/><stop offset=".6" stop-color="#b3123a"/><stop offset="1" stop-color="#69041e"/></radialGradient>
+ <radialGradient id="mShade" cx=".5" cy=".5" r=".5">
+  <stop offset="0" stop-color="rgba(0,0,0,0)"/><stop offset=".82" stop-color="rgba(0,0,0,0)"/><stop offset="1" stop-color="rgba(0,0,0,.4)"/></radialGradient>
+ <pattern id="mPerl" width="16" height="16" patternUnits="userSpaceOnUse">
+  <circle cx="8" cy="8" r="7.5" fill="none" stroke="rgba(60,38,10,.26)" stroke-width="2.4"/>
+  <circle cx="0" cy="0" r="7.5" fill="none" stroke="rgba(255,240,200,.18)" stroke-width="1.3"/>
+  <circle cx="16" cy="16" r="7.5" fill="none" stroke="rgba(255,240,200,.18)" stroke-width="1.3"/></pattern>
+ <pattern id="mStripe" width="17" height="17" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+  <rect width="8.5" height="17" fill="rgba(70,44,10,.18)"/><rect x="8" width="2" height="17" fill="rgba(255,240,200,.2)"/></pattern>
+ <pattern id="mMesh" width="6.5" height="6.5" patternUnits="userSpaceOnUse">
+  <rect width="6.5" height="6.5" fill="#8f939c"/><circle cx="1.7" cy="1.7" r="1.6" fill="#c6cad2"/>
+  <circle cx="4.9" cy="4.9" r="1.6" fill="#b2b6be"/><circle cx="4.9" cy="1.7" r="1.3" fill="#6e727c"/><circle cx="1.7" cy="4.9" r="1.3" fill="#787c86"/></pattern>
+ <pattern id="mNato" width="14" height="10" patternUnits="userSpaceOnUse">
+  <rect width="14" height="10" fill="#4a463c"/><rect y="1" width="14" height="1.4" fill="rgba(240,232,210,.25)"/>
+  <rect y="5" width="14" height="1.4" fill="rgba(20,18,12,.5)"/><rect y="8" width="14" height="1.2" fill="rgba(240,232,210,.18)"/></pattern>
+ <pattern id="mPerlon" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <rect width="9" height="9" fill="#57534a"/><rect width="4.5" height="9" fill="#6b675c"/>
+  <rect x="4.5" width=".9" height="9" fill="rgba(0,0,0,.4)"/></pattern>
+ <filter id="mBlur1"><feGaussianBlur stdDeviation="1"/></filter>
+ <filter id="mBlur3"><feGaussianBlur stdDeviation="3"/></filter>
+</defs>`;
+
+/* movement anchor points (400×400 space, centre 200,200) */
+const AT={barrel:[200,126],center:[200,200],third:[258,232],fourth:[236,288],escape:[176,278],
+  pallet:[150,251],balance:[124,218],cage:[200,296],micro:[268,148],moon:[200,284],gmt:[142,146],col:[306,196]};
+const tr=(p,inner)=>`<g transform="translate(${p[0]},${p[1]})">${inner}</g>`;
+
+/* ═══════════ shared movement components ═══════════ */
+const BASE={};
+BASE.mainplate=()=>{
+  let m=`<circle cx="200" cy="200" r="150" fill="url(#mPlate)" stroke="#5e421c" stroke-width="2"/>
+   <circle cx="200" cy="200" r="150" fill="url(#mPerl)" opacity=".5"/>
+   <circle cx="200" cy="200" r="146" fill="none" stroke="rgba(255,240,200,.32)" stroke-width="1"/>`;
+  for(const k of ['barrel','center','third','fourth','escape','balance']){
+    const [x,y]=AT[k]; const rr={barrel:44,center:36,third:27,fourth:23,escape:18,balance:34}[k];
+    m+=`<circle cx="${x}" cy="${y}" r="${rr}" fill="rgba(40,24,6,.28)"/>
+        <circle cx="${x}" cy="${y}" r="${rr}" fill="none" stroke="rgba(255,235,190,.16)" stroke-width="1"/>`;}
+  m+=screwG(78,110,20,4.5)+screwG(322,110,140,4.5)+screwG(96,306,75,4.5)+screwG(304,306,-30,4.5);
+  return m;
+};
+BASE.jewels=()=>['barrel','center','third','fourth','escape','pallet','balance']
+  .map(k=>jewelG(AT[k][0],AT[k][1],k==='barrel'?4.6:k==='pallet'?3:4)).join('');
+BASE.mainspring=()=>tr(AT.barrel,`<circle r="42" fill="rgba(30,18,5,.55)"/>
+  <path d="${spiralPath(5.5,4,37)}" fill="none" stroke="#767c88" stroke-width="3" stroke-linecap="round"/>
+  <path d="${spiralPath(5.5,4,37)}" fill="none" stroke="rgba(240,244,250,.45)" stroke-width="1"/>
+  <circle r="5" fill="url(#mSteel)"/>`);
+BASE.barrel=()=>tr(AT.barrel,`<g class="rBarrel">
+  <path d="${gearPath(44,52,4.2)}" fill="url(#mGold)" stroke="#7a5c22" stroke-width=".6"/>
+  <circle r="43" fill="url(#mGold)"/><circle r="43" fill="url(#mPlate)" opacity=".4"/>
+  <circle r="40" fill="none" stroke="rgba(110,80,26,.7)" stroke-width="1.3"/>
+  <circle r="29" fill="none" stroke="rgba(255,240,200,.38)" stroke-width="1"/>
+  ${screwG(0,0,45,5)}</g>`);
+BASE.center=()=>tr(AT.center,wheelG(36,44,'rCenter',1));
+BASE.third =()=>tr(AT.third, wheelG(27,36,'rThird',1));
+BASE.fourth=()=>tr(AT.fourth,wheelG(23,30,'rFourth',1));
+BASE.escape=()=>tr(AT.escape,`<g class="rEscape">
+  <path d="${gearPath(15.5,15,5,true)}" fill="url(#mSteel)" stroke="#5c6068" stroke-width=".5"/>
+  <circle r="12.5" fill="none" stroke="rgba(70,74,82,.5)" stroke-width="1"/>
+  <circle r="5.2" fill="none" stroke="url(#mSteel)" stroke-width="2"/><circle r="1.9" fill="#23150a"/></g>`);
+BASE.pallet=()=>tr(AT.pallet,`<g transform="rotate(-46)"><g class="rPallet">
+  <path d="M-29,-3 L-23,-1.6 L18,-1.8 L25,-6 L28,-3.4 L22,1 L25,4.4 L21.5,6.4 L18,1.8 L-23,1.6 L-29,3 Z"
+   fill="url(#mSteel)" stroke="#565a62" stroke-width=".7"/>
+  <rect x="13" y="-6.2" width="4.4" height="4.8" rx="1" fill="url(#mRuby)" transform="rotate(14 15 -4)"/>
+  <rect x="13" y="1.6" width="4.4" height="4.8" rx="1" fill="url(#mRuby)" transform="rotate(-14 15 4)"/>
+  <circle r="3" fill="url(#mSteel)"/><circle r="1.1" fill="#20130a"/></g></g>`);
+BASE.oil=()=>['center','third','fourth','escape','pallet']
+  .map(k=>`<circle cx="${AT[k][0]}" cy="${AT[k][1]}" r="5.5" fill="rgba(255,246,200,.16)" class="oilDrop"/>`).join('');
+BASE.balance=()=>tr(AT.balance,balanceG('rBalance',33)+`<circle r="42" fill="rgba(0,0,0,.001)" data-eg="bal"/>`);
+BASE.bridgeTrain=()=>`
+  <path d="M310,176 Q344,242 288,306 Q246,350 190,338 L196,306 Q244,314 266,274 Q286,238 272,194 Z" fill="url(#mPlate)"/>
+  <path d="M310,176 Q344,242 288,306 Q246,350 190,338 L196,306 Q244,314 266,274 Q286,238 272,194 Z" fill="url(#mStripe)"/>
+  <path d="M310,176 Q344,242 288,306 Q246,350 190,338 L196,306 Q244,314 266,274 Q286,238 272,194 Z" fill="none" stroke="rgba(255,238,190,.5)"/>
+  ${jewelG(258,232,3.8)}${jewelG(236,288,3.6)}
+  <path d="M52,196 L106,206 A17,17 0 1 1 106,232 L52,244 Z" fill="url(#mPlate)"/>
+  <path d="M52,196 L106,206 A17,17 0 1 1 106,232 L52,244 Z" fill="url(#mStripe)"/>
+  ${jewelG(124,218,3.6)}
+  <text x="238" y="330" font-size="6" letter-spacing="1.4" fill="rgba(66,42,12,.85)" font-family="Georgia" font-style="italic" transform="rotate(-18 238 330)">cal. B-01 · Genève</text>`;
+BASE.screwsTrain=()=>screwG(296,262,40,4.2)+screwG(222,322,-70,4.2)+screwG(66,220,100,4);
+BASE.bridgeBarrel=()=>`
+  <path d="M64,148 Q56,62 156,52 Q234,44 280,84 L270,124 Q216,90 162,96 Q106,104 102,152 Z" fill="url(#mPlate)"/>
+  <path d="M64,148 Q56,62 156,52 Q234,44 280,84 L270,124 Q216,90 162,96 Q106,104 102,152 Z" fill="url(#mStripe)"/>
+  <path d="M64,148 Q56,62 156,52 Q234,44 280,84 L270,124 Q216,90 162,96 Q106,104 102,152 Z" fill="none" stroke="rgba(255,238,190,.5)"/>
+  ${jewelG(200,126,4.6)}`;
+BASE.screwsBarrel=()=>screwG(84,120,10,4.2)+screwG(252,96,80,4.2)+screwG(150,66,150,4.2);
+
+/* ═══════════ movement-specific components ═══════════ */
+const MX={};
+MX.autoBridge=()=>`
+  <path d="M120,120 Q200,66 282,122 L266,156 Q202,112 136,154 Z" fill="url(#mPlate)"/>
+  <path d="M120,120 Q200,66 282,122 L266,156 Q202,112 136,154 Z" fill="url(#mStripe)"/>
+  ${jewelG(200,118,3.4)}${screwG(134,140,30,4)}${screwG(268,142,120,4)}`;
+MX.rotor=()=>tr(AT.center,`<g class="rRotor" data-eg="rotor">
+  <path d="M-124,0 A124,124 0 0 1 124,0 L98,0 A98,98 0 0 0 -98,0 Z" fill="#3c4048" stroke="rgba(0,0,0,.5)"/>
+  <path d="M-98,0 A98,98 0 0 1 98,0 L0,0 Z" fill="url(#mPlate)" opacity=".92"/>
+  <path d="M-98,0 A98,98 0 0 1 98,0 L0,0 Z" fill="url(#mStripe)"/>
+  <path d="M-124,0 A124,124 0 0 1 124,0" fill="none" stroke="rgba(255,244,210,.4)" stroke-width="1.4"/>
+  <text x="0" y="-64" text-anchor="middle" font-size="11" letter-spacing="3" fill="rgba(60,40,10,.85)" font-family="Didot,Georgia,serif">ATELIER</text>
+  <circle r="14" fill="url(#mSteel)"/><circle r="5" fill="url(#mRuby)"/>${screwG(0,-22,10,3.4)}</g>`);
+MX.manualRatchet=()=>tr(AT.barrel,`<g class="rBarrel">
+  <path d="${gearPath(30,40,3)}" fill="url(#mSteelV)" stroke="#5c6068" stroke-width=".5"/>
+  <circle r="22" fill="none" stroke="rgba(70,74,82,.55)" stroke-width="1.2"/>${screwG(0,0,90,4.6)}</g>`);
+MX.manualCrown=()=>tr([278,108],`<g class="rBarrel">
+  <path d="${gearPath(19,26,2.6)}" fill="url(#mSteelV)" stroke="#5c6068" stroke-width=".5"/>${screwG(0,0,40,3.6)}</g>`);
+MX.cage=()=>tr(AT.cage,`<g class="rCage">
+  <circle r="45" fill="none" stroke="url(#mSteel)" stroke-width="3.2"/>
+  <path d="M-45,0 A45,45 0 0 1 45,0" fill="none" stroke="url(#mSteel)" stroke-width="6" opacity=".85"/>
+  <path d="M0,-45 L0,-30 M-39,22 L-28,16 M39,22 L28,16" stroke="url(#mSteel)" stroke-width="4"/>
+  <g transform="translate(0,-16) scale(.62)"><path d="${gearPath(15.5,15,5,true)}" fill="url(#mSteel)"/></g>
+  <circle r="45" fill="rgba(0,0,0,.001)"/></g>`);
+MX.cageBalance=()=>tr(AT.cage,`<g class="rCage"><g transform="translate(0,10)">${balanceG('rBalance',22)}</g></g>
+  ${jewelG(AT.cage[0],AT.cage[1],3.4)}`);
+MX.micro=()=>tr(AT.micro,`<g class="rMicro" data-eg="rotor">
+  <path d="M-40,0 A40,40 0 0 1 40,0 L0,0 Z" fill="url(#mPlate)"/>
+  <path d="M-40,0 A40,40 0 0 1 40,0 L0,0 Z" fill="url(#mStripe)"/>
+  <path d="M-40,0 A40,40 0 0 1 40,0 L-40,0" fill="none" stroke="#3c4048" stroke-width="4"/>
+  <circle r="7" fill="url(#mSteel)"/><circle r="2.6" fill="url(#mRuby)"/></g>`);
+MX.moon=()=>tr(AT.moon,`<g class="rMoon">
+  <circle r="44" fill="#1b2540"/>
+  <circle r="44" fill="none" stroke="url(#mGold)" stroke-width="2"/>
+  ${[[-.5,-.62],[.55,.4],[.1,.72],[-.68,.3]].map(([a,b])=>`<circle cx="${a*30}" cy="${b*30}" r="1.3" fill="rgba(240,240,255,.9)"/>`).join('')}
+  <circle cx="0" cy="-24" r="11" fill="#efe8d2"/><circle cx="24" cy="10" r="11" fill="#efe8d2" opacity=".95"/>
+  <path d="${gearPath(46,59,2)}" fill="none" stroke="rgba(201,162,75,.4)" stroke-width=".8"/></g>`);
+MX.gmtWheel=()=>tr(AT.gmt,wheelG(26,32,'rGmt',1));
+MX.jumpDisc=()=>tr(AT.center,`<g class="rJump">
+  <circle r="118" fill="#171310"/><circle r="118" fill="none" stroke="url(#mGold)" stroke-width="1.6"/>
+  ${[...Array(12)].map((_,i)=>{const a=(i/12)*Math.PI*2-Math.PI/2;
+   return `<text x="${(96*Math.cos(a)).toFixed(1)}" y="${((96*Math.sin(a))+8).toFixed(1)}" text-anchor="middle" font-size="24" font-family="Didot,Georgia,serif" fill="#e6dcc0">${i===0?12:i}</text>`;}).join('')}
+  <circle r="8" fill="url(#mSteel)"/></g>`);
+MX.chrono=()=>`
+  ${tr(AT.col,`<g><path d="${gearPath(13,9,4)}" fill="url(#mSteelV)"/><circle r="5" fill="url(#mGold)"/></g>`)}
+  <path d="M306,150 Q262,168 252,196 M306,242 Q268,236 252,212" fill="none" stroke="url(#mSteel)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M296,132 L316,146 M296,262 L318,248" stroke="#5c6068" stroke-width="3" stroke-linecap="round"/>
+  ${screwG(292,168,20,3.4)}${screwG(288,232,80,3.4)}`;
+
+/* ═══════════ the movement library ═══════════ */
+const MOVEMENTS={
+ 'Automatic':{blurb:'A weighted rotor winds it as you live your life.',
+   feats:{rotor:1},
+   extra:[['autobridge','Automatic Bridge','One more bridge — this one carries the winding works.',MX.autoBridge],
+          ['rotor','Winding Rotor','A half-moon of heavy metal. Every turn of the wrist winds the spring.',MX.rotor]]},
+ 'Manual':{blurb:'Wound by hand, every morning. A ritual.',
+   feats:{manual:1},
+   extra:[['ratchet','Ratchet Wheel','It clicks as you wind — each click is stored energy.',MX.manualRatchet],
+          ['crownwheel','Crown Wheel','It meshes with the stem. Your fingers reach the mainspring through here.',MX.manualCrown]]},
+ 'Tourbillon':{blurb:'The escapement rides a rotating cage, cancelling gravity.',
+   feats:{tourbillon:1},
+   extra:[]},
+ 'Micro Rotor':{blurb:'Self-winding, without the bulk — the rotor hides inside.',
+   feats:{micro:1},
+   extra:[['micro','Micro-Rotor','A rotor shrunk and sunk flush into the movement itself.',MX.micro]]},
+ 'Jump Hour':{blurb:'No hour hand. At the top of the hour, the numeral leaps.',
+   feats:{jump:1},
+   extra:[['jumpdisc','Hour Disc','Twelve numerals on a disc. At sixty minutes exactly, it jumps.',MX.jumpDisc]]},
+ 'Moonphase':{blurb:'Two moons on a wheel, faithful to the sky for years.',
+   feats:{moon:1},
+   extra:[['moondisc','Moon Disc','Fifty-nine teeth. It will stay true to the real moon for two and a half years.',MX.moon]]},
+ 'GMT':{blurb:'A second hour hand for a second home.',
+   feats:{gmt:1},
+   extra:[['gmtwheel','GMT Wheel','It turns once a day, not twice — a whole other timezone rides on it.',MX.gmtWheel]]},
+ 'Chronograph':{blurb:'A stopwatch built into the heart of the movement.',
+   feats:{chrono:1},
+   extra:[['chrono','Column Wheel & Levers','A tiny castle of columns starts, stops and resets the stopwatch.',MX.chrono]]},
+};
+const MOVE_KEYS=Object.keys(MOVEMENTS);
+
+/* ═══════════ cases ═══════════ */
+const CX=240, CY=340, DIAL_R=148, OPEN_R=152;
+function ringPath(outer){
+  return `<path d="${outer} M${CX},${CY-OPEN_R} A${OPEN_R},${OPEN_R} 0 1 0 ${CX+0.1},${CY-OPEN_R} Z"
+    fill-rule="evenodd" fill="url(#mSteelV)" stroke="rgba(0,0,0,.55)" stroke-width="1.6"/>`;
+}
+const circleO=r=>`M${CX},${CY-r} A${r},${r} 0 1 1 ${CX-0.1},${CY-r} Z`;
+function hornLugs(spread,yIn,yOut,w){
+  w=w||30; let m='';
+  for(const [sx,sy] of [[1,-1],[-1,-1],[1,1],[-1,1]]){
+    const x=CX+sx*spread, y1=CY+sy*yIn, y2=CY+sy*yOut;
+    m+=`<path d="M${x-w/2},${y1} L${x+w/2},${y1} L${x+w*0.32},${y2} Q${x},${y2+sy*8} ${x-w*0.32},${y2} Z"
+      fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>`;
+  } return m;
+}
+function smoothBezel(rO){
+  return `<path d="${circleO(rO)} M${CX},${CY-(OPEN_R-4)} A${OPEN_R-4},${OPEN_R-4} 0 1 0 ${CX+0.1},${CY-(OPEN_R-4)} Z"
+    fill-rule="evenodd" fill="url(#mSteel)" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>
+   <path d="M${CX-rO*.72},${CY-rO*.62} A${rO*.95},${rO*.95} 0 0 1 ${CX+rO*.2},${CY-rO*.94}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.6" filter="url(#mBlur1)"/>`;
+}
+function stdCrown(x,big){
+  const s=big?1.35:1;
+  return `<g transform="translate(${x},${CY}) scale(${s})" data-eg="crown">
+   <rect x="-3" y="-12" width="14" height="24" rx="4.5" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/>
+   ${[-8,-4.4,-.8,2.8,6.4].map(y=>`<line x1="-2" y1="${y}" x2="11" y2="${y}" stroke="rgba(0,0,0,.45)" stroke-width="1.1"/>`).join('')}
+   <circle cx="16" cy="0" r="15" fill="rgba(0,0,0,.001)"/></g>`;
+}
+const CASES={
+ 'Round':{blurb:'The eternal geometry. Nothing to hide behind.',
+   outer:()=>circleO(184), lugs:()=>hornLugs(108,176,216), bezel:()=>smoothBezel(184), crownX:CX+186},
+ 'Square':{blurb:'Four corners, machined and polished. Architecture on the wrist.',
+   outer:()=>`M${CX-172},${CY-116} Q${CX-172},${CY-172} ${CX-116},${CY-172} L${CX+116},${CY-172} Q${CX+172},${CY-172} ${CX+172},${CY-116} L${CX+172},${CY+116} Q${CX+172},${CY+172} ${CX+116},${CY+172} L${CX-116},${CY+172} Q${CX-172},${CY+172} ${CX-172},${CY+116} Z`,
+   lugs:()=>hornLugs(104,168,210), bezel:()=>smoothBezel(178), crownX:CX+174},
+ 'Tonneau':{blurb:'The barrel. Curved like the wrist it lives on.',
+   outer:()=>`M${CX-150},${CY-140} C${CX-150},${CY-206} ${CX+150},${CY-206} ${CX+150},${CY-140} C${CX+172},${CY-50} ${CX+172},${CY+50} ${CX+150},${CY+140} C${CX+150},${CY+206} ${CX-150},${CY+206} ${CX-150},${CY+140} C${CX-172},${CY+50} ${CX-172},${CY-50} ${CX-150},${CY-140} Z`,
+   lugs:()=>'', bezel:()=>smoothBezel(178), crownX:CX+166},
+ 'Cushion':{blurb:'A square gone soft. Nineteen-thirties romance.',
+   outer:()=>`M${CX-176},${CY-92} Q${CX-176},${CY-176} ${CX-92},${CY-176} L${CX+92},${CY-176} Q${CX+176},${CY-176} ${CX+176},${CY-92} L${CX+176},${CY+92} Q${CX+176},${CY+176} ${CX+92},${CY+176} L${CX-92},${CY+176} Q${CX-176},${CY+176} ${CX-176},${CY+92} Z`,
+   lugs:()=>hornLugs(102,170,212), bezel:()=>smoothBezel(180), crownX:CX+178},
+ 'Octagonal':{blurb:'Eight sides, eight screws. Industrial and noble at once.',
+   outer:()=>{let p='';for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/8;
+     p+=(i?'L':'M')+(CX+188*Math.cos(a)).toFixed(1)+','+(CY+188*Math.sin(a)).toFixed(1)+' ';}return p+'Z';},
+   lugs:()=>hornLugs(110,178,214),
+   bezel:()=>{let p='';for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/8;
+     p+=(i?'L':'M')+(CX+176*Math.cos(a)).toFixed(1)+','+(CY+176*Math.sin(a)).toFixed(1)+' ';}
+     let m=`<path d="${p}Z M${CX},${CY-(OPEN_R-2)} A${OPEN_R-2},${OPEN_R-2} 0 1 0 ${CX+0.1},${CY-(OPEN_R-2)} Z" fill-rule="evenodd" fill="url(#mSteel)" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>`;
+     for(let i=0;i<8;i++){const a=i*Math.PI/4;
+       m+=screwG(CX+164*Math.cos(a),CY+164*Math.sin(a),i*37,4.6);}
+     return m;}, crownX:CX+184},
+ 'Integrated':{blurb:'Case and bracelet drawn in a single unbroken line.',
+   outer:()=>circleO(180),
+   lugs:()=>`<path d="M${CX-128},${CY-126} L${CX+128},${CY-126} L${CX+104},${CY-208} L${CX-104},${CY-208} Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>
+     <path d="M${CX-128},${CY+126} L${CX+128},${CY+126} L${CX+104},${CY+208} L${CX-104},${CY+208} Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>`,
+   bezel:()=>smoothBezel(180), crownX:CX+182},
+ 'Ultra Thin':{blurb:'Less metal than seems possible. Dress-watch discipline.',
+   outer:()=>circleO(172), lugs:()=>hornLugs(100,164,200,24), bezel:()=>smoothBezel(170), crownX:CX+172, small:1},
+ 'Dive':{blurb:'Built for pressure. The bezel counts what your lungs cannot.',
+   outer:()=>circleO(192),
+   lugs:()=>hornLugs(112,184,222,34)+`<path d="M${CX+184},${CY-30} q26,8 26,30 q0,22 -26,30 Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/>`,
+   bezel:()=>{let m=`<path d="${circleO(192)} M${CX},${CY-154} A154,154 0 1 0 ${CX+0.1},${CY-154} Z" fill-rule="evenodd" fill="#101114" stroke="rgba(0,0,0,.6)" stroke-width="1.4"/>`;
+     for(let i=0;i<60;i++){const a=i*6*Math.PI/180-Math.PI/2, maj=i%5===0;
+       m+=`<line x1="${(CX+(maj?164:172)*Math.cos(a)).toFixed(1)}" y1="${(CY+(maj?164:172)*Math.sin(a)).toFixed(1)}" x2="${(CX+184*Math.cos(a)).toFixed(1)}" y2="${(CY+184*Math.sin(a)).toFixed(1)}" stroke="#e6dcc0" stroke-width="${maj?3.4:1.4}" opacity="${maj?.95:.55}"/>`;}
+     m+=`<path d="M${CX-7},${CY-186} L${CX+7},${CY-186} L${CX},${CY-166} Z" fill="#e6dcc0"/>`;
+     for(let i=0;i<90;i++){const a=i*4*Math.PI/180;
+       m+=`<line x1="${(CX+188*Math.cos(a)).toFixed(1)}" y1="${(CY+188*Math.sin(a)).toFixed(1)}" x2="${(CX+192*Math.cos(a)).toFixed(1)}" y2="${(CY+192*Math.sin(a)).toFixed(1)}" stroke="rgba(0,0,0,.5)" stroke-width="1.6"/>`;}
+     return m;}, crownX:CX+196, big:1},
+ 'Pilot':{blurb:'Read at a glance, wound with gloves on.',
+   outer:()=>circleO(188), lugs:()=>hornLugs(110,180,218,32),
+   bezel:()=>smoothBezel(186),
+   crown:(x)=>`<g transform="translate(${x},${CY})" data-eg="crown">
+     <path d="M-2,-14 L10,-9 L14,0 L10,9 L-2,14 Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/>
+     ${[-7,-2.4,2.2,6.8].map(y=>`<line x1="0" y1="${y}" x2="11" y2="${(y*.7).toFixed(1)}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>`).join('')}
+     <circle cx="14" cy="0" r="15" fill="rgba(0,0,0,.001)"/></g>`, crownX:CX+190},
+};
+const CASE_KEYS=Object.keys(CASES);
+
+/* ═══════════ dial architectures (drawn at movement centre, r=148) ═══════════ */
+const CREAM='#e6dcc0', INKD='#191510';
+function minuteTrack(r1,r2,col,every){
+  every=every||1; let m='';
+  for(let i=0;i<60;i+=every){const a=i*6*Math.PI/180;
+    const maj=i%5===0;
+    m+=`<line x1="${(r1*Math.sin(a)).toFixed(1)}" y1="${(-r1*Math.cos(a)).toFixed(1)}" x2="${(r2*Math.sin(a)).toFixed(1)}" y2="${(-r2*Math.cos(a)).toFixed(1)}" stroke="${col}" stroke-width="${maj?2.4:1}" opacity="${maj?.95:.55}"/>`;}
+  return m;
+}
+function batons(col,skip){
+  let m='';
+  for(let h=0;h<12;h++){
+    if(skip&&skip.includes(h))continue;
+    const a=h*30*Math.PI/180;
+    m+=`<g transform="translate(${(112*Math.sin(a)).toFixed(1)},${(-112*Math.cos(a)).toFixed(1)}) rotate(${h*30})">
+      <rect x="-3.2" y="-11" width="6.4" height="22" rx="1.2" fill="${col}" stroke="rgba(0,0,0,.4)" stroke-width=".5"/></g>`;}
+  return m;
+}
+function numeralRing(r,fmt,size,col,font){
+  let m='';
+  for(let h=1;h<=12;h++){const a=h*30*Math.PI/180;
+    m+=`<text x="${(r*Math.sin(a)).toFixed(1)}" y="${(-r*Math.cos(a)).toFixed(1)}" dy="${(size*.36).toFixed(1)}" text-anchor="middle" font-size="${size}" font-family="${font||'Georgia'}" fill="${col}">${fmt(h)}</text>`;}
+  return m;
+}
+const ROMANS=['','I','II','III','IIII','V','VI','VII','VIII','IX','X','XI','XII'];
+/* windows for complications are punched straight through the plate */
+function holesFor(f){
+  let h='';
+  if(f.tourbillon) h+='M0,47 A49,49 0 1 0 0.1,47 Z ';
+  if(f.moon) h+='M0,54 A30,30 0 1 0 0.1,54 Z ';
+  if(f.jump) h+='M-22,-102 L22,-102 L22,-64 L-22,-64 Z ';
+  return h;
+}
+function base(fill,extra,holes){
+  return `<path d="M0,-148 A148,148 0 1 1 -0.1,-148 Z ${holes||''}" fill-rule="evenodd" fill="${fill}"/>
+   ${extra||''}<circle r="148" fill="url(#mShade)" pointer-events="none"/>
+   <circle r="148" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.4"/>`;
+}
+function brand(col,y){return `<text x="0" y="${y||-58}" text-anchor="middle" font-size="10.5" letter-spacing="4" font-family="Didot,Georgia,serif" fill="${col}">ATELIER</text>`;}
+const DIALS={
+ 'California':{blurb:'Half Roman, half Arabic — a dial that never chose sides.',
+   draw:f=>base('#1b1712',null,holesFor(f))+minuteTrack(132,140,CREAM)+
+    `<path d="M-8,-124 L8,-124 L0,-104 Z" fill="${CREAM}"/>
+     <rect x="-14" y="118" width="28" height="7" fill="${CREAM}"/>
+     <rect x="-124" y="-3.5" width="22" height="7" fill="${CREAM}"/><rect x="102" y="-3.5" width="22" height="7" fill="${CREAM}"/>`+
+    [1,2,10,11].map(h=>{const a=h*30*Math.PI/180;
+     return `<text x="${(112*Math.sin(a)).toFixed(1)}" y="${(-112*Math.cos(a)).toFixed(1)}" dy="6" text-anchor="middle" font-size="19" font-family="Georgia" fill="${CREAM}">${ROMANS[h]}</text>`;}).join('')+
+    [4,5,7,8].map(h=>{const a=h*30*Math.PI/180;
+     return `<text x="${(112*Math.sin(a)).toFixed(1)}" y="${(-112*Math.cos(a)).toFixed(1)}" dy="7" text-anchor="middle" font-size="21" font-family="Georgia" fill="${CREAM}">${h}</text>`;}).join('')+brand(CREAM)},
+ 'Sector':{blurb:'Engineer’s drawing as a face: rings, spokes, certainty.',
+   draw:f=>base('#ded7c4',null,holesFor(f))+
+    `<circle r="128" fill="none" stroke="${INKD}" stroke-width="1.4"/>
+     <circle r="96" fill="none" stroke="${INKD}" stroke-width="1.4"/>
+     <circle r="52" fill="none" stroke="${INKD}" stroke-width="1.2"/>`+
+    [...Array(12)].map((_,h)=>{const a=h*30*Math.PI/180;
+     return `<line x1="${(52*Math.sin(a)).toFixed(1)}" y1="${(-52*Math.cos(a)).toFixed(1)}" x2="${(128*Math.sin(a)).toFixed(1)}" y2="${(-128*Math.cos(a)).toFixed(1)}" stroke="${INKD}" stroke-width="1.4"/>`;}).join('')+
+    minuteTrack(128,138,INKD)+numeralRing(112,h=>h,17,INKD)+brand(INKD)},
+ 'Sandwich':{blurb:'Indices cut clean through the plate — light shines from beneath.',
+   draw:f=>{let holes='';
+    for(let h=0;h<12;h++){const a=h*30*Math.PI/180,x=(110*Math.sin(a)).toFixed(1),y=(-110*Math.cos(a)).toFixed(1);
+      holes+= h%3===0
+       ?`<g transform="translate(${x},${y}) rotate(${h*30})"><rect x="-6" y="-16" width="12" height="32" rx="2" fill="#0c0a07"/><rect x="-3.6" y="-13.4" width="7.2" height="26.8" rx="1.4" fill="#d8c993"/></g>`
+       :`<circle cx="${x}" cy="${y}" r="9" fill="#0c0a07"/><circle cx="${x}" cy="${y}" r="6.2" fill="#d8c993"/>`;}
+    return base('#14110c',null,holesFor(f))+holes+minuteTrack(132,140,'rgba(233,223,202,.5)',5)+brand('rgba(233,223,202,.65)');}},
+ 'Skeleton':{blurb:'No face at all. The machine is the beauty.',
+   draw:f=>`<g><path d="M0,-148 A148,148 0 1 1 -0.1,-148 Z M0,-104 A104,104 0 1 0 0.1,-104 Z" fill-rule="evenodd" fill="#171310"/>
+    <circle r="148" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.4"/>
+    <circle r="104" fill="none" stroke="url(#mGold)" stroke-width="1.6"/>`+
+    minuteTrack(126,140,'rgba(233,223,202,.8)',5)+numeralRing(118,h=>[3,6,9,12].includes(h)?h:'',15,CREAM)+`</g>`},
+ 'Enamel':{blurb:'Fired glass on gold. It will look like this in two hundred years.',
+   draw:f=>base('#f2ecdc',`<circle r="148" fill="rgba(255,255,255,.35)" filter="url(#mBlur3)" opacity=".5"/>`,holesFor(f))+
+    numeralRing(108,h=>ROMANS[h],21,INKD,'Didot,Georgia,serif')+minuteTrack(130,138,INKD)+brand(INKD,-52)},
+ 'Regulator':{blurb:'Hour, minute and second each keep their own house.',
+   layout:{hourAt:[0,-58,.5],secAt:[0,66,.42]},
+   draw:f=>base('#ded7c4',null,holesFor(f))+minuteTrack(130,140,INKD)+numeralRing(118,h=>h%2?'':h,13,INKD)+
+    `<circle cx="0" cy="-58" r="42" fill="none" stroke="${INKD}" stroke-width="1.3"/>`+
+    [...Array(12)].map((_,h)=>{const a=h*30*Math.PI/180;
+     return `<line x1="${(34*Math.sin(a)).toFixed(1)}" y1="${(-58-34*Math.cos(a)).toFixed(1)}" x2="${(40*Math.sin(a)).toFixed(1)}" y2="${(-58-40*Math.cos(a)).toFixed(1)}" stroke="${INKD}" stroke-width="1.6"/>`;}).join('')+
+    `<circle cx="0" cy="66" r="35" fill="none" stroke="${INKD}" stroke-width="1.2"/>`+
+    [...Array(12)].map((_,h)=>{const a=h*30*Math.PI/180;
+     return `<line x1="${(28*Math.sin(a)).toFixed(1)}" y1="${(66-28*Math.cos(a)).toFixed(1)}" x2="${(33*Math.sin(a)).toFixed(1)}" y2="${(66-33*Math.cos(a)).toFixed(1)}" stroke="${INKD}" stroke-width="1.2"/>`;}).join('')+brand(INKD,-108)},
+ 'Open Heart':{blurb:'A window over the balance — the heartbeat on display.',
+   draw:f=>base('#1b1712',null,'M-76,-22 A40,40 0 1 0 -75.9,-22 Z '+holesFor(f))+`<circle cx="-76" cy="18" r="42" fill="none" stroke="url(#mGold)" stroke-width="2.4"/>`+
+    batons(CREAM,[9,10])+minuteTrack(132,140,'rgba(233,223,202,.55)',5)+brand(CREAM)},
+ 'Field':{blurb:'A soldier’s dial: numbers you can read in the rain, at night, at speed.',
+   draw:f=>base('#12100c',null,holesFor(f))+numeralRing(112,h=>h,22,CREAM)+
+    numeralRing(76,h=>h+12,10,'rgba(233,223,202,.55)')+
+    minuteTrack(132,142,CREAM)+`<path d="M-7,-140 L7,-140 L0,-122 Z" fill="${CREAM}"/>`+brand(CREAM,58)},
+ 'Railroad':{blurb:'Precision was the law of the rails. Every minute counted twice.',
+   draw:f=>base('#e8e1cf',null,holesFor(f))+
+    `<circle r="140" fill="none" stroke="${INKD}" stroke-width="1.2"/>
+     <circle r="128" fill="none" stroke="${INKD}" stroke-width="1.2"/>`+
+    minuteTrack(128,140,INKD)+numeralRing(106,h=>h,19,INKD)+
+    `<path d="M-40,0 H40 M0,-40 V40" stroke="rgba(20,16,10,.28)" stroke-width="1"/>`+brand(INKD)},
+ 'Explorer':{blurb:'Three, six, nine — the rest is trust.',
+   draw:f=>base('#15120d',null,holesFor(f))+batons(CREAM,[0,3,6,9])+
+    [3,6,9].map(h=>{const a=h*30*Math.PI/180;
+     return `<text x="${(112*Math.sin(a)).toFixed(1)}" y="${(-112*Math.cos(a)).toFixed(1)}" dy="8" text-anchor="middle" font-size="24" font-family="Georgia" fill="${CREAM}">${h}</text>`;}).join('')+
+    `<path d="M-10,-122 L10,-122 L0,-100 Z" fill="${CREAM}"/>`+minuteTrack(132,140,'rgba(233,223,202,.6)',5)+brand(CREAM)},
+};
+const DIAL_KEYS=Object.keys(DIALS);
+
+/* feature frames drawn onto any dial (the holes are punched by base) */
+function dialFeatures(f){
+  let m='';
+  if(f.tourbillon) m+=`<circle cx="0" cy="96" r="50" fill="none" stroke="url(#mGold)" stroke-width="2.6"/>`;
+  if(f.moon) m+=`<circle cx="0" cy="84" r="31" fill="none" stroke="url(#mGold)" stroke-width="2.2"/>`;
+  if(f.jump) m+=`<rect x="-24" y="-104" width="48" height="42" rx="4" fill="none" stroke="url(#mGold)" stroke-width="2.2"/>`;
+  if(f.gmt){for(let h=0;h<24;h+=2){const a=h*15*Math.PI/180;
+    m+=`<text x="${(64*Math.sin(a)).toFixed(1)}" y="${(-64*Math.cos(a)).toFixed(1)}" dy="3.4" text-anchor="middle" font-size="9.5" font-family="Georgia" fill="rgba(201,162,75,.9)">${h===0?24:h}</text>`;}}
+  if(f.chrono){
+    for(const cx of [-64,64]){
+      m+=`<circle cx="${cx}" cy="0" r="34" fill="rgba(0,0,0,.25)"/><circle cx="${cx}" cy="0" r="34" fill="none" stroke="rgba(180,168,140,.6)" stroke-width="1.2"/>`;
+      for(let i=0;i<12;i++){const a=i*30*Math.PI/180;
+        m+=`<line x1="${(cx+27*Math.sin(a)).toFixed(1)}" y1="${(-27*Math.cos(a)).toFixed(1)}" x2="${(cx+32*Math.sin(a)).toFixed(1)}" y2="${(-32*Math.cos(a)).toFixed(1)}" stroke="rgba(220,208,180,.7)" stroke-width="1.2"/>`;}
+    }
+  }
+  return m;
+}
+
+/* ═══════════ hand styles ═══════════ */
+function handPath(style,L,W,fill){
+  const F=fill||'url(#mSteelV)', S='stroke="rgba(0,0,0,.5)" stroke-width=".7"';
+  switch(style){
+   case 'Dauphine':return `<path d="M0,14 L${W},2 L0,${-L} L${-W},2 Z" fill="${F}" ${S}/><path d="M0,14 L0,${-L} L${-W},2 Z" fill="rgba(0,0,0,.25)"/>`;
+   case 'Sword':return `<path d="M${-W*.72},12 L${W*.72},12 L${W*.45},${-L*.84} L0,${-L} L${-W*.45},${-L*.84} Z" fill="${F}" ${S}/>`;
+   case 'Leaf':return `<path d="M0,12 C${W*1.5},${-L*.3} ${W*1.1},${-L*.72} 0,${-L} C${-W*1.1},${-L*.72} ${-W*1.5},${-L*.3} 0,12 Z" fill="${F}" ${S}/>`;
+   case 'Alpha':return `<path d="M${-W*.4},12 L${W*.4},12 L${W*1.15},${-L*.2} L${W*.26},${-L*.32} L${W*.12},${-L} L${-W*.12},${-L} L${-W*.26},${-L*.32} L${-W*1.15},${-L*.2} Z" fill="${F}" ${S}/>`;
+   case 'Breguet':return `<rect x="${-W*.42}" y="${-L*.66}" width="${W*.84}" height="${L*.66+12}" fill="${F}" ${S}/>
+     <circle cy="${-L*.76}" r="${L*.09}" fill="none" stroke="${F}" stroke-width="${W*.8}"/>
+     <path d="M${-W*.5},${-L*.86} L${W*.5},${-L*.86} L0,${-L} Z" fill="${F}"/>`;
+   case 'Mercedes':return `<rect x="${-W*.5}" y="${-L*.52}" width="${W}" height="${L*.52+12}" fill="${F}" ${S}/>
+     <circle cy="${-L*.68}" r="${L*.15}" fill="none" stroke="${F}" stroke-width="${W*.9}"/>
+     <path d="M0,${-L*.68} L0,${-L*.53} M0,${-L*.68} L${-L*.11},${-L*.61} M0,${-L*.68} L${L*.11},${-L*.61}" stroke="${F}" stroke-width="${W*.5}"/>
+     <path d="M${-W*.45},${-L*.84} L${W*.45},${-L*.84} L0,${-L} Z" fill="${F}"/>`;
+   case 'Cathedral':return `<rect x="${-W*.4}" y="${-L*.9}" width="${W*.8}" height="${L*.9+12}" fill="${F}" ${S}/>
+     <circle cy="${-L*.42}" r="${L*.13}" fill="none" stroke="${F}" stroke-width="${W*.55}"/>
+     <circle cy="${-L*.72}" r="${L*.08}" fill="none" stroke="${F}" stroke-width="${W*.5}"/>
+     <path d="M${-W*.5},${-L*.93} L${W*.5},${-L*.93} L0,${-L} Z" fill="${F}"/>`;
+   default:return `<rect x="${-W*.5}" y="${-L}" width="${W}" height="${L+12}" rx="${W*.3}" fill="${F}" ${S}/>`;
+  }
+}
+const HAND_KEYS=['Dauphine','Sword','Leaf','Alpha','Breguet','Mercedes','Cathedral','Pencil'];
+const HAND_BLURB={Dauphine:'Two facets, one crease of light.',Sword:'Straight, honest, legible.',
+ Leaf:'A curve borrowed from nature.',Alpha:'Broad shoulders, long reach.',
+ Breguet:'The hollowed moon-tip, since 1783.',Mercedes:'A circle split in three, filled with glow.',
+ Cathedral:'Gothic tracery in steel.',Pencil:'The plainest hand. The hardest to get right.'};
+
+/* ═══════════ straps ═══════════ */
+const STRAPS={
+ 'Leather':{blurb:'Vegetable-tanned calf. It will remember your wrist.',
+  top:()=>`<path d="M${CX-64},20 L${CX+64},20 L${CX+72},152 L${CX-72},152 Z" fill="#4e3018" stroke="#241205" stroke-width="1.6"/>
+    <path d="M${CX-56},26 L${CX-63},146 M${CX+56},26 L${CX+63},146" stroke="rgba(235,214,170,.55)" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <ellipse cx="${CX}" cy="60" rx="3" ry="4" fill="#170d04"/><ellipse cx="${CX}" cy="88" rx="3" ry="4" fill="#170d04"/><ellipse cx="${CX}" cy="116" rx="3" ry="4" fill="#170d04"/>`,
+  bot:()=>`<path d="M${CX-72},${CY+188} L${CX+72},${CY+188} L${CX+60},726 L${CX-60},726 Z" fill="#4e3018" stroke="#241205" stroke-width="1.6"/>
+    <path d="M${CX-63},${CY+196} L${CX-53},718 M${CX+63},${CY+196} L${CX+53},718" stroke="rgba(235,214,170,.55)" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <rect x="${CX-58}" y="${CY+240}" width="116" height="13" rx="5" fill="rgba(0,0,0,.3)"/>`,
+  buckle:()=>`<g transform="translate(${CX},716)">
+    <path d="M-52,-14 Q-58,0 -52,14 L52,14 Q58,0 52,-14 Z" fill="none" stroke="url(#mSteelV)" stroke-width="9"/>
+    <line x1="0" y1="-12" x2="0" y2="12" stroke="url(#mSteelV)" stroke-width="6"/>
+    <path d="M0,-4 L0,26 L4,30" fill="none" stroke="url(#mSteelV)" stroke-width="5"/></g>`},
+ 'Rubber':{blurb:'Vulcanised, salt-proof, indifferent to oceans.',
+  top:()=>`<path d="M${CX-66},20 L${CX+66},20 L${CX+74},152 L${CX-74},152 Z" fill="#17181b" stroke="#000" stroke-width="1.4"/>
+    <path d="M${CX},26 L${CX},148" stroke="rgba(0,0,0,.65)" stroke-width="7"/>
+    ${[44,66,88,110,130].map(y=>`<line x1="${CX-52}" y1="${y}" x2="${CX+52}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-width="3"/>`).join('')}`,
+  bot:()=>`<path d="M${CX-74},${CY+188} L${CX+74},${CY+188} L${CX+62},726 L${CX-62},726 Z" fill="#17181b" stroke="#000" stroke-width="1.4"/>
+    <path d="M${CX},${CY+194} L${CX},720" stroke="rgba(0,0,0,.65)" stroke-width="7"/>`,
+  buckle:()=>STRAPS['Leather'].buckle()},
+ 'Bracelet':{blurb:'Solid links, screwed not pinned. It pours over the wrist.',
+  top:()=>{let m='';for(let i=0;i<7;i++){const y=150-i*19.5-17;if(y<14)break;
+    m+=`<rect x="${CX-72}" y="${y}" width="46" height="17" rx="3" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX-24}" y="${y}" width="48" height="17" rx="3" fill="url(#mSteel)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX+26}" y="${y}" width="46" height="17" rx="3" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>`;}return m;},
+  bot:()=>{let m='';for(let i=0;i<8;i++){const y=CY+188+i*19.5;if(y>726)break;
+    m+=`<rect x="${CX-72}" y="${y}" width="46" height="17" rx="3" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX-24}" y="${y}" width="48" height="17" rx="3" fill="url(#mSteel)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX+26}" y="${y}" width="46" height="17" rx="3" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>`;}return m;},
+  buckle:()=>`<g transform="translate(${CX},700)">
+    <rect x="-74" y="-12" width="148" height="30" rx="4" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/>
+    <rect x="-30" y="-4" width="60" height="14" rx="2" fill="url(#mSteel)"/>
+    <text x="0" y="7" text-anchor="middle" font-size="8" letter-spacing="2" font-family="Georgia" fill="rgba(40,30,10,.8)">ATELIER</text></g>`},
+ 'NATO':{blurb:'One strip of nylon, threaded under the case. Unbreakable logic.',
+  top:()=>`<path d="M${CX-62},18 L${CX+62},18 L${CX+62},152 L${CX-62},152 Z" fill="url(#mNato)" stroke="rgba(0,0,0,.6)" stroke-width="1.4"/>
+    <rect x="${CX-66}" y="70" width="132" height="12" rx="3" fill="url(#mSteelV)" opacity=".95"/>`,
+  bot:()=>`<path d="M${CX-62},${CY+186} L${CX+62},${CY+186} L${CX+62},744 L${CX-62},744 Z" fill="url(#mNato)" stroke="rgba(0,0,0,.6)" stroke-width="1.4"/>
+    <rect x="${CX-66}" y="${CY+250}" width="132" height="12" rx="3" fill="url(#mSteelV)" opacity=".95"/>
+    <path d="M${CX-62},700 L${CX+62},700 L${CX+62},744 L${CX-62},744" fill="rgba(0,0,0,.22)"/>`,
+  buckle:()=>`<g transform="translate(${CX},676)">
+    <rect x="-56" y="-11" width="112" height="22" rx="6" fill="none" stroke="url(#mSteelV)" stroke-width="7"/>
+    <line x1="0" y1="-10" x2="0" y2="10" stroke="url(#mSteelV)" stroke-width="5"/></g>`},
+ 'Perlon':{blurb:'Braided in one piece; adjust it to the millimetre.',
+  top:()=>`<path d="M${CX-60},18 L${CX+60},18 L${CX+60},152 L${CX-60},152 Z" fill="url(#mPerlon)" stroke="rgba(0,0,0,.55)" stroke-width="1.3"/>`,
+  bot:()=>`<path d="M${CX-60},${CY+186} L${CX+60},${CY+186} L${CX+60},742 L${CX-60},742 Z" fill="url(#mPerlon)" stroke="rgba(0,0,0,.55)" stroke-width="1.3"/>`,
+  buckle:()=>`<g transform="translate(${CX},704)">
+    <rect x="-52" y="-10" width="104" height="20" rx="5" fill="none" stroke="url(#mSteelV)" stroke-width="6"/>
+    <line x1="0" y1="-9" x2="0" y2="9" stroke="url(#mSteelV)" stroke-width="4.5"/></g>`},
+ 'Integrated':{blurb:'The bracelet begins where the case refuses to end.',
+  top:()=>{let m='';for(let i=0;i<6;i++){const y=CY-208-((i+1)*22);if(y<10)break;
+    m+=`<path d="M${CX-100+i*4},${y} L${CX+100-i*4},${y} L${CX+96-i*4},${y+20} L${CX-96+i*4},${y+20} Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX-30}" y="${y+2}" width="60" height="16" rx="2" fill="url(#mSteel)"/>`;}return m;},
+  bot:()=>{let m='';for(let i=0;i<7;i++){const y=CY+208+i*22;if(y>730)break;
+    m+=`<path d="M${CX-100+i*4},${y+20} L${CX+100-i*4},${y+20} L${CX+96-i*4},${y} L${CX-96+i*4},${y} Z" fill="url(#mSteelV)" stroke="rgba(0,0,0,.45)"/>
+        <rect x="${CX-30}" y="${y+2}" width="60" height="16" rx="2" fill="url(#mSteel)"/>`;}return m;},
+  buckle:()=>`<g transform="translate(${CX},712)">
+    <rect x="-66" y="-12" width="132" height="26" rx="4" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/>
+    <text x="0" y="6" text-anchor="middle" font-size="8" letter-spacing="2" font-family="Georgia" fill="rgba(40,30,10,.8)">ATELIER</text></g>`},
+};
+const STRAP_KEYS=Object.keys(STRAPS);
+
+/* ═══════════ state & step builder ═══════════ */
+const state={
+  cfg:{movement:'Automatic',case:'Round',dial:'Explorer',hands:'Dauphine',strap:'Leather'},
+  steps:[], idx:0, phase:'intro',
+  clk:0, rotClk:0, level:0,
+  jam:false, sound:true, loupe:false,
+  chronoOn:false, chronoT:0, startTime:null,
+};
+const SLOTS=['plate','jewels','mainspring','barrel','wcenter','wthird','wfourth','wescape','wpallet','oil',
+ 'wbalance','cage','cagebalance','bridgeT','screwT','bridgeB','screwB','ratchet','crownwheel','autobridge',
+ 'micro','gmtwheel','chrono','rotor','moondisc','jumpdisc','dial','hH','hM','hS','hX'];
+const XSLOTS=['caseband','lugs','stem','crown','pushers','crystal','bezel'];
+
+function buildWatchSVG(){
+  const svg=$('#watch');
+  let m=DEFS;
+  m+=`<g id="Sholder">
+    <circle cx="240" cy="340" r="168" fill="rgba(12,7,2,.5)" filter="url(#mBlur3)"/>
+    <circle cx="240" cy="340" r="164" fill="#241708" stroke="#110a04" stroke-width="3"/>
+    <circle cx="240" cy="340" r="158" fill="none" stroke="url(#mGold)" stroke-width="3" opacity=".8"/>
+    ${[0,120,240].map(a=>`<rect x="232" y="168" width="16" height="14" rx="3" fill="#3a2c14" transform="rotate(${a} 240 340)"/>`).join('')}
+  </g>`;
+  m+=`<g id="SstrapT" class="lay"></g><g id="SstrapB" class="lay"></g><g id="Sbuckle" class="lay"></g>`;
+  m+=`<g transform="translate(40,140)">${SLOTS.map(s=>`<g id="S${s}" class="lay"></g>`).join('')}</g>`;
+  m+=XSLOTS.map(s=>`<g id="S${s}" class="lay"></g>`).join('');
+  svg.innerHTML=m;
+}
+function slot(id){return document.getElementById('S'+id);}
+
+function handSet(style,which,layout,feats){
+  const local=(inner,at)=>at?`<g transform="translate(${at[0]},${at[1]}) scale(${at[2]})">${inner}</g>`:inner;
+  if(which==='h'){
+    const inner=`<g class="rHour">${handPath(style,72,9)}</g>`;
+    return tr(AT.center, local(inner, layout&&layout.hourAt));
+  }
+  if(which==='m') return tr(AT.center,`<g class="rMin">${handPath(style,116,6.6)}</g>`);
+  if(which==='s'){
+    const inner=`<g class="rSec"><path d="M-1,26 L1,26 L1,-118 L-1,-118 Z" fill="#26418a"/>
+      <path d="M0,-118 l3.2,10 h-6.4 Z" fill="#26418a"/><circle cy="18" r="5" fill="none" stroke="#26418a" stroke-width="2.6"/></g>`;
+    const sm=`<g class="rSec"><path d="M-1.6,14 L1.6,14 L1.2,-60 L-1.2,-60 Z" fill="#26418a"/><circle r="4.4" fill="#26418a"/></g>`;
+    if(feats.chrono) return tr(AT.center,`<g transform="translate(-64,0) scale(.5)">${sm}</g>`);
+    if(layout&&layout.secAt) return tr(AT.center,local(sm,layout.secAt));
+    return tr(AT.center,inner+`<circle r="6.4" fill="url(#mGold)" stroke="#6e5518"/>`);
+  }
+  if(feats&&feats.gmt) return tr(AT.center,`<g class="rGmt24">
+    <path d="M-2.6,18 L2.6,18 L2,-96 L-2,-96 Z" fill="url(#mGold)" stroke="rgba(0,0,0,.4)"/>
+    <path d="M-7,-96 L7,-96 L0,-116 Z" fill="url(#mGold)" stroke="rgba(0,0,0,.4)"/></g>`);
+  return tr(AT.center,`<g class="rChrono"><path d="M-1.2,30 L1.2,30 L1,-124 L-1,-124 Z" fill="url(#mGold)"/>
+    <circle cy="24" r="5" fill="url(#mGold)"/></g><circle r="4" fill="url(#mSteel)"/>`);
+}
+
+function buildSteps(){
+  const c=state.cfg, mv=MOVEMENTS[c.movement], f=mv.feats, S=[];
+  const dial=DIALS[c.dial], cse=CASES[c.case], stp=STRAPS[c.strap];
+  const add=(slotId,name,tip,draw,vb,fx,snd)=>S.push({slot:slotId,name,tip,draw,vb,fx,snd});
+  const vbP=(k,r)=>[AT[k][0]-r,AT[k][1]-r,r*2,r*2];
+
+  add('plate','Main Plate','The foundation. Every pivot, wheel and bridge will call this plate home.',BASE.mainplate,[36,36,328,328]);
+  add('jewels','Ruby Jewels · ×7','Synthetic rubies — not decoration, bearings. Steel glides on stone with almost no friction.',BASE.jewels,[86,84,236,236]);
+  add('mainspring','Mainspring','A coiled ribbon of steel. Wound tight, it holds three days of energy.',BASE.mainspring,vbP('barrel',48));
+  add('barrel','Barrel','The spring lives inside this drum; its teeth drive the whole train.',BASE.barrel,vbP('barrel',52),()=>{state.level=1;});
+  add('wcenter','Centre Wheel','Turns once per hour. The minute hand will ride its arbor.',BASE.center,vbP('center',44));
+  add('wthird','Third Wheel','A messenger — it carries power onward, multiplying speed.',BASE.third,vbP('third',34));
+  add('wfourth','Fourth Wheel','Turns once per minute. The seconds will belong to it.',BASE.fourth,vbP('fourth',30));
+  if(f.tourbillon){
+    add('cage','Tourbillon Cage','The escapement will ride this carriage — one turn per minute, averaging out gravity.',MX.cage,vbP('cage',52));
+    add('oil','Fine Oil','One drop on each jewel. Too much is worse than none.',BASE.oil,[120,180,180,140]);
+    add('cagebalance','Cage Balance','The heart, mounted inside its carousel.',MX.cageBalance,vbP('cage',52),()=>{state.level=2;},'tick');
+  }else{
+    add('wescape','Escape Wheel','Fifteen teeth shaped like waves. It wants to run wild — something must count it.',BASE.escape,vbP('escape',26));
+    add('wpallet','Pallet Fork','The gatekeeper. Twice a second it locks, unlocks, and locks again.',BASE.pallet,vbP('pallet',34));
+    add('oil','Fine Oil','One drop on each jewel. Too much is worse than none.',BASE.oil,[120,180,180,140]);
+    add('wbalance','Balance Wheel','The heart. It swings five times a second, cutting time into equal beats.',BASE.balance,vbP('balance',44),()=>{state.level=2;},'tick');
+  }
+  add('bridgeT','Train Bridge','Bridges hold the pivots from above — Geneva stripes face the collector.',BASE.bridgeTrain,[150,170,200,180]);
+  add('screwT','Bridge Screws · ×3','Heat-blued screws. The colour is temperature, not paint.',BASE.screwsTrain,[190,190,140,150]);
+  add('bridgeB','Barrel Bridge','The heaviest bridge, over the heaviest wheel.',BASE.bridgeBarrel,[60,40,230,120]);
+  add('screwB','Bridge Screws · ×3','Three more. Tightened in sequence, like the wheel of a car.',BASE.screwsBarrel,[70,50,200,90]);
+  for(const [id,name,tip,draw] of mv.extra){
+    const vb={autobridge:[110,60,190,110],rotor:[70,70,260,150],ratchet:vbP('barrel',36),crownwheel:[252,82,54,54],
+      micro:vbP('micro',46),gmtwheel:vbP('gmt',32),moondisc:vbP('moon',50),jumpdisc:[80,80,240,240],chrono:[240,120,110,160]}[id]||[80,80,240,240];
+    add(id,name,tip,draw,vb);
+  }
+  const feats=f;
+  add('dial','Dial — '+c.dial,dial.blurb,()=>tr(AT.center,dial.draw(feats)+dialFeatures(feats)),[52,52,296,296]);
+  if(!f.jump) add('hH','Hour Hand','The hour hand — shortest, slowest, first.',()=>handSet(c.hands,'h',dial.layout,feats),[150,150,100,100]);
+  add('hM','Minute Hand','It reaches almost to the track — almost.',()=>handSet(c.hands,'m',dial.layout,feats),[140,140,120,120]);
+  add('hS','Seconds Hand','Proof, sweeping five times a second, that the heart beats.',()=>handSet(c.hands,'s',dial.layout,feats),[150,150,100,100],()=>{state.level=3;state.startTime=new Date();});
+  if(f.gmt) add('hX','GMT Hand','It circles once a day — a second home on the same dial.',()=>handSet(c.hands,'x',dial.layout,feats),[150,150,100,100]);
+  if(f.chrono) add('hX','Chronograph Hand','Parked at twelve until you press the pusher.',()=>handSet(c.hands,'x',dial.layout,feats),[150,150,100,100]);
+  add('caseband','Case — '+c.case,cse.blurb,()=>ringPath(cse.outer()),[30,120,420,440]);
+  if(c.case!=='Tonneau') add('lugs',c.case==='Integrated'?'End Links':'Lugs','They hold the strap; they decide how the watch sits on a wrist.',cse.lugs,[100,110,280,460]);
+  add('stem','Winding Stem','It reaches through the case wall to the keyless works.',
+    ()=>`<rect x="${CX+140}" y="${CY-3}" width="${(cse.crownX-6)-(CX+140)}" height="6" rx="3" fill="url(#mSteelV)"/>`,[CX+134,CY-22,70,44]);
+  add('crown','Crown','Grip. Wind. Feel the ratchet click.',()=>cse.crown?cse.crown(cse.crownX):stdCrown(cse.crownX,cse.big),[cse.crownX-22,CY-26,56,52]);
+  if(f.chrono) add('pushers','Pushers','Start. Stop. Return to zero. Three commands, two buttons.',
+    ()=>[-38,38].map(dg=>{const a=dg*Math.PI/180;
+      const px=CX+Math.cos(a)*184,py=CY+Math.sin(a)*184;
+      return `<g transform="translate(${px.toFixed(1)},${py.toFixed(1)}) rotate(${dg})" data-eg="pusher"><rect x="0" y="-8" width="22" height="16" rx="6" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)"/></g>`;}).join(''),[CX+150,CY-140,90,280]);
+  add('crystal','Sapphire Crystal','Second only to diamond — the window you will look through for years.',
+    ()=>`<circle cx="${CX}" cy="${CY}" r="150" fill="rgba(215,232,248,.05)" pointer-events="none"/>
+      <ellipse cx="${CX-56}" cy="${CY-74}" rx="82" ry="38" fill="rgba(255,255,255,.09)" transform="rotate(-32 ${CX-56} ${CY-74})" filter="url(#mBlur3)" pointer-events="none"/>
+      <path d="M${CX+42},${CY+82} A116,116 0 0 0 ${CX+76},${CY-4}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="6" filter="url(#mBlur3)" pointer-events="none"/>`,[92,192,300,300]);
+  add('bezel','Bezel','The frame that locks the crystal down.',cse.bezel,[44,144,392,392]);
+  add('strapT','Strap — '+c.strap,stp.blurb,stp.top,[CX-90,10,180,150],()=>{
+    slot('strapB').innerHTML=stp.bot(); slot('strapB').classList.add('on','set');});
+  add('buckle',(c.strap==='Bracelet'||c.strap==='Integrated')?'Clasp':'Buckle','The last part. It closes around a life.',stp.buckle,[CX-80,640,160,110]);
+  add('caseback','Case Back','Closed. Sealed. Alive.',()=>'',[92,192,300,300],null,'close');
+  state.steps=S;
+}
+
+/* ═══════════ tray, drag & install ═══════════ */
+const trayIn=$('#trayIn'), ghost=$('#ghost');
+function buildTray(){
+  trayIn.innerHTML='';
+  state.steps.forEach((st,i)=>{
+    const el=document.createElement('div');
+    el.className='part'; el.dataset.i=i; el.tabIndex=0;
+    el.setAttribute('role','button'); el.setAttribute('aria-label',st.name);
+    const vb=st.vb||[0,0,480,760];
+    el.innerHTML=`<svg viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid meet">${st.slot==='caseback'
+      ?`<circle cx="${CX}" cy="${CY}" r="140" fill="url(#mSteelV)" stroke="rgba(0,0,0,.5)" stroke-width="4"/><circle cx="${CX}" cy="${CY}" r="112" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="3"/><text x="${CX}" y="${CY+8}" text-anchor="middle" font-size="26" font-family="Georgia" fill="rgba(40,30,10,.7)">A</text>`
+      :st.draw()}</svg><div class="lb">${st.name}</div>`;
+    trayIn.appendChild(el);
+  });
+  markNext();
+}
+function markNext(){
+  $$('.part').forEach(el=>{
+    const i=+el.dataset.i;
+    el.classList.toggle('next', i===state.idx);
+    el.classList.toggle('done', i<state.idx);
+  });
+  const st=state.steps[state.idx];
+  $('#stepName').textContent=st?st.name:'Complete';
+  $('#stepCount').textContent=st?`piece ${state.idx+1} of ${state.steps.length}`:'';
+  const nx=$(`.part[data-i="${state.idx}"]`);
+  if(nx&&nx.scrollIntoView) nx.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+let drag=null;
+function stagePoint(vx,vy){
+  const r=$('#watch').getBoundingClientRect();
+  return {x:r.left+(vx/480)*r.width, y:r.top+(vy/760)*r.height};
+}
+function targetFor(st){
+  const vb=st.vb;
+  const inMove=SLOTS.includes(st.slot);
+  const cx=vb[0]+vb[2]/2+(inMove?40:0);
+  const cy=vb[1]+vb[3]/2+(inMove?140:0);
+  return stagePoint(cx,cy);
+}
+trayIn.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.part'); if(!el||el.classList.contains('done')) return;
+  if(state.phase!=='build') return;
+  e.preventDefault();
+  const i=+el.dataset.i, st=state.steps[i];
+  ghost.innerHTML=el.querySelector('svg').outerHTML;
+  ghost.style.display='block';
+  drag={i,st,el,x:e.clientX,y:e.clientY,gx:e.clientX,gy:e.clientY,raf:0};
+  el.classList.add('drag');
+  SND.pick(); buzz(4);
+  const follow=()=>{
+    if(!drag) return;
+    drag.gx+=(drag.x-drag.gx)*.22; drag.gy+=(drag.y-drag.gy)*.22;
+    const t=targetFor(drag.st), d=Math.hypot(t.x-drag.gx,t.y-drag.gy);
+    if(d<90&&drag.i===state.idx){drag.gx+=(t.x-drag.gx)*.06; drag.gy+=(t.y-drag.gy)*.06;
+      ghost.style.filter='drop-shadow(0 0 13px rgba(233,205,122,.65))';}
+    else ghost.style.filter='';
+    ghost.style.transform=`translate(${drag.gx-35}px,${drag.gy-35}px)`;
+    drag.raf=requestAnimationFrame(follow);
+  };
+  drag.raf=requestAnimationFrame(follow);
+});
+addEventListener('pointermove',e=>{if(drag){drag.x=e.clientX;drag.y=e.clientY;}});
+addEventListener('pointerup',()=>{
+  if(!drag) return;
+  cancelAnimationFrame(drag.raf);
+  const t=targetFor(drag.st), d=Math.hypot(t.x-drag.gx,t.y-drag.gy);
+  const {i,st,el}=drag; const g0={x:drag.gx,y:drag.gy}; drag=null;
+  if(d<95&&i===state.idx){
+    animGhost(g0,t,()=>{ghost.style.display='none'; install(st,el);});
+  }else if(d<95){
+    jamNow();
+    returnGhost(g0,el);
+  }else returnGhost(g0,el);
+});
+trayIn.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  const el=e.target.closest('.part'); if(!el) return;
+  e.preventDefault();
+  const i=+el.dataset.i;
+  if(i===state.idx) install(state.steps[i],el);
+  else jamNow();
+});
+function animGhost(from,to,done){
+  const t0=performance.now();
+  (function stepA(t){
+    const k=Math.min(1,(t-t0)/130), e2=1-Math.pow(1-k,3);
+    ghost.style.transform=`translate(${from.x+(to.x-from.x)*e2-35}px,${from.y+(to.y-from.y)*e2-35}px) scale(${1-.3*e2})`;
+    if(k<1) requestAnimationFrame(stepA); else done();
+  })(t0);
+}
+function returnGhost(from,el){
+  const r=el.getBoundingClientRect(), to={x:r.left+r.width/2,y:r.top+r.height/2};
+  const t0=performance.now();
+  (function stepA(t){
+    const k=Math.min(1,(t-t0)/360), e2=1-Math.pow(1-k,3);
+    ghost.style.transform=`translate(${from.x+(to.x-from.x)*e2-35}px,${from.y+(to.y-from.y)*e2-35}px)`;
+    if(k<1) requestAnimationFrame(stepA);
+    else {ghost.style.display='none'; el.classList.remove('drag');}
+  })(t0);
+}
+function jamNow(){
+  $('#stage').classList.add('jam');
+  SND.thud(); buzz([40,50,40]);
+  showTip('Not that piece — not yet. The movement only accepts one order.',2600);
+  setTimeout(()=>$('#stage').classList.remove('jam'),600);
+}
+let tipT=null;
+function showTip(txt,ms){
+  const el=$('#tip'); el.textContent=txt; el.classList.add('show');
+  clearTimeout(tipT); tipT=setTimeout(()=>el.classList.remove('show'),ms||4200);
+}
+function install(st,el){
+  el.classList.remove('drag');
+  const g=slot(st.slot);
+  if(g){g.innerHTML=st.draw(); g.classList.add('on','set'); setTimeout(()=>g.classList.remove('set'),700);}
+  if(st.snd==='tick'){SND.seat(); setTimeout(()=>SND.chime(),300);}
+  else if(st.snd==='close'){SND.close();}
+  else if(st.slot.startsWith('screw')||st.slot==='jewels'){SND.multi(3);}
+  else SND.seat();
+  buzz([12,28,8]);
+  const t=targetFor(st), sr=$('#stage').getBoundingClientRect();
+  const snap=$('#snap');
+  snap.style.left=(t.x-sr.left)+'px'; snap.style.top=(t.y-sr.top)+'px';
+  snap.classList.remove('go'); void snap.offsetWidth; snap.classList.add('go');
+  if(st.fx) st.fx(st);
+  showTip(st.tip,4600);
+  $('#srLive').textContent=st.name+' installed.';
+  state.idx++;
+  markNext();
+  if(state.idx>=state.steps.length) finale();
+}
+
+/* ═══════════ audio (all synthesised) ═══════════ */
+const AU={ctx:null,master:null,amb:null};
+function auInit(){
+  if(AU.ctx) return;
+  try{
+    AU.ctx=new (window.AudioContext||window.webkitAudioContext)();
+    AU.master=AU.ctx.createGain(); AU.master.gain.value=.85; AU.master.connect(AU.ctx.destination);
+    const len=AU.ctx.sampleRate*3, buf=AU.ctx.createBuffer(1,len,AU.ctx.sampleRate), d=buf.getChannelData(0);
+    let last=0; for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+.02*w)/1.02; d[i]=last*3;}
+    const src=AU.ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+    const lp=AU.ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=160;
+    AU.amb=AU.ctx.createGain(); AU.amb.gain.value=0;
+    src.connect(lp); lp.connect(AU.amb); AU.amb.connect(AU.master); src.start();
+    AU.amb.gain.linearRampToValueAtTime(state.sound?.045:0,AU.ctx.currentTime+3);
+  }catch(e){}
+}
+function tone(f,dur,v,type,when,bend){
+  if(!AU.ctx||!state.sound) return;
+  const t=AU.ctx.currentTime+(when||0);
+  const o=AU.ctx.createOscillator(),g=AU.ctx.createGain();
+  o.type=type||'sine'; o.frequency.setValueAtTime(f,t);
+  if(bend) o.frequency.exponentialRampToValueAtTime(bend,t+dur);
+  g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g); g.connect(AU.master); o.start(t); o.stop(t+dur+.02);
+}
+function burst(dur,v,f,q,when){
+  if(!AU.ctx||!state.sound) return;
+  const t=AU.ctx.currentTime+(when||0);
+  const n=Math.max(1,AU.ctx.sampleRate*dur|0), b=AU.ctx.createBuffer(1,n,AU.ctx.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=AU.ctx.createBufferSource(); s.buffer=b;
+  const flt=AU.ctx.createBiquadFilter(); flt.type='bandpass'; flt.frequency.value=f; flt.Q.value=q||1.4;
+  const g=AU.ctx.createGain(); g.gain.value=v;
+  s.connect(flt); flt.connect(g); g.connect(AU.master); s.start(t);
+}
+const SND={
+  pick:()=>burst(.03,.2,2600,1.2),
+  click:()=>{burst(.03,.4,3200,1.5);tone(1900,.05,.09,'triangle');},
+  seat:()=>{burst(.05,.5,2400,1.2);tone(1500,.07,.09,'triangle');tone(330,.09,.12,'sine',.012);},
+  multi:n=>{for(let i=0;i<n;i++){burst(.035,.4,2600+i*300,1.4,i*.09);tone(1600,.05,.07,'triangle',i*.09);}},
+  tick:v=>{burst(.011,(v||1)*.1,5200,2.4);burst(.013,(v||1)*.06,2400,2,.012);},
+  thud:()=>{tone(90,.28,.38,'sine',0,50);burst(.1,.22,300,.8);},
+  wind:n=>{for(let i=0;i<(n||5);i++){burst(.016,.24,3500,2,i*.05);}},
+  chime:()=>{[660,990,1318].forEach((f,i)=>tone(f,2-i*.3,.09-i*.02,'sine',i*.15));},
+  close:()=>{burst(.06,.5,1400,1);tone(240,.22,.2,'sine',.02,150);tone(120,.4,.16,'sine',.06);},
+  shutter:()=>{burst(.02,.4,2600,1);burst(.04,.28,900,1,.05);},
+  woosh:()=>burst(.26,.1,480,.5),
+};
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p);}catch(e){}}
+
+/* ═══════════ the movement lives ═══════════ */
+function setRot(cls,deg){$$('.'+cls).forEach(el=>el.setAttribute('transform',`rotate(${deg.toFixed(2)})`));}
+let lastT=0, tickAcc=0, rotA=0, rotV=0;
+function loop(t){
+  const dt=Math.min(.05,(t-lastT)/1000||0); lastT=t;
+  const run=state.level>=2&&!state.jam;
+  if(run){state.clk+=dt; state.rotClk+=dt;}
+  const rc=state.rotClk;
+  if(state.level>=2){
+    setRot('rBarrel',rc*3); setRot('rCenter',rc*8); setRot('rThird',-rc*18); setRot('rFourth',rc*40);
+    const si=Math.floor(state.clk/.4), fr=Math.min(1,(state.clk%.4)/.07);
+    setRot('rEscape',(si+fr)*24);
+    const ph=state.clk*2*Math.PI/.8;
+    setRot('rPallet',7*Math.tanh(3.4*Math.sin(ph)));
+    setRot('rBalance',(RM?14:38)*Math.sin(ph));
+    setRot('rCage',rc*6);
+    setRot('rGmt',rc*2);
+    setRot('rMoon',rc*.5);
+    if(state.sound){tickAcc+=dt/.4; if(tickAcc>=1){tickAcc%=1; SND.tick(state.phase==='studio'?.9:.55);}}
+  }
+  rotV+=(-rotA*1.6-rotV*.9)*dt + (run?Math.sin(t*.00045)*8*dt:0);
+  rotA+=rotV*dt;
+  setRot('rRotor',rotA); setRot('rMicro',rotA*1.4);
+  const now=new Date();
+  const s=now.getSeconds()+now.getMilliseconds()/1000;
+  const mi=now.getMinutes()+s/60, h=(now.getHours()%12)+mi/60;
+  setRot('rHour',h*30); setRot('rMin',mi*6);
+  if(state.level>=3) setRot('rSec',s*6);
+  setRot('rGmt24',((now.getHours()+mi/60-Math.floor(mi/60))/24)*360);
+  setRot('rJump',-(Math.floor(now.getHours()%12))*30);
+  if(state.chronoOn) state.chronoT+=dt;
+  setRot('rChrono',(state.chronoT%60)*6);
+  drawDust(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* interactive metal */
+document.addEventListener('click',e=>{
+  const eg=e.target.closest&&e.target.closest('[data-eg]');
+  if(!eg) return;
+  const k=eg.dataset.eg;
+  if(k==='crown'){SND.wind(6); buzz([6,20,6]); showTip('Wound. The barrel takes it gladly.',2200);}
+  if(k==='rotor'){rotV+=380+Math.random()*160; SND.woosh();}
+  if(k==='pusher'){
+    if(!state.chronoOn&&state.chronoT===0){state.chronoOn=true; SND.click(); showTip('Chronograph running.',1800);}
+    else if(state.chronoOn){state.chronoOn=false; SND.click(); showTip('Stopped. Press again to fly back to zero.',2400);}
+    else {state.chronoT=0; SND.seat(); showTip('Reset. The hand flies home.',1800);}
+  }
+  if(k==='bal'&&state.level>=2){SND.tick(1.4);}
+});
+
+/* dust */
+const dC=$('#dust'), dctx=dC.getContext('2d');
+let motes=[];
+function sizeD(){dC.width=innerWidth; dC.height=innerHeight;}
+sizeD(); addEventListener('resize',sizeD);
+if(!RM) for(let i=0;i<52;i++) motes.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+  r:Math.random()*1.3+.35,s:Math.random()*.3+.06,ph:Math.random()*7,a:Math.random()*.09+.03});
+function drawDust(dt){
+  if(!motes.length) return;
+  dctx.clearRect(0,0,dC.width,dC.height);
+  for(const m of motes){
+    m.ph+=dt*.6; m.y-=m.s; m.x+=Math.sin(m.ph)*.16;
+    if(m.y<-4){m.y=innerHeight+4; m.x=Math.random()*innerWidth;}
+    dctx.beginPath(); dctx.arc(m.x,m.y,m.r,0,7);
+    dctx.fillStyle=`rgba(255,224,170,${(m.a*(0.7+0.3*Math.sin(m.ph*2))).toFixed(3)})`;
+    dctx.fill();
+  }
+}
+
+/* ═══════════ loupe ═══════════ */
+const lens=$('#lens'), lensIn=$('#lensIn');
+let lensClone=null;
+$('#pLoupe').addEventListener('click',()=>{
+  state.loupe=!state.loupe;
+  document.body.classList.toggle('loupe',state.loupe);
+  $('#pLoupe').style.opacity=state.loupe?'.35':'.92';
+  SND.click();
+  if(state.loupe){lensClone=$('#watch').cloneNode(true); lensClone.removeAttribute('id');
+    lensIn.innerHTML=''; lensIn.appendChild(lensClone);}
+  else {lens.style.display='none'; lensIn.innerHTML=''; lensClone=null;}
+});
+addEventListener('pointermove',e=>{
+  if(!state.loupe||drag){if(state.loupe)lens.style.display='none';return;}
+  const wr=$('#stage').getBoundingClientRect();
+  if(e.clientX<wr.left-40||e.clientX>wr.right+40||e.clientY<wr.top-40||e.clientY>wr.bottom+40){
+    lens.style.display='none'; return;}
+  lens.style.display='block';
+  lens.style.left=(e.clientX-100)+'px'; lens.style.top=(e.clientY-100)+'px';
+  const Z=3, lx=e.clientX-wr.left, ly=e.clientY-wr.top;
+  if(lensClone){lensClone.style.width=wr.width+'px'; lensClone.style.height=wr.height+'px';
+    lensClone.style.position='absolute';
+    lensIn.style.transform=`translate(${100-lx*Z}px,${100-ly*Z}px) scale(${Z})`;}
+});
+
+/* ═══════════ commission ═══════════ */
+function buildCommission(){
+  const cols=[['movement','Movement',MOVE_KEYS,MOVEMENTS],['case','Case',CASE_KEYS,CASES],
+    ['dial','Dial',DIAL_KEYS,DIALS],['hands','Hands',HAND_KEYS,null],['strap','Strap',STRAP_KEYS,STRAPS]];
+  const grid=$('#commGrid'); grid.innerHTML='';
+  for(const [key,label,keys,reg] of cols){
+    const col=document.createElement('div'); col.className='cCol';
+    col.innerHTML=`<h3>${label}</h3>`;
+    const ul=document.createElement('ul');
+    keys.forEach(k=>{
+      const li=document.createElement('li');
+      li.innerHTML=`<span class="m"></span>${k}`;
+      if(state.cfg[key]===k) li.classList.add('sel');
+      li.addEventListener('click',()=>{
+        state.cfg[key]=k; SND.click();
+        ul.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
+        li.classList.add('sel'); updSpec();
+      });
+      li.addEventListener('mouseenter',()=>{
+        const b=reg?(reg[k].blurb):HAND_BLURB[k];
+        $('#commSpec').textContent=b||'';
+      });
+      ul.appendChild(li);
+    });
+    col.appendChild(ul); grid.appendChild(col);
+  }
+  updSpec();
+}
+function updSpec(){
+  const c=state.cfg;
+  $('#commSpec').textContent=`${c.movement} · ${c.case} · ${c.dial} · ${c.hands} hands · ${c.strap}`;
+}
+
+/* ═══════════ finale — the studio ═══════════ */
+function finale(){
+  state.phase='studio';
+  $('#tray').style.opacity='0'; $('#tray').style.pointerEvents='none';
+  $('#step').style.opacity='0';
+  $$('.prop').forEach(p=>p.style.opacity='.12');
+  $('#mat').style.opacity='0';
+  $('#desk').style.opacity='.25'; $('#lamp').style.opacity='.4';
+  if(AU.amb&&AU.ctx) AU.amb.gain.linearRampToValueAtTime(0,AU.ctx.currentTime+3);
+  setTimeout(()=>{
+    $('#studio').classList.add('on');
+    $('#stage').classList.add('studioPose');
+    SND.chime();
+    const c=state.cfg;
+    $('#finName').textContent=`${c.movement} ${c.case}`;
+    $('#finSpec').textContent=`${c.dial} dial · ${c.hands} hands · ${c.strap} · cal. B-01 · assembled by hand`;
+    setTimeout(()=>$('#fin').classList.add('on'),1600);
+  },900);
+}
+function wallpaper(w,h){
+  SND.shutter();
+  const fl=$('#flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  const svg=$('#watch').cloneNode(true);
+  svg.removeAttribute('id'); svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+  svg.setAttribute('width','960'); svg.setAttribute('height','1520');
+  const xml=new XMLSerializer().serializeToString(svg);
+  const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
+  const img=new Image();
+  img.onload=()=>{
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    const g=cv.getContext('2d');
+    const gr=g.createRadialGradient(w/2,h*.4,60,w/2,h*.45,Math.max(w,h)*.75);
+    gr.addColorStop(0,'#2b2115'); gr.addColorStop(.45,'#171009'); gr.addColorStop(1,'#070402');
+    g.fillStyle=gr; g.fillRect(0,0,w,h);
+    const wh=h*.78, ww=wh*480/760;
+    g.shadowColor='rgba(0,0,0,.7)'; g.shadowBlur=70; g.shadowOffsetY=40;
+    g.drawImage(img,(w-ww)/2,h*.07,ww,wh);
+    g.shadowColor='transparent';
+    const c=state.cfg;
+    g.fillStyle='rgba(233,223,202,.85)'; g.textAlign='center';
+    g.font=`${Math.round(h*.023)}px Didot, Georgia, serif`;
+    g.fillText('A T E L I E R',w/2,h*.915);
+    g.fillStyle='rgba(201,162,75,.85)';
+    g.font=`italic ${Math.round(h*.013)}px Georgia`;
+    g.fillText(`${c.movement} · ${c.case} · ${c.dial} · assembled at The Bench`,w/2,h*.945);
+    const a=document.createElement('a');
+    a.download=`the-bench-${c.movement.toLowerCase().replace(/\s/g,'-')}.png`;
+    a.href=cv.toDataURL('image/png'); a.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src=url;
+}
+$('#btnShot').addEventListener('click',()=>wallpaper(2560,1440));
+$('#btnShotPhone').addEventListener('click',()=>wallpaper(1170,2532));
+function resetAll(){
+  state.idx=0; state.level=0; state.clk=0; state.rotClk=0; state.chronoOn=false; state.chronoT=0;
+  state.phase='commission';
+  $('#studio').classList.remove('on'); $('#fin').classList.remove('on');
+  $('#stage').classList.remove('studioPose');
+  $('#tray').style.opacity=''; $('#tray').style.pointerEvents='';
+  $('#step').style.opacity='';
+  $$('.prop').forEach(p=>p.style.opacity='');
+  $('#mat').style.opacity=''; $('#desk').style.opacity=''; $('#lamp').style.opacity='';
+  if(AU.amb&&AU.ctx&&state.sound) AU.amb.gain.linearRampToValueAtTime(.045,AU.ctx.currentTime+2);
+  $('#comm').classList.remove('gone');
+  buildCommission();
+}
+$('#btnAgain').addEventListener('click',()=>{SND.click(); resetAll();});
+$('#btnRestart').addEventListener('click',()=>{SND.click(); resetAll();});
+$('#btnSound').classList.add('on');
+$('#btnSound').addEventListener('click',()=>{
+  state.sound=!state.sound;
+  $('#btnSound').classList.toggle('on',state.sound);
+  $('#btnSound').textContent=state.sound?'Sound':'Muted';
+  if(AU.amb&&AU.ctx) AU.amb.gain.linearRampToValueAtTime(state.sound?.045:0,AU.ctx.currentTime+.4);
+});
+
+/* ═══════════ boot ═══════════ */
+$('#comm').classList.add('gone');
+$('#commGo').addEventListener('click',()=>{
+  SND.seat();
+  $('#comm').classList.add('gone');
+  state.phase='build';
+  buildWatchSVG(); buildSteps(); buildTray();
+  setTimeout(()=>showTip('The bench is yours. Take the first piece from the tray and set it in the holder.',5200),1200);
+});
+$('#intro').addEventListener('click',()=>{
+  auInit(); SND.tick(2);
+  $('#intro').classList.add('gone');
+  state.phase='commission';
+  setTimeout(()=>$('#comm').classList.remove('gone'),700);
+  buildCommission();
+});
+buildWatchSVG();
+
+</script>
+</body>
+</html>
