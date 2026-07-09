@@ -2,1552 +2,876 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>The Watchmaker's Atelier — Assemble time itself</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>The Watchmaking Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   THE WATCHMAKER'S ATELIER
-   ============================================================ */
-:root{
-  --brass:#c9a227;
-  --cream:#e9ddc4;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{
-  font-family:Georgia,'Times New Roman',serif;
-  background:#150d06;
-  color:#e9ddc4;
-  user-select:none;-webkit-user-select:none;
-  cursor:default;
-}
-/* ---------- desk & lighting ---------- */
-#stage{position:fixed;inset:0;overflow:hidden;transition:transform 4s cubic-bezier(.22,1,.3,1), filter 4s ease;}
-#desk{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(140% 90% at 50% -8%, rgba(255,214,150,.16), rgba(255,190,110,.05) 42%, rgba(0,0,0,0) 70%),
-    linear-gradient(178deg, #46311c 0%, #3a2716 26%, #2c1c0e 58%, #1c1108 100%);
-  transition:filter 2.5s ease;
-}
-#desk::before{ /* wood grain */
-  content:"";position:absolute;inset:0;opacity:.5;
-  background:
-    repeating-linear-gradient(88deg, rgba(0,0,0,0) 0 26px, rgba(0,0,0,.10) 27px 29px, rgba(0,0,0,0) 30px 71px, rgba(255,220,170,.028) 72px 74px),
-    repeating-linear-gradient(91.5deg, rgba(0,0,0,0) 0 9px, rgba(0,0,0,.05) 10px 11px);
-}
-#desk::after{ /* fine noise */
-  content:"";position:absolute;inset:0;opacity:.20;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-#lampGlow{
-  position:absolute;left:50%;top:-14%;width:130vmin;height:96vmin;transform:translateX(-50%);
-  background:radial-gradient(ellipse at 50% 18%, rgba(255,207,133,.30), rgba(255,190,110,.10) 44%, rgba(0,0,0,0) 70%);
-  pointer-events:none;transition:opacity 2.5s ease, background 2.5s ease;
-}
-#vignette{position:absolute;inset:0;pointer-events:none;
-  box-shadow:inset 0 0 24vmin 8vmin rgba(8,4,1,.82);
-  background:radial-gradient(120% 120% at 50% 46%, rgba(0,0,0,0) 42%, rgba(6,3,1,.55) 100%);
-  transition:background 2.5s ease;
-}
-body.night #desk{filter:brightness(.42) saturate(.72) hue-rotate(-6deg)}
-body.night #lampGlow{background:radial-gradient(ellipse at 50% 18%, rgba(150,180,225,.16), rgba(120,150,200,.05) 44%, rgba(0,0,0,0) 70%)}
-body.night #vignette{background:radial-gradient(120% 120% at 50% 46%, rgba(0,0,0,0) 30%, rgba(2,4,10,.72) 100%)}
-#dust{position:absolute;inset:0;pointer-events:none;z-index:30}
-
-/* ---------- masthead ---------- */
-#masthead{
-  position:absolute;top:26px;left:0;right:0;text-align:center;z-index:20;pointer-events:none;
-  letter-spacing:.42em;font-size:11px;color:rgba(233,221,196,.62);
-  text-transform:uppercase;transition:opacity 2s ease;
-}
-#masthead .rule{display:inline-block;width:54px;height:1px;background:rgba(201,162,39,.5);vertical-align:middle;margin:0 16px 3px}
-#progress{
-  position:absolute;top:52px;left:0;right:0;text-align:center;z-index:20;pointer-events:none;
-  font-size:10px;letter-spacing:.34em;color:rgba(201,162,39,.72);font-variant:small-caps;
-  transition:opacity 1.4s ease;
-}
-#progressBar{position:absolute;top:70px;left:50%;transform:translateX(-50%);width:180px;height:1px;background:rgba(233,221,196,.14);z-index:20}
-#progressFill{height:100%;width:0%;background:linear-gradient(90deg,#8a6d1f,#e9cd7a);transition:width 1.1s cubic-bezier(.4,0,.2,1);box-shadow:0 0 6px rgba(233,205,122,.5)}
-
-/* ---------- bench (the watch) ---------- */
-#benchWrap{
-  position:absolute;left:50%;top:50%;z-index:10;
-  width:min(56vh,470px,86vw);aspect-ratio:400/620;
-  transform:translate(-50%,-51%);
-  perspective:1400px;
-}
-#mat{ /* leather work mat */
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:132%;height:96%;border-radius:24px;z-index:-1;
-  background:radial-gradient(90% 90% at 42% 34%, #4c3625, #34241660 62%, #2a1c10 100%), #33241608;
-  background-color:#3b2a1a;
-  box-shadow:0 22px 60px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,225,180,.09), inset 0 -14px 40px rgba(0,0,0,.4);
-  border:1px solid rgba(0,0,0,.5);outline:1.5px dashed rgba(214,183,128,.16);outline-offset:-11px;
-}
-#bench{position:absolute;inset:0;transform-style:preserve-3d;transition:transform 1.25s cubic-bezier(.55,.05,.25,1)}
-#bench.flipped{transform:rotateY(180deg)}
-#tilt{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .35s ease-out}
-#watch,#watchBack{position:absolute;inset:0;width:100%;height:100%;backface-visibility:hidden;overflow:visible}
-#watchBack{transform:rotateY(180deg)}
-#bench.jam{animation:jamShake .55s cubic-bezier(.36,.07,.19,.97)}
-@keyframes jamShake{
-  10%,90%{transform:translate(-1px,0) rotate(-.4deg)}20%,80%{transform:translate(2px,0) rotate(.5deg)}
-  30%,50%,70%{transform:translate(-3px,1px) rotate(-.7deg)}40%,60%{transform:translate(3px,-1px) rotate(.7deg)}
-}
-svg .layer{opacity:0;transition:opacity .5s ease}
-svg .layer.on{opacity:1}
-svg .layer.placing{animation:settle .62s cubic-bezier(.34,1.45,.5,1) both}
-@keyframes settle{0%{opacity:0;transform:scale(1.14)}55%{opacity:1;transform:scale(.985)}100%{opacity:1;transform:scale(1)}}
-#snapRing{position:absolute;left:50%;top:50%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(233,205,122,.85);
-  transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;z-index:40}
-#snapRing.go{animation:ringPulse .7s ease-out both}
-@keyframes ringPulse{0%{opacity:.9;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.1)}}
-
-/* ---------- parts tray ---------- */
-#tray{
-  position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:50;
-  width:min(1060px,100vw);padding:10px 18px 14px;
-  transition:opacity 1.6s ease, transform 1.6s ease;
-}
-#trayWood{
-  position:absolute;inset:0;border-radius:14px 14px 0 0;
-  background:linear-gradient(180deg,#52381f, #3a2712 30%, #2a1a0b);
-  box-shadow:0 -8px 34px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,222,170,.14), inset 0 -10px 26px rgba(0,0,0,.5);
-  border:1px solid rgba(0,0,0,.55);border-bottom:none;
-}
-#trayInner{position:relative;display:flex;gap:8px;overflow-x:auto;overflow-y:visible;padding:8px 4px 4px;scrollbar-width:thin;scrollbar-color:rgba(201,162,39,.3) transparent}
-#trayInner::-webkit-scrollbar{height:5px}
-#trayInner::-webkit-scrollbar-thumb{background:rgba(201,162,39,.28);border-radius:3px}
-.part{
-  position:relative;flex:0 0 auto;width:72px;height:84px;border-radius:9px;
-  background:radial-gradient(120% 100% at 50% 20%, rgba(0,0,0,.34), rgba(0,0,0,.55));
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,220,170,.07);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  cursor:grab;transition:transform .28s cubic-bezier(.34,1.5,.5,1), box-shadow .28s ease, opacity .5s ease;
-  touch-action:none;outline:none;
-}
-.part svg{width:46px;height:46px;overflow:visible;filter:drop-shadow(0 4px 5px rgba(0,0,0,.55));transition:transform .3s cubic-bezier(.34,1.5,.5,1)}
-.part .lbl{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(233,221,196,.42);text-align:center;line-height:1.25;padding:0 3px;transition:color .3s}
-.part:hover,.part:focus-visible{transform:translateY(-7px);box-shadow:inset 0 2px 6px rgba(0,0,0,.7),0 12px 22px rgba(0,0,0,.5)}
-.part:hover svg,.part:focus-visible svg{transform:scale(1.22)}
-.part:hover .lbl{color:rgba(240,224,190,.85)}
-.part:active{cursor:grabbing}
-.part.done{opacity:.14;pointer-events:none}
-.part.dragging{opacity:.15}
-.part.beckon svg{animation:beckon 2.4s ease-in-out infinite}
-@keyframes beckon{0%,100%{filter:drop-shadow(0 4px 5px rgba(0,0,0,.55))}50%{filter:drop-shadow(0 0 10px rgba(233,205,122,.75))}}
-#ghost{position:fixed;left:0;top:0;z-index:200;pointer-events:none;will-change:transform;display:none}
-#ghost svg{width:66px;height:66px;overflow:visible;filter:drop-shadow(0 18px 22px rgba(0,0,0,.6))}
-#hint{
-  position:absolute;left:50%;bottom:118px;transform:translateX(-50%);z-index:45;
-  font-style:italic;font-size:13px;color:rgba(233,221,196,.55);letter-spacing:.06em;
-  opacity:0;transition:opacity 1.8s ease;pointer-events:none;white-space:nowrap;
-}
-#hint.show{opacity:1}
-
-/* ---------- toolbar ---------- */
-#toolbar{position:absolute;right:22px;top:22px;z-index:60;display:flex;flex-direction:column;gap:10px;transition:opacity 1.4s ease}
-.tbtn{
-  width:38px;height:38px;border-radius:50%;border:1px solid rgba(201,162,39,.35);
-  background:rgba(20,12,5,.55);backdrop-filter:blur(4px);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .3s ease;position:relative;
-}
-.tbtn svg{width:17px;height:17px;stroke:rgba(233,221,196,.75);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.tbtn:hover{border-color:rgba(233,205,122,.8);background:rgba(40,26,10,.7);transform:scale(1.08)}
-.tbtn.active{border-color:#e9cd7a;box-shadow:0 0 10px rgba(233,205,122,.35)}
-.tbtn .tip{position:absolute;right:46px;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
-  color:rgba(233,221,196,.7);white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
-.tbtn:hover .tip{opacity:1}
-.tbtn.hidden{display:none}
-
-/* ---------- desk props ---------- */
-.prop{position:absolute;z-index:5;pointer-events:none;opacity:.9;transition:opacity 2s ease, filter .4s ease}
-.prop.interactive{pointer-events:auto;cursor:pointer}
-.prop.interactive:hover{filter:drop-shadow(0 0 8px rgba(233,205,122,.4))}
-#propBlueprint{left:2%;top:9%;width:min(19vw,240px);transform:rotate(-7deg)}
-#propTools{right:1.5%;bottom:16%;width:min(16vw,200px);transform:rotate(4deg)}
-#propCoffee{right:4%;top:9%;width:min(9vw,110px)}
-#propNotebook{left:2.5%;bottom:13%;width:min(15vw,190px);transform:rotate(3deg)}
-#propLoupe{left:20%;top:12%;width:min(7.5vw,92px);transform:rotate(-14deg)}
-@media (max-width:900px){#propBlueprint,#propNotebook,#propTools{display:none}}
-.steam{animation:steam 4.5s ease-in-out infinite;transform-origin:50% 100%}
-@keyframes steam{0%,100%{opacity:.16;transform:translateY(0) scaleX(1)}50%{opacity:.34;transform:translateY(-6px) scaleX(1.15)}}
-
-/* ---------- loupe lens ---------- */
-#lens{
-  position:fixed;width:210px;height:210px;border-radius:50%;z-index:150;pointer-events:none;display:none;
-  border:7px solid #2b1c0c;outline:2px solid #caa544;outline-offset:-4px;overflow:hidden;
-  box-shadow:0 24px 50px rgba(0,0,0,.7), inset 0 0 34px rgba(0,0,0,.5), inset 0 0 10px rgba(255,240,200,.12);
-  background:#1d1207;
-}
-#lens::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(60% 60% at 32% 26%, rgba(255,250,235,.14), rgba(0,0,0,0) 60%)}
-#lensInner{position:absolute;left:0;top:0;transform-origin:0 0}
-body.loupeOn #benchWrap{cursor:none}
-
-/* ---------- customization panel ---------- */
-#custPanel{
-  position:absolute;right:0;top:50%;transform:translate(110%,-50%);z-index:70;
-  width:238px;max-height:82vh;overflow-y:auto;padding:26px 22px 22px;
-  background:linear-gradient(160deg, rgba(30,19,8,.94), rgba(18,11,4,.96));
-  border:1px solid rgba(201,162,39,.28);border-right:none;border-radius:14px 0 0 14px;
-  box-shadow:-18px 0 50px rgba(0,0,0,.55);backdrop-filter:blur(6px);
-  transition:transform 1.2s cubic-bezier(.22,1,.3,1);scrollbar-width:thin;
-}
-#custPanel.open{transform:translate(0,-50%)}
-#custPanel h3{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#caa544;font-weight:normal;text-align:center;margin-bottom:4px}
-#custPanel .sub{font-size:10px;font-style:italic;color:rgba(233,221,196,.45);text-align:center;margin-bottom:16px}
-.cGroup{margin-bottom:15px}
-.cGroup h4{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:rgba(233,221,196,.55);font-weight:normal;margin-bottom:7px;border-bottom:1px solid rgba(201,162,39,.16);padding-bottom:4px}
-.swRow{display:flex;flex-wrap:wrap;gap:6px}
-.sw{
-  min-width:26px;height:26px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.14);
-  box-shadow:inset 0 2px 4px rgba(255,255,255,.22), inset 0 -2px 4px rgba(0,0,0,.4), 0 2px 5px rgba(0,0,0,.4);
-  transition:transform .22s cubic-bezier(.34,1.6,.5,1), box-shadow .22s;position:relative;
-}
-.sw:hover{transform:scale(1.22)}
-.sw.sel{outline:1.5px solid #e9cd7a;outline-offset:2.5px}
-.sw .tip2{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:rgba(240,224,190,.9);background:rgba(15,9,3,.92);padding:3px 7px;border-radius:3px;white-space:nowrap;opacity:0;transition:opacity .25s;pointer-events:none;z-index:5}
-.sw:hover .tip2{opacity:1}
-.swTxt{
-  height:24px;border-radius:12px;padding:0 10px;display:flex;align-items:center;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(233,221,196,.65);border:1px solid rgba(201,162,39,.25);cursor:pointer;transition:all .25s;background:rgba(0,0,0,.25);
-}
-.swTxt:hover{color:#f0e0be;border-color:rgba(233,205,122,.7)}
-.swTxt.sel{color:#1d1207;background:#caa544;border-color:#caa544}
-
-/* ---------- overlays ---------- */
-.overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:opacity 2.4s ease;padding:0 20px}
-#overlayIntro{background:radial-gradient(120% 120% at 50% 40%, rgba(24,14,5,.88), rgba(8,4,1,.985));cursor:pointer}
-#overlayIntro h1{font-size:clamp(26px,5vw,52px);font-weight:normal;letter-spacing:.3em;text-transform:uppercase;color:#ecdfc2;margin-bottom:18px;text-indent:.3em}
-#overlayIntro .tag{font-style:italic;font-size:clamp(14px,2vw,20px);color:#caa544;letter-spacing:.12em;margin-bottom:60px}
-#overlayIntro .enter{font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:rgba(233,221,196,.45);animation:breathe 3.4s ease-in-out infinite;text-indent:.5em}
-#overlayIntro .orn{width:120px;height:1px;background:linear-gradient(90deg,transparent,#caa544,transparent);margin:26px auto}
-@keyframes breathe{0%,100%{opacity:.3}50%{opacity:.85}}
-#overlayFinal{background:radial-gradient(130% 130% at 50% 42%, rgba(10,6,2,0) 34%, rgba(5,3,1,.93));opacity:0;pointer-events:none}
-#overlayFinal.show{opacity:1;pointer-events:auto}
-#finalMsg{font-size:clamp(20px,3.4vw,34px);font-style:italic;line-height:1.75;color:#ecdfc2;letter-spacing:.06em;text-shadow:0 2px 20px rgba(0,0,0,.8)}
-#finalMsg .l{display:block;opacity:0;transform:translateY(14px);transition:opacity 2.6s ease, transform 2.6s ease}
-#finalMsg.go .l1{opacity:1;transform:none;transition-delay:.4s}
-#finalMsg.go .l2{opacity:1;transform:none;transition-delay:2.4s;color:#e9cd7a}
-#finalActions{margin-top:54px;opacity:0;transition:opacity 2s ease 1s;display:flex;gap:26px}
-#overlayFinal.acts #finalActions{opacity:1}
-.fbtn{font-family:inherit;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:rgba(233,221,196,.75);background:none;
-  border:1px solid rgba(201,162,39,.4);padding:13px 26px 13px 30px;cursor:pointer;transition:all .4s ease;border-radius:2px}
-.fbtn:hover{color:#1d1207;background:#caa544;border-color:#caa544}
-#srLive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-
-/* slow motion aura */
-#stage.slowmo{filter:saturate(.85) brightness(.92)}
-#slowVin{position:fixed;inset:0;z-index:120;pointer-events:none;opacity:0;transition:opacity .8s ease;
-  background:radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(10,14,26,.5))}
-#slowVin.on{opacity:1}
-
-/* rolling screw */
-.looseScrew{position:fixed;z-index:180;width:16px;height:16px;pointer-events:none;will-change:transform}
-
-@media (prefers-reduced-motion:reduce){
-  .part.beckon svg,#overlayIntro .enter,.steam{animation:none}
-}
-@media (max-width:700px){
-  #benchWrap{width:min(50vh,80vw);top:47%}
-  #custPanel{width:200px;padding:20px 16px}
-  #masthead{font-size:9px;letter-spacing:.3em}
-}
+:root{--ink:#efe7d8;--muted:#a99e8c;--brass:#c8a24a;--sans:'Inter',system-ui,sans-serif;--serif:'Cormorant Garamond',Georgia,serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink);cursor:default;
+  background:radial-gradient(120% 100% at 50% 42%, #17110b 0%, #070503 72%)}
+#c{position:fixed;inset:0;display:block;touch-action:none}
+/* cinematic vignette */
+#vig{position:fixed;inset:0;pointer-events:none;z-index:5;
+  box-shadow:inset 0 0 220px 60px rgba(0,0,0,.72), inset 0 0 60px 10px rgba(0,0,0,.35);
+  transition:opacity 1.6s ease}
+/* caption — the interface almost disappears */
+#cap{position:fixed;left:0;right:0;bottom:46px;z-index:8;text-align:center;pointer-events:none;
+  opacity:0;transition:opacity .9s ease}
+#cap .n{font-family:var(--serif);font-size:26px;letter-spacing:.01em}
+#cap .h{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:300}
+#cap.on{opacity:1}
+/* progress ticks */
+#prog{position:fixed;left:50%;top:30px;transform:translateX(-50%);z-index:8;display:flex;gap:7px;opacity:0;transition:opacity 1s}
+#prog.on{opacity:.9}
+#prog i{width:6px;height:6px;border-radius:50%;background:rgba(239,231,216,.18);transition:.5s;display:block}
+#prog i.done{background:var(--brass);box-shadow:0 0 9px rgba(200,162,74,.7)}
+#prog i.cur{background:var(--ink);transform:scale(1.35)}
+/* floating controls, only when needed */
+.act{position:fixed;z-index:9;opacity:0;transform:translateY(8px);transition:.7s;pointer-events:none}
+.act.on{opacity:1;transform:none;pointer-events:auto}
+.btn{font-family:var(--sans);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
+  border:1px solid rgba(239,231,216,.28);background:rgba(20,16,12,.5);backdrop-filter:blur(6px);
+  padding:13px 26px;border-radius:2px;cursor:pointer;transition:.35s}
+.btn:hover{border-color:var(--brass);color:#f6ecd6}
+.btn.gold{background:var(--brass);color:#1a1207;border-color:var(--brass)}
+.btn.gold:hover{box-shadow:0 0 30px rgba(200,162,74,.4)}
+#finishActs{left:0;right:0;bottom:40px;display:flex;gap:12px;justify-content:center}
+/* intro */
+#intro{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(120% 100% at 50% 40%, #16110b 0%, #070503 72%);transition:opacity 1.4s ease}
+#intro.gone{opacity:0;pointer-events:none}
+#intro .k{font-size:11px;letter-spacing:.55em;text-transform:uppercase;color:var(--brass);margin-bottom:26px}
+#intro h1{font-family:var(--serif);font-weight:500;font-size:clamp(46px,9vw,104px);line-height:1;letter-spacing:.01em}
+#intro h1 em{font-style:italic;color:#e7cf8f}
+#intro p{max-width:440px;margin:24px auto 0;color:var(--muted);font-size:14.5px;line-height:1.75;font-weight:300}
+#sit{margin-top:42px;padding:15px 38px;border:1px solid var(--brass);color:#e7cf8f;letter-spacing:.28em;
+  font-size:11px;text-transform:uppercase;background:none;border-radius:2px;cursor:pointer;transition:.4s}
+#sit:hover{background:var(--brass);color:#1a1207;box-shadow:0 0 40px rgba(200,162,74,.35)}
+#intro .f{position:absolute;bottom:24px;font-size:10px;letter-spacing:.34em;color:#5a5044;text-transform:uppercase}
+#loading{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#070503;
+  color:var(--muted);font-size:11px;letter-spacing:.34em;text-transform:uppercase;transition:opacity .8s}
+#loading.gone{opacity:0;pointer-events:none}
+#err{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;text-align:center;
+  background:#070503;color:var(--muted);font-size:13px;line-height:1.7;padding:40px}
+#err.on{display:flex}
+.hint-drag{position:fixed;z-index:8;pointer-events:none;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);opacity:0;transition:.6s}
 </style>
 </head>
 <body>
-<div id="stage">
-  <div id="desk"></div>
-  <div id="lampGlow"></div>
-
-  <!-- desk props -->
-  <svg id="propBlueprint" class="prop" viewBox="0 0 240 170">
-    <rect x="4" y="4" width="232" height="162" rx="3" fill="#20293a" opacity=".85"/>
-    <rect x="4" y="4" width="232" height="162" rx="3" fill="none" stroke="#0e1420" stroke-width="2"/>
-    <g stroke="#9fb8d8" stroke-width=".8" fill="none" opacity=".8">
-      <circle cx="88" cy="86" r="52"/><circle cx="88" cy="86" r="44"/><circle cx="88" cy="86" r="14"/>
-      <path d="M88,34 L88,20 M88,138 L88,152 M36,86 L22,86 M140,86 L154,86"/>
-      <circle cx="118" cy="62" r="16"/><circle cx="64" cy="112" r="12"/>
-      <path d="M170,40 h52 M170,52 h40 M170,64 h48 M170,88 h52 M170,100 h34 M170,112 h44" stroke-width=".7" opacity=".6"/>
-      <path d="M88,86 L124,50" stroke-dasharray="3 3" opacity=".6"/>
-    </g>
-    <text x="176" y="148" fill="#9fb8d8" font-size="8" font-style="italic" opacity=".7" font-family="Georgia">cal. 001</text>
-  </svg>
-
-  <svg id="propCoffee" class="prop" viewBox="0 0 110 110">
-    <ellipse cx="55" cy="88" rx="40" ry="12" fill="rgba(0,0,0,.4)"/>
-    <path d="M22,50 a33,30 0 0 0 66,0 l-2,-16 a31,10 0 0 0 -62,0 Z" fill="#e5dccb"/>
-    <ellipse cx="55" cy="35" rx="31" ry="10" fill="#c9bda6"/>
-    <ellipse cx="55" cy="35" rx="26" ry="8" fill="#3a2213"/>
-    <ellipse cx="50" cy="33.4" rx="9" ry="3" fill="#5b3a20" opacity=".8"/>
-    <path d="M87,44 q18,4 12,18 q-5,12 -18,10" fill="none" stroke="#e5dccb" stroke-width="6"/>
-    <g class="steam" stroke="#fff" stroke-width="2" fill="none" opacity=".2" stroke-linecap="round">
-      <path d="M46,22 q-4,-8 2,-14"/><path d="M60,20 q5,-9 -1,-15"/>
-    </g>
-  </svg>
-
-  <svg id="propTools" class="prop" viewBox="0 0 200 130">
-    <ellipse cx="100" cy="112" rx="88" ry="12" fill="rgba(0,0,0,.35)"/>
-    <!-- screwdriver -->
-    <g transform="rotate(-12 60 60)">
-      <rect x="30" y="52" width="52" height="12" rx="6" fill="#7a2e1e"/>
-      <rect x="30" y="55" width="52" height="2.5" rx="1" fill="rgba(255,255,255,.25)"/>
-      <rect x="82" y="56" width="46" height="4" fill="#c8ccd4"/>
-      <rect x="126" y="55.4" width="8" height="5.2" fill="#9a9ea8"/>
-    </g>
-    <!-- tweezers -->
-    <g transform="rotate(8 120 96)">
-      <path d="M52,92 L146,86 L54,98 Z" fill="#b8bcc6"/>
-      <path d="M52,95 L142,102 L54,99 Z" fill="#989ca8"/>
-    </g>
-    <!-- oil bottle -->
-    <g transform="translate(152,28)">
-      <rect x="6" y="16" width="26" height="34" rx="5" fill="#274018" opacity=".92"/>
-      <rect x="6" y="26" width="26" height="12" fill="#e8dcc0"/>
-      <text x="19" y="35" text-anchor="middle" font-size="6.5" fill="#3a2a10" font-family="Georgia" font-style="italic">huile</text>
-      <rect x="13" y="6" width="12" height="12" rx="2" fill="#1a1208"/>
-      <rect x="11" y="12" width="16" height="5" rx="2" fill="#caa544"/>
-    </g>
-  </svg>
-
-  <svg id="propNotebook" class="prop" viewBox="0 0 190 130">
-    <rect x="8" y="10" width="174" height="110" rx="4" fill="#33261a" transform="rotate(-1 95 65)"/>
-    <rect x="14" y="14" width="162" height="100" rx="2" fill="#e9dfc8" transform="rotate(-1 95 65)"/>
-    <g stroke="#8a7c5e" stroke-width=".8" opacity=".7" transform="rotate(-1 95 65)">
-      <path d="M28,36 h100 M28,50 h130 M28,64 h112 M28,78 h124 M28,92 h60"/>
-    </g>
-    <g transform="rotate(-1 95 65)" opacity=".65">
-      <circle cx="152" cy="82" r="17" fill="none" stroke="#5a4a2e" stroke-width="1"/>
-      <path d="M152,70 v12 l8,6" fill="none" stroke="#5a4a2e" stroke-width="1"/>
-    </g>
-    <rect x="90" y="102" width="66" height="7" rx="3.5" fill="#8a6d1f" transform="rotate(-4 120 105)"/>
-    <path d="M156,103 l10,3 -10,3 Z" fill="#2a1c0e" transform="rotate(-4 120 105)"/>
-  </svg>
-
-  <svg id="propLoupe" class="prop interactive" viewBox="0 0 92 92" role="button" aria-label="Pick up the loupe" tabindex="0">
-    <ellipse cx="46" cy="80" rx="34" ry="8" fill="rgba(0,0,0,.4)"/>
-    <circle cx="40" cy="40" r="30" fill="rgba(190,215,235,.16)" stroke="#caa544" stroke-width="5"/>
-    <circle cx="40" cy="40" r="30" fill="none" stroke="#7a5c22" stroke-width="1.5"/>
-    <path d="M30,26 a18,18 0 0 1 16,-6" stroke="rgba(255,255,255,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <rect x="60" y="58" width="28" height="13" rx="6" transform="rotate(45 62 60)" fill="#3a2413"/>
-  </svg>
-
-  <!-- the watch -->
-  <div id="benchWrap">
-    <div id="mat"></div>
-    <div id="tilt">
-      <div id="bench">
-        <svg id="watch" viewBox="0 0 400 620" aria-label="Watch under assembly"></svg>
-        <svg id="watchBack" viewBox="0 0 400 620" aria-hidden="true"></svg>
-      </div>
-    </div>
-    <div id="snapRing"></div>
-  </div>
-
-  <div id="hint"></div>
-
-  <!-- tray -->
-  <div id="tray"><div id="trayWood"></div><div id="trayInner"></div></div>
-
-  <header id="masthead"><span class="rule"></span>The Watchmaker&rsquo;s Atelier<span class="rule"></span></header>
-  <div id="progress"></div>
-  <div id="progressBar"><div id="progressFill"></div></div>
-
-  <!-- toolbar -->
-  <div id="toolbar">
-    <button class="tbtn" id="btnSound" aria-label="Toggle sound"><span class="tip">Sound</span>
-      <svg viewBox="0 0 24 24"><path d="M4,9 h4 l5,-4 v14 l-5,-4 h-4 Z"/><path d="M16.5,8.5 a5,5 0 0 1 0,7" class="wv"/></svg></button>
-    <button class="tbtn" id="btnNight" aria-label="Night mode"><span class="tip">Lamplight</span>
-      <svg viewBox="0 0 24 24"><path d="M19,13.5 A8,8 0 1 1 10.5,5 A6.5,6.5 0 0 0 19,13.5 Z"/></svg></button>
-    <button class="tbtn hidden" id="btnFlip" aria-label="Turn the watch over"><span class="tip">Turn over</span>
-      <svg viewBox="0 0 24 24"><path d="M4,12 a8,5.5 0 1 0 3,-4.4"/><path d="M4,4 v5 h5"/></svg></button>
-  </div>
-
-  <div id="vignette"></div>
-  <canvas id="dust"></canvas>
+<canvas id="c"></canvas>
+<div id="vig"></div>
+<div id="prog"></div>
+<div id="cap"><div class="n"></div><div class="h"></div></div>
+<div class="act" id="finishActs">
+  <button class="btn" id="orbitBtn">Turn slowly</button>
+  <button class="btn gold" id="dlBtn">Download photograph</button>
+  <button class="btn" id="againBtn">Begin again</button>
 </div>
 
-<!-- customization -->
-<aside id="custPanel" aria-label="Customization">
-  <h3>Make It Yours</h3>
-  <div class="sub">every detail, to your taste</div>
-  <div id="custGroups"></div>
-</aside>
-
-<!-- loupe lens -->
-<div id="lens"><div id="lensInner"></div></div>
-<div id="slowVin"></div>
-<div id="ghost"></div>
-
-<!-- intro -->
-<div class="overlay" id="overlayIntro">
-  <h1>The Watchmaker&rsquo;s Atelier</h1>
-  <div class="tag">Assemble time itself.</div>
-  <div class="orn"></div>
-  <div class="enter">Enter the atelier</div>
-</div>
-
-<!-- final -->
-<div class="overlay" id="overlayFinal">
-  <div id="finalMsg">
-    <span class="l l1">You didn&rsquo;t build a watch.</span>
-    <span class="l l2">You assembled time.</span>
-  </div>
-  <div id="finalActions">
-    <button class="fbtn" id="btnCustomize">Make it yours</button>
-    <button class="fbtn" id="btnAgain">Build another</button>
-  </div>
-</div>
-
-<div id="srLive" aria-live="polite"></div>
-
+<div id="loading">Preparing the bench…</div>
+<div id="err"></div>
 <script>
-"use strict";
-/* ================================================================
-   A. GEOMETRY HELPERS, SVG BUILDERS, PART REGISTRY
-   ================================================================ */
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function P(r,a){return (r*Math.cos(a)).toFixed(2)+','+(r*Math.sin(a)).toFixed(2);}
-function gearPath(r,teeth,th,type){
-  th = th || r*.15;
-  let p=''; const s=Math.PI*2/teeth;
-  for(let i=0;i<teeth;i++){
-    const a=i*s;
-    if(type==='escape'){
-      p+=(i?'L':'M')+P(r+th,a)+' L'+P(r*.92,a+s*.22)+' L'+P(r,a+s*.88)+' ';
-    }else{
-      p+=(i?'L':'M')+P(r,a)+' L'+P(r+th,a+s*.13)+' L'+P(r+th,a+s*.37)+' L'+P(r,a+s*.5)+' ';
-    }
+/* fallback if the 3D engine can't load (offline / blocked CDN) */
+window.__wmLoaded=false;
+setTimeout(function(){
+  if(!window.__wmLoaded){
+    var e=document.getElementById('err');
+    e.textContent="The 3D engine (Three.js) could not load. Please open this file in a desktop browser with an internet connection — the first load fetches the WebGL library from a CDN.";
+    e.classList.add('on');document.getElementById('loading').classList.add('gone');
   }
-  return p+'Z';
+},9000);
+window.addEventListener('error',function(ev){
+  if(ev&&ev.message&&/import|module|three/i.test(ev.message)&&!window.__wmLoaded){
+    var e=document.getElementById('err');
+    e.textContent="Something blocked the 3D engine from starting. Try a different desktop browser, or check that scripts from jsdelivr.net are allowed.";
+    e.classList.add('on');document.getElementById('loading').classList.add('gone');
+  }
+});
+</script>
+
+<section id="intro">
+  <div class="k">A Digital Craft Experience</div>
+  <h1>The <em>Watchmaking</em> Table</h1>
+  <p>Sit down at the bench. Take each part with the tweezers and build a mechanical movement by hand — until it draws its first breath.</p>
+  <button id="sit">Sit at the bench</button>
+  <div class="f">Best with sound · drag each component into place</div>
+</section>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
 }
-function spiralPath(turns,r0,r1,step){
-  step=step||0.22; let p='M'+r0.toFixed(1)+',0'; const A=turns*Math.PI*2;
-  for(let a=step;a<=A;a+=step){
-    const r=r0+(r1-r0)*a/A;
-    p+=' L'+(r*Math.cos(a)).toFixed(1)+','+(r*Math.sin(a)).toFixed(1);
-  }
-  return p;
-}
-function screw(x,y,ang,r){
-  r=r||4;
-  return `<g transform="translate(${x},${y}) rotate(${ang||0})">
-    <circle r="${r}" fill="url(#gSteel)" stroke="#3c3f46" stroke-width=".6"/>
-    <rect x="${-r*.85}" y="-.7" width="${r*1.7}" height="1.4" rx=".7" fill="#2b2e34"/>
-    <circle r="${r}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".4" stroke-dasharray="${(r*2).toFixed(1)} ${(r*4.3).toFixed(1)}"/></g>`;
-}
-function jewelSVG(x,y,r){
-  r=r||4;
-  return `<g transform="translate(${x},${y})">
-    <circle r="${r+2.4}" fill="none" stroke="url(#gGold)" stroke-width="1.6"/>
-    <circle r="${r}" fill="url(#gRuby)"/>
-    <circle cx="${-r*.34}" cy="${-r*.34}" r="${r*.28}" fill="rgba(255,220,225,.85)"/></g>`;
-}
-function wheelSVG(r,teeth,opt){
-  opt=opt||{};
-  let m=`<path d="${gearPath(r,teeth,opt.th,opt.type)}" fill="url(#gGold)" stroke="#7a5c22" stroke-width=".6"/>`;
-  m+=`<circle r="${(r*.985).toFixed(1)}" fill="none" stroke="rgba(110,82,28,.55)" stroke-width="1.1"/>`;
-  if(!opt.solid){
-    const hr=r*.52, n=opt.spokes||4;
-    for(let i=0;i<n;i++){
-      const a=i*Math.PI*2/n+Math.PI/n;
-      m+=`<circle cx="${(hr*Math.cos(a)).toFixed(1)}" cy="${(hr*Math.sin(a)).toFixed(1)}" r="${(r*.29).toFixed(1)}" fill="rgba(24,15,5,.55)"/>`;
-    }
-  }
-  m+=`<circle r="${(r*.17).toFixed(1)}" fill="none" stroke="url(#gSteel)" stroke-width="${(r*.09).toFixed(1)}"/>`;
-  m+=`<circle r="${(r*.35).toFixed(1)}" fill="none" stroke="rgba(122,92,34,.7)" stroke-width=".8"/>`;
-  return m;
-}
-/* movement anchor points (within the 400x400 movement space, center 200,200) */
-const POS={barrel:[200,128],center:[200,200],third:[258,232],fourth:[236,288],escape:[176,278],lever:[150,251],balance:[124,218]};
+</script>
 
-/* ---------------- static defs ---------------- */
-function buildDefs(){
-  return `<defs>
-  <radialGradient id="gPlate" cx=".4" cy=".33" r="1.05">
-    <stop offset="0" stop-color="#e3c690"/><stop offset=".55" stop-color="#c09659"/><stop offset="1" stop-color="#7e5c2e"/>
-  </radialGradient>
-  <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#f4dd94"/><stop offset=".5" stop-color="#cfa63a"/><stop offset="1" stop-color="#8a6d1f"/>
-  </linearGradient>
-  <linearGradient id="gSteel" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#f2f3f5"/><stop offset=".5" stop-color="#b6bac2"/><stop offset="1" stop-color="#70747e"/>
-  </linearGradient>
-  <radialGradient id="gRuby" cx=".35" cy=".3" r="1">
-    <stop offset="0" stop-color="#ff5f76"/><stop offset=".6" stop-color="#b3123a"/><stop offset="1" stop-color="#69041e"/>
-  </radialGradient>
-  <linearGradient id="gCase" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" id="cs0" stop-color="#e8e8ea"/><stop offset=".52" id="cs1" stop-color="#9a9aa2"/><stop offset="1" id="cs2" stop-color="#6c6c74"/>
-  </linearGradient>
-  <linearGradient id="gCaseV" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" id="cv0" stop-color="#e8e8ea"/><stop offset=".5" id="cv1" stop-color="#9a9aa2"/><stop offset="1" id="cv2" stop-color="#6c6c74"/>
-  </linearGradient>
-  <radialGradient id="gMOP" cx=".38" cy=".32" r="1">
-    <stop offset="0" stop-color="#fdfbf6"/><stop offset=".38" stop-color="#f3e4ec"/><stop offset=".68" stop-color="#dde8f2"/><stop offset="1" stop-color="#efe9da"/>
-  </radialGradient>
-  <radialGradient id="gDialShade" cx=".5" cy=".5" r=".5">
-    <stop offset="0" stop-color="rgba(255,255,255,0)"/><stop offset=".82" stop-color="rgba(255,255,255,0)"/><stop offset="1" stop-color="rgba(0,0,0,.38)"/>
-  </radialGradient>
-  <pattern id="perlage" width="17" height="17" patternUnits="userSpaceOnUse">
-    <circle cx="8.5" cy="8.5" r="8" fill="none" stroke="rgba(60,38,10,.28)" stroke-width="2.6"/>
-    <circle cx="0" cy="0" r="8" fill="none" stroke="rgba(255,240,200,.20)" stroke-width="1.4"/>
-    <circle cx="17" cy="17" r="8" fill="none" stroke="rgba(255,240,200,.20)" stroke-width="1.4"/>
-  </pattern>
-  <pattern id="stripes" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
-    <rect width="18" height="18" fill="rgba(0,0,0,0)"/>
-    <rect width="9" height="18" fill="rgba(70,44,10,.20)"/>
-    <rect x="8" width="2.2" height="18" fill="rgba(255,240,200,.22)"/>
-  </pattern>
-  <pattern id="patMeteor" width="26" height="26" patternUnits="userSpaceOnUse">
-    <rect width="26" height="26" fill="#9aa0a8"/>
-    <g stroke="rgba(50,55,64,.6)" stroke-width="1.6">
-      <path d="M-4,8 L30,2 M-2,20 L28,14 M4,30 L26,22"/>
-      <path d="M6,-4 L12,30 M18,-2 L24,28" stroke="rgba(235,240,246,.55)" stroke-width="1.2"/>
-    </g>
-  </pattern>
-  <pattern id="patMesh" width="7" height="7" patternUnits="userSpaceOnUse">
-    <rect width="7" height="7" fill="#8f939c"/>
-    <circle cx="1.8" cy="1.8" r="1.7" fill="#c6cad2"/><circle cx="5.3" cy="5.3" r="1.7" fill="#b2b6be"/>
-    <circle cx="5.3" cy="1.8" r="1.4" fill="#6e727c"/><circle cx="1.8" cy="5.3" r="1.4" fill="#787c86"/>
-  </pattern>
-  <filter id="fBlur1"><feGaussianBlur stdDeviation="1.1"/></filter>
-  <filter id="fBlur3"><feGaussianBlur stdDeviation="3"/></filter>
-  </defs>`;
-}
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-/* ---------------- watch front skeleton: fixed z-ordered layer groups ---------------- */
-const LAYER_ORDER=['strapTop','strapBot','__mv','holder','mainplate','jewels','mainspring','barrel','center','third','fourth','escape','escapement','balspring','balance','bridges','dial','chapter','hands','case','bezel','crystal','crown','__end'];
-function buildWatchSkeleton(svg,back){
-  let inner=buildDefs();
-  if(!back){
-    inner+=`<g id="LstrapTop" class="layer"></g><g id="LstrapBot" class="layer"></g>`;
-  }
-  inner+=`<g transform="translate(0,110)${back?' scale(-1,1) translate(-400,0)':''}">`;
-  if(!back){
-    inner+=`<g id="Lholder">
-      <circle cx="200" cy="200" r="163" fill="rgba(14,8,2,.5)" filter="url(#fBlur3)"/>
-      <circle cx="200" cy="200" r="160" fill="#241708" stroke="#120b04" stroke-width="3"/>
-      <circle cx="200" cy="200" r="155" fill="none" stroke="url(#gGold)" stroke-width="3" opacity=".8"/>
-      <g fill="#3a2c14">${[0,120,240].map(a=>`<rect x="192" y="30" width="16" height="14" rx="3" transform="rotate(${a} 200 200)"/>`).join('')}</g>
-    </g>`;
-  } else {
-    inner+=`<g id="Bholderb"><circle cx="200" cy="200" r="160" fill="#1a1006"/></g>`;
-  }
-  const pre=back?'B':'L';
-  const movLayers=['mainplate','jewels','mainspring','barrel','center','third','fourth','escape','escapement','balspring','balance','bridges'];
-  movLayers.forEach(id=>{inner+=`<g id="${pre}${id}" class="layer"></g>`;});
-  if(!back){
-    ['dial','chapter','hands','case','bezel','crystal','crown'].forEach(id=>{inner+=`<g id="L${id}" class="layer"></g>`;});
-  } else {
-    inner+=`</g><g id="Bcaseback" class="layer"></g><g transform="translate(0,110)">`;
-  }
-  inner+='</g>';
-  svg.innerHTML=inner;
-}
+/* ===================================================================
+   THE WATCHMAKING TABLE — true 3D (Three.js)
+   Single file. Procedural materials, PBR, IBL, drag-assembly, mechanism.
+   =================================================================== */
+const CFG={
+  DPRmax:2,
+  gilt:0xd7c088, giltDark:0x9c8038,
+  steel:0xc6ccd2, blued:0x2e4a86, ruby:0x86131f,
+};
+let renderer,scene,camera,controls,clock,pmrem;
+let W=innerWidth,H=innerHeight;
+const canvas=document.getElementById('c');
+const $=s=>document.querySelector(s);
 
-/* ---------------- per-part layer artwork ---------------- */
-const ART={};
-ART.mainplate=()=>{
-  let m=`<circle cx="200" cy="200" r="150" fill="url(#gPlate)" stroke="#5e421c" stroke-width="2"/>
-  <circle cx="200" cy="200" r="150" fill="url(#perlage)" opacity=".5"/>
-  <circle cx="200" cy="200" r="146" fill="none" stroke="rgba(255,240,200,.35)" stroke-width="1"/>`;
-  for(const k of ['barrel','center','third','fourth','escape','balance']){
-    const [x,y]=POS[k]; const rr={barrel:44,center:36,third:27,fourth:23,escape:18,balance:34}[k];
-    m+=`<circle cx="${x}" cy="${y}" r="${rr}" fill="rgba(40,24,6,.30)"/>
-        <circle cx="${x}" cy="${y}" r="${rr}" fill="none" stroke="rgba(255,235,190,.18)" stroke-width="1"/>`;
-  }
-  m+=screw(78,110,20,4.5)+screw(322,110,140,4.5)+screw(96,306,75,4.5)+screw(304,306,-30,4.5);
-  m+=`<text x="200" y="342" text-anchor="middle" font-size="7" letter-spacing="3" fill="rgba(70,44,12,.85)" font-family="Georgia">SWISS&#160;MADE</text>`;
-  return m;
-};
-ART.jewels=()=>{
-  let m='';
-  for(const k of ['barrel','center','third','fourth','escape','lever','balance']){
-    const [x,y]=POS[k]; m+=jewelSVG(x,y,k==='barrel'?4.6:k==='lever'?3:4);
-  }
-  return m;
-};
-ART.mainspring=()=>{
-  const [x,y]=POS.barrel;
-  return `<g transform="translate(${x},${y})" id="springCoil">
-    <circle r="42" fill="rgba(30,18,5,.6)"/>
-    <path d="${spiralPath(5.5,4,37)}" fill="none" stroke="#767c88" stroke-width="3.1" stroke-linecap="round"/>
-    <path d="${spiralPath(5.5,4,37)}" fill="none" stroke="rgba(240,244,250,.5)" stroke-width="1" stroke-linecap="round"/>
-    <circle r="5" fill="url(#gSteel)"/><rect x="-1.4" y="-5" width="2.8" height="10" fill="#3a3d44"/>
-  </g>`;
-};
-ART.barrel=()=>{
-  const [x,y]=POS.barrel;
-  return `<g transform="translate(${x},${y})"><g class="rotBarrel">
-    <path d="${gearPath(44,52,4.4)}" fill="url(#gGold)" stroke="#7a5c22" stroke-width=".6"/>
-    <circle r="43" fill="url(#gGold)"/>
-    <circle r="43" fill="url(#gPlate)" opacity=".35"/>
-    <circle r="40" fill="none" stroke="rgba(110,80,26,.7)" stroke-width="1.4"/>
-    <circle r="30" fill="none" stroke="rgba(255,240,200,.4)" stroke-width="1"/>
-    <circle r="20" fill="none" stroke="rgba(110,80,26,.5)" stroke-width="1"/>
-    ${screw(0,0,45,5)}
-    <rect x="-3.2" y="-3.2" width="6.4" height="6.4" fill="#2e3138" transform="rotate(45)"/>
-  </g></g>`;
-};
-ART.center =()=>`<g transform="translate(${POS.center[0]},${POS.center[1]})"><g class="rotCenter">${wheelSVG(36,44)}</g></g>`;
-ART.third  =()=>`<g transform="translate(${POS.third[0]},${POS.third[1]})"><g class="rotThird">${wheelSVG(27,36)}</g></g>`;
-ART.fourth =()=>`<g transform="translate(${POS.fourth[0]},${POS.fourth[1]})"><g class="rotFourth">${wheelSVG(23,30)}</g></g>`;
-ART.escape =()=>`<g transform="translate(${POS.escape[0]},${POS.escape[1]})"><g class="rotEscape">
-  <path d="${gearPath(15.5,15,5,'escape')}" fill="url(#gSteel)" stroke="#5c6068" stroke-width=".5"/>
-  <circle r="13" fill="none" stroke="rgba(70,74,82,.5)" stroke-width="1"/>
-  ${[0,1,2,3].map(i=>{const a=i*Math.PI/2+Math.PI/4;return `<circle cx="${(8*Math.cos(a)).toFixed(1)}" cy="${(8*Math.sin(a)).toFixed(1)}" r="4" fill="rgba(24,15,5,.5)"/>`;}).join('')}
-  <circle r="5.5" fill="none" stroke="url(#gSteel)" stroke-width="2"/><circle r="2" fill="#23150a"/></g></g>`;
-ART.escapement=()=>{
-  const [x,y]=POS.lever;
-  return `<g transform="translate(${x},${y}) rotate(-46)"><g class="rotLever">
-    <path d="M-30,-3 L-24,-1.6 L18,-1.8 L26,-6 L29,-3.4 L23,1 L26,4.4 L22.5,6.5 L18,1.8 L-24,1.6 L-30,3 Z"
-      fill="url(#gSteel)" stroke="#565a62" stroke-width=".7"/>
-    <rect x="14" y="-6.4" width="4.6" height="5" rx="1" fill="url(#gRuby)" transform="rotate(14 16 -4)"/>
-    <rect x="14" y="1.6" width="4.6" height="5" rx="1" fill="url(#gRuby)" transform="rotate(-14 16 4)"/>
-    <circle cx="-30" cy="0" r="2.6" fill="url(#gRuby)"/>
-    <circle r="3.2" fill="url(#gSteel)" stroke="#494c54" stroke-width=".6"/><circle r="1.1" fill="#20130a"/>
-  </g></g>`;
-};
-ART.balspring=()=>{
-  const [x,y]=POS.balance;
-  return `<g transform="translate(${x},${y})"><g class="rotSpring">
-    <path d="${spiralPath(6,2.5,27,.16)}" fill="none" stroke="#4a5666" stroke-width="1.25"/>
-    <circle cx="27" cy="0" r="2" fill="url(#gGold)"/>
-  </g></g>`;
-};
-ART.balance=()=>{
-  const [x,y]=POS.balance;
-  let sc='';
-  for(let i=0;i<8;i++){const a=i*Math.PI/4+.4; sc+=`<circle cx="${(33*Math.cos(a)).toFixed(1)}" cy="${(33*Math.sin(a)).toFixed(1)}" r="1.9" fill="url(#gGold)" stroke="#6e5518" stroke-width=".4"/>`;}
-  return `<g transform="translate(${x},${y})" data-eg="balance"><g class="rotBalance">
-    <circle r="33" fill="none" stroke="url(#gGold)" stroke-width="6.5"/>
-    <circle r="36.5" fill="none" stroke="rgba(255,240,200,.35)" stroke-width=".8"/>
-    <path d="M-30,0 L30,0" stroke="url(#gGold)" stroke-width="4.6"/>
-    <path d="M0,-30 L0,30" stroke="url(#gGold)" stroke-width="3" opacity=".85"/>
-    ${sc}
-    <circle r="4.6" fill="url(#gSteel)"/><circle r="1.6" fill="url(#gRuby)"/>
-  </g><circle r="42" fill="rgba(0,0,0,0)"/></g>`;
-};
-ART.bridges=()=>{
-  const bevel='stroke="rgba(255,238,190,.55)" stroke-width="1"';
-  return `
-  <g>
-    <path id="brBarrel" d="M64,148 Q56,64 156,54 Q232,46 278,84 L268,124 Q216,92 162,98 Q106,106 102,152 Z"
-      fill="url(#gPlate)"/>
-    <path d="M64,148 Q56,64 156,54 Q232,46 278,84 L268,124 Q216,92 162,98 Q106,106 102,152 Z" fill="url(#stripes)"/>
-    <path d="M64,148 Q56,64 156,54 Q232,46 278,84 L268,124 Q216,92 162,98 Q106,106 102,152 Z" fill="none" ${bevel}/>
-    ${jewelSVG(200,128,4.6)}${screw(84,120,10,4.2)}${screw(252,96,80,4.2)}${screw(148,68,150,4.2)}
-    <path d="M310,178 Q342,244 288,306 Q246,350 192,338 L198,306 Q244,314 266,276 Q288,238 276,196 Z" fill="url(#gPlate)"/>
-    <path d="M310,178 Q342,244 288,306 Q246,350 192,338 L198,306 Q244,314 266,276 Q288,238 276,196 Z" fill="url(#stripes)"/>
-    <path d="M310,178 Q342,244 288,306 Q246,350 192,338 L198,306 Q244,314 266,276 Q288,238 276,196 Z" fill="none" ${bevel}/>
-    ${jewelSVG(258,232,3.8)}${jewelSVG(236,288,3.6)}${screw(296,262,40,4.2)}${screw(222,322,-70,4.2)}
-    <path d="M52,196 L106,206 A17,17 0 1 1 106,232 L52,244 Z" fill="url(#gPlate)"/>
-    <path d="M52,196 L106,206 A17,17 0 1 1 106,232 L52,244 Z" fill="url(#stripes)"/>
-    <path d="M52,196 L106,206 A17,17 0 1 1 106,232 L52,244 Z" fill="none" ${bevel}/>
-    ${jewelSVG(124,218,3.6)}${screw(66,220,100,4)}
-    <g transform="translate(96,206) rotate(-8)"><path d="M0,0 l14,2" stroke="#2e2410" stroke-width="1.2"/><path d="M0,5 l14,-1" stroke="#2e2410" stroke-width="1.2"/></g>
-    <text x="230" y="168" font-size="6" letter-spacing="1.5" fill="rgba(66,42,12,.9)" font-family="Georgia" font-style="italic" transform="rotate(12 230 168)">cal.&#160;001&#160;&#183;&#160;21&#160;jewels</text>
-    <text x="118" y="250" font-size="3" letter-spacing=".8" fill="rgba(66,42,12,.75)" font-family="Georgia">N&#176; 001 &#8212; assembled with patience &#8212; F.</text>
-  </g>`;
-};
-ART.dial=()=>`
-  <g>
-    <circle cx="200" cy="200" r="151" fill="rgba(10,6,2,.55)" filter="url(#fBlur1)"/>
-    <circle id="dialFace" cx="200" cy="200" r="150" fill="#0f1013"/>
-    <circle id="dialTex" cx="200" cy="200" r="150" fill="none"/>
-    <circle cx="200" cy="200" r="150" fill="url(#gDialShade)"/>
-    <text id="dialBrand" x="200" y="152" text-anchor="middle" font-size="11" letter-spacing="4.5" font-family="Georgia" fill="#cbb476">ATELIER</text>
-    <text id="dialSub" x="200" y="262" text-anchor="middle" font-size="6.5" letter-spacing="2.5" font-style="italic" font-family="Georgia" fill="#a3915e">Gen&#232;ve &#183; fait main</text>
-  </g>`;
-ART.chapter=()=>{
-  let m='<g id="chapterG">';
-  for(let i=0;i<60;i++){
-    const a=i*6*Math.PI/180, maj=i%5===0;
-    const r1=maj?128:135, r2=141;
-    m+=`<line x1="${(200+r1*Math.sin(a)).toFixed(1)}" y1="${(200-r1*Math.cos(a)).toFixed(1)}" x2="${(200+r2*Math.sin(a)).toFixed(1)}" y2="${(200-r2*Math.cos(a)).toFixed(1)}" class="${maj?'tickMaj':'tickMin'}" stroke-width="${maj?2.6:1}"/>`;
-  }
-  for(let h=0;h<12;h++){
-    const a=h*30*Math.PI/180, r=113;
-    m+=`<g transform="translate(${(200+r*Math.sin(a)).toFixed(1)},${(200-r*Math.cos(a)).toFixed(1)}) rotate(${h*30})">
-      <rect x="-3" y="-11" width="6" height="22" rx="1.2" fill="url(#gGold)" stroke="rgba(0,0,0,.4)" stroke-width=".5"/></g>`;
-  }
-  m+=`<circle cx="200" cy="200" r="145" fill="none" class="chapRing" stroke-width="1"/>`;
-  return m+'</g>';
-};
-ART.hands=()=>`
-  <g transform="translate(200,200)">
-    <g class="rotHour"><g id="handHour"></g></g>
-    <g class="rotMin"><g id="handMin"></g></g>
-    <g class="rotSec">
-      <path d="M-1.1,30 L1.1,30 L1.1,-108 L-1.1,-108 Z" fill="#2a4a7e"/>
-      <path d="M0,-108 l3.4,10 h-6.8 Z" fill="#2a4a7e"/>
-      <circle cy="21" r="6" fill="none" stroke="#2a4a7e" stroke-width="3"/>
-    </g>
-    <circle r="7" fill="url(#gGold)" stroke="#6e5518" stroke-width="1"/>
-    <circle r="2.4" fill="#2a4a7e"/>
-  </g>`;
-ART.case=()=>`
-  <g>
-    <g id="lugsG" fill="url(#gCaseV)" stroke="rgba(0,0,0,.5)" stroke-width="1.4">
-      <path d="M143,-118 L166,-32 L143,-24 L118,-100 Q126,-114 143,-118 Z" transform="translate(0,90)"/>
-      <path d="M257,-118 L234,-32 L257,-24 L282,-100 Q274,-114 257,-118 Z" transform="translate(0,90)"/>
-      <path d="M143,518 L166,432 L143,424 L118,500 Q126,514 143,518 Z" transform="translate(0,-90)"/>
-      <path d="M257,518 L234,432 L257,424 L282,500 Q274,514 257,518 Z" transform="translate(0,-90)"/>
-    </g>
-    <path d="M200,16 A184,184 0 1 1 199.9,16 Z M200,48 A152,152 0 1 0 200.1,48 Z" fill-rule="evenodd" fill="url(#gCase)" stroke="rgba(0,0,0,.55)" stroke-width="1.6"/>
-    <path d="M76,86 A170,170 0 0 1 200,32" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2.6" filter="url(#fBlur1)"/>
-    <path d="M330,300 A168,168 0 0 1 236,362" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="2" filter="url(#fBlur1)"/>
-  </g>`;
-ART.bezel=()=>`<g id="bezelG"></g>`;
-ART.crystal=()=>`
-  <g style="pointer-events:none">
-    <circle cx="200" cy="200" r="150" fill="rgba(220,235,250,.05)"/>
-    <ellipse cx="146" cy="128" rx="86" ry="42" fill="rgba(255,255,255,.10)" transform="rotate(-32 146 128)" filter="url(#fBlur3)"/>
-    <path d="M282,282 A116,116 0 0 0 316,196" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="7" filter="url(#fBlur3)"/>
-    <g opacity=".05" stroke="#fff" fill="none">
-      <path d="M226,236 q10,-3 14,6 q3,8 -6,11 q-8,2 -11,-5 q-2,-7 3,-12" stroke-width="2.2"/>
-      <path d="M229,239 q7,-2 10,4 q2,6 -4,8" stroke-width="1.4"/>
-    </g>
-    <path d="M112,296 L188,318" stroke="rgba(255,255,255,.07)" stroke-width=".9"/>
-    <path d="M256,96 L286,132" stroke="rgba(255,255,255,.06)" stroke-width=".8"/>
-  </g>`;
-ART.crown=()=>`
-  <g transform="translate(384,200)" data-eg="crown">
-    <rect x="-10" y="-5" width="10" height="10" fill="url(#gCaseV)"/>
-    <g class="crownHead">
-      <rect x="-2" y="-13" width="15" height="26" rx="5" fill="url(#gCaseV)" stroke="rgba(0,0,0,.5)" stroke-width="1"/>
-      <g id="crownRidges" stroke="rgba(0,0,0,.45)" stroke-width="1.1">
-        ${[-9,-5.4,-1.8,1.8,5.4,9].map(y=>`<line x1="-1" y1="${y}" x2="12.6" y2="${y}"/>`).join('')}
-      </g>
-      <circle cx="5.5" r="3.4" fill="none" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>
-    </g>
-    <circle cx="4" cy="0" r="18" fill="rgba(0,0,0,0)"/>
-  </g>`;
-ART.casebackFront=()=>``;
+function fail(msg){const e=$('#err');e.textContent=msg;e.classList.add('on');$('#loading').classList.add('gone');}
 
-/* back-side artwork (rendered into watchBack svg) */
-function casebackArt(){
-  return `<g transform="translate(0,110)">
-    <path d="M200,20 A180,180 0 1 1 199.9,20 Z M200,58 A142,142 0 1 0 200.1,58 Z" fill-rule="evenodd" fill="url(#gCase)" stroke="rgba(0,0,0,.55)" stroke-width="1.6"/>
-    <circle cx="200" cy="200" r="142" fill="rgba(150,190,220,.07)"/>
-    <circle cx="200" cy="200" r="142" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-    <ellipse cx="152" cy="136" rx="70" ry="34" fill="rgba(255,255,255,.08)" transform="rotate(-30 152 136)" filter="url(#fBlur3)"/>
-    ${[30,90,150,210,270,330].map(a=>screw(200+168*Math.cos(a*Math.PI/180),200+168*Math.sin(a*Math.PI/180),a+40,4.4)).join('')}
-    <defs><path id="cbArc" d="M200,200 m-158,0 a158,158 0 1 1 316,0 a158,158 0 1 1 -316,0"/></defs>
-    <text font-size="10.5" letter-spacing="4" fill="rgba(30,20,8,.85)" font-family="Georgia">
-      <textPath href="#cbArc" startOffset="2%">THE WATCHMAKER&#8217;S ATELIER &#183; GEN&#200;VE &#183; N&#176; 001 &#183; SAPPHIRE CRYSTAL &#183; 21 JEWELS</textPath>
-    </text>
-  </g>`;
-}
-
-/* ---------------- tray icons ---------------- */
-const ICON={};
-ICON.mainplate=`<svg viewBox="-40 -40 80 80"><circle r="34" fill="url(#gPlate)" stroke="#5e421c" stroke-width="1.5"/><circle r="34" fill="url(#perlage)" opacity=".5"/><circle cx="-8" cy="-12" r="10" fill="rgba(40,24,6,.3)"/><circle cx="12" cy="10" r="8" fill="rgba(40,24,6,.3)"/></svg>`;
-ICON.jewels=`<svg viewBox="-40 -40 80 80">${jewelSVG(-14,-10,7)}${jewelSVG(12,-16,5.5)}${jewelSVG(2,12,6.5)}${jewelSVG(-18,16,5)}</svg>`;
-ICON.mainspring=`<svg viewBox="-40 -40 80 80"><path d="${spiralPath(4.5,4,30)}" fill="none" stroke="#8a909c" stroke-width="4" stroke-linecap="round"/></svg>`;
-ICON.barrel=`<svg viewBox="-40 -40 80 80"><path d="${gearPath(28,36,3.4)}" fill="url(#gGold)"/><circle r="27" fill="url(#gGold)"/><circle r="18" fill="none" stroke="rgba(110,80,26,.7)" stroke-width="1.4"/>${screw(0,0,45,4)}</svg>`;
-ICON.center=`<svg viewBox="-40 -40 80 80">${wheelSVG(28,40)}</svg>`;
-ICON.third=`<svg viewBox="-40 -40 80 80">${wheelSVG(26,32)}</svg>`;
-ICON.fourth=`<svg viewBox="-40 -40 80 80">${wheelSVG(25,26)}</svg>`;
-ICON.escape=`<svg viewBox="-40 -40 80 80"><path d="${gearPath(24,15,7,'escape')}" fill="url(#gSteel)" stroke="#5c6068" stroke-width=".6"/><circle r="8" fill="none" stroke="url(#gSteel)" stroke-width="3"/></svg>`;
-ICON.escapement=`<svg viewBox="-40 -40 80 80"><g transform="rotate(-30) scale(1.15)">${ART.escapement().replace(/translate\([^)]*\)\s*rotate\(-46\)/,'')}</g></svg>`;
-ICON.balspring=`<svg viewBox="-40 -40 80 80"><path d="${spiralPath(5.5,2.5,30,.16)}" fill="none" stroke="#5a6a80" stroke-width="1.8"/></svg>`;
-ICON.balance=`<svg viewBox="-40 -40 80 80"><circle r="27" fill="none" stroke="url(#gGold)" stroke-width="5.5"/><path d="M-24,0 L24,0" stroke="url(#gGold)" stroke-width="4"/><circle r="4" fill="url(#gSteel)"/><circle r="1.5" fill="url(#gRuby)"/></svg>`;
-ICON.bridges=`<svg viewBox="-40 -40 80 80"><g transform="translate(-38,-30) scale(.36)"><path d="M8,60 Q4,10 66,4 Q118,0 150,26 L142,52 Q108,32 70,36 Q34,42 32,64 Z" fill="url(#gPlate)"/><path d="M8,60 Q4,10 66,4 Q118,0 150,26 L142,52 Q108,32 70,36 Q34,42 32,64 Z" fill="url(#stripes)"/>${jewelSVG(84,32,8)}${screw(24,44,20,7)}${screw(128,34,90,7)}<path d="M20,110 Q60,84 128,96 L124,124 Q70,112 34,132 Z" fill="url(#gPlate)"/><path d="M20,110 Q60,84 128,96 L124,124 Q70,112 34,132 Z" fill="url(#stripes)"/>${screw(46,114,50,7)}</g></svg>`;
-ICON.dial=`<svg viewBox="-40 -40 80 80"><circle r="33" fill="#101116" stroke="rgba(200,180,120,.5)" stroke-width="1"/><text y="-14" text-anchor="middle" font-size="6" letter-spacing="2" fill="#cbb476" font-family="Georgia">ATELIER</text><circle r="2.4" fill="#cbb476"/></svg>`;
-ICON.chapter=`<svg viewBox="-40 -40 80 80"><circle r="31" fill="none" stroke="rgba(233,221,196,.25)" stroke-width="1"/>${[0,30,60,90,120,150,180,210,240,270,300,330].map(a=>`<line x1="${(26*Math.sin(a*Math.PI/180)).toFixed(1)}" y1="${(-26*Math.cos(a*Math.PI/180)).toFixed(1)}" x2="${(32*Math.sin(a*Math.PI/180)).toFixed(1)}" y2="${(-32*Math.cos(a*Math.PI/180)).toFixed(1)}" stroke="url(#gGold)" stroke-width="2.4"/>`).join('')}</svg>`;
-ICON.hands=`<svg viewBox="-40 -40 80 80"><g transform="translate(-8,6)"><path d="M0,8 L5,0 L0,-30 L-5,0 Z" fill="url(#gSteel)"/></g><g transform="translate(10,10) rotate(40)"><path d="M0,8 L4,0 L0,-38 L-4,0 Z" fill="url(#gSteel)"/></g><circle cx="0" cy="4" r="3.5" fill="url(#gGold)"/></svg>`;
-ICON.case=`<svg viewBox="-40 -40 80 80"><path d="M0,-34 A34,34 0 1 1 -.1,-34 Z M0,-22 A22,22 0 1 0 .1,-22 Z" fill-rule="evenodd" fill="url(#gCase)" stroke="rgba(0,0,0,.5)"/><path d="M-14,-38 L-8,-24 M14,-38 L8,-24 M-14,38 L-8,24 M14,38 L8,24" stroke="url(#gCase)" stroke-width="7"/></svg>`;
-ICON.crystal=`<svg viewBox="-40 -40 80 80"><circle r="30" fill="rgba(210,230,248,.13)" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/><path d="M-18,-14 a22,22 0 0 1 16,-9" stroke="rgba(255,255,255,.7)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
-ICON.bezel=`<svg viewBox="-40 -40 80 80"><path d="M0,-33 A33,33 0 1 1 -.1,-33 Z M0,-23 A23,23 0 1 0 .1,-23 Z" fill-rule="evenodd" fill="url(#gCase)" stroke="rgba(0,0,0,.5)"/>${[...Array(24)].map((_,i)=>{const a=i*15*Math.PI/180;return `<line x1="${(29*Math.cos(a)).toFixed(1)}" y1="${(29*Math.sin(a)).toFixed(1)}" x2="${(33*Math.cos(a)).toFixed(1)}" y2="${(33*Math.sin(a)).toFixed(1)}" stroke="rgba(0,0,0,.4)" stroke-width="1.4"/>`;}).join('')}</svg>`;
-ICON.crown=`<svg viewBox="-40 -40 80 80"><g transform="rotate(90) scale(2)"><rect x="-2" y="-13" width="15" height="26" rx="5" fill="url(#gCaseV)" stroke="rgba(0,0,0,.5)"/><g stroke="rgba(0,0,0,.45)" stroke-width="1.1">${[-9,-5.4,-1.8,1.8,5.4,9].map(y=>`<line x1="-1" y1="${y}" x2="12.6" y2="${y}"/>`).join('')}</g></g></svg>`;
-ICON.caseback=`<svg viewBox="-40 -40 80 80"><path d="M0,-34 A34,34 0 1 1 -.1,-34 Z M0,-25 A25,25 0 1 0 .1,-25 Z" fill-rule="evenodd" fill="url(#gCase)"/><circle r="25" fill="rgba(160,195,225,.15)"/>${screw(0,-29.5,10,3)}${screw(29.5,0,60,3)}${screw(0,29.5,120,3)}${screw(-29.5,0,170,3)}</svg>`;
-ICON.leather=`<svg viewBox="-40 -40 80 80"><path d="M-13,-34 L13,-34 L16,34 L-16,34 Z" fill="#5a3a22" stroke="#31200f" stroke-width="1.5"/><path d="M-10,-30 L10,-30 M-11,-20 L11,-20" stroke="rgba(240,220,180,.4)" stroke-width="1" stroke-dasharray="2.5 2.5"/><path d="M-12.5,-28 L-15,30 M12.5,-28 L15,30" stroke="rgba(240,220,180,.35)" stroke-width="1" stroke-dasharray="2.5 2.5"/><ellipse cx="0" cy="8" rx="2" ry="3" fill="#31200f"/><ellipse cx="0" cy="20" rx="2" ry="3" fill="#31200f"/></svg>`;
-ICON.bracelet=`<svg viewBox="-40 -40 80 80">${[-30,-15,0,15].map(y=>`<rect x="-17" y="${y}" width="34" height="13" rx="2.5" fill="url(#gCase)" stroke="rgba(0,0,0,.45)"/><rect x="-6" y="${y}" width="12" height="13" fill="rgba(255,255,255,.28)"/>`).join('')}</svg>`;
-
-/* ---------------- part registry (assembly order) ---------------- */
-const PARTS=[
- {id:'mainplate', name:'Main Plate',        whisper:'Every empire begins with a foundation.'},
- {id:'jewels',    name:'Jewels',            whisper:'Rubies, that steel may glide on stone.'},
- {id:'mainspring',name:'Mainspring',        whisper:'A ribbon of steel, holding its breath.'},
- {id:'barrel',    name:'Barrel',            whisper:'The spring asks for a home.'},
- {id:'center',    name:'Center Wheel',      whisper:'The heart of the train.'},
- {id:'third',     name:'Third Wheel',       whisper:'One wheel whispers to the next.'},
- {id:'fourth',    name:'Fourth Wheel',      whisper:'It will carry the seconds.'},
- {id:'escape',    name:'Escape Wheel',      whisper:'Fifteen teeth, waiting to be counted.'},
- {id:'escapement',name:'Swiss Lever',       whisper:'The gatekeeper of time.'},
- {id:'balspring', name:'Balance Spring',    whisper:'Thinner than a hair, truer than a vow.'},
- {id:'balance',   name:'Balance Wheel',     whisper:'Give it a heartbeat.'},
- {id:'bridges',   name:'Bridges',           whisper:'Geneva stripes, to crown the movement.'},
- {id:'dial',      name:'Dial',              whisper:'A face for the hours.'},
- {id:'chapter',   name:'Chapter Ring',      whisper:'Sixty small promises.'},
- {id:'hands',     name:'Hands',             whisper:'They will never stop reaching.'},
- {id:'case',      name:'Case',              whisper:'Armor, polished like water.'},
- {id:'crystal',   name:'Crystal',           whisper:'Sapphire, clear as morning.'},
- {id:'bezel',     name:'Bezel',             whisper:'A frame for the view.'},
- {id:'crown',     name:'Crown',             whisper:'You will wind it by hand.'},
- {id:'caseback',  name:'Caseback',          whisper:'Sealed, signed, certain.'},
- {id:'leather',   name:'Leather Strap',     whisper:'Or perhaps the bracelet?', step:'strap'},
- {id:'bracelet',  name:'Metal Bracelet',    whisper:'Or perhaps the leather?', step:'strap'},
-];
-const STEPS=[...PARTS.slice(0,20).map(p=>p.id),'strap'];
-const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
-
-/* ================================================================
-   B. STATE, AUDIO, TRAY, DRAG PHYSICS, ASSEMBLY, MOVEMENT LOOP
-   ================================================================ */
-const state={
-  entered:false, stepIdx:0, level:0,       // level: 0 dead,1 tension,2 train,3 escapement,4 balance,5 alive
-  ts:1, tsTarget:1, slow:false,
-  jammed:false, complete:false, flipped:false,
-  clk:0, handsClk:0, lastTick:-1, startTime:null,
-  soundOn:true, night:false, loupe:false,
-  idleTimer:null,
-  config:{caseMat:'Steel', dial:'Black', hands:'Dauphine', bezel:'Smooth', strap:'Leather'}
-};
-
-/* ---------------- audio ---------------- */
-const AU={ctx:null,master:null,amb:null,ambGain:null};
-function auInit(){
-  if(AU.ctx) return;
+function initCore(){
+  // WebGL support
   try{
-    AU.ctx=new (window.AudioContext||window.webkitAudioContext)();
-    AU.master=AU.ctx.createGain(); AU.master.gain.value=.9; AU.master.connect(AU.ctx.destination);
-    // ambient workshop air: filtered brown noise
-    const len=AU.ctx.sampleRate*3, buf=AU.ctx.createBuffer(1,len,AU.ctx.sampleRate), d=buf.getChannelData(0);
-    let last=0; for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+.02*w)/1.02; d[i]=last*3.2;}
-    AU.amb=AU.ctx.createBufferSource(); AU.amb.buffer=buf; AU.amb.loop=true;
-    const lp=AU.ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=170;
-    AU.ambGain=AU.ctx.createGain(); AU.ambGain.gain.value=0;
-    AU.amb.connect(lp); lp.connect(AU.ambGain); AU.ambGain.connect(AU.master);
-    AU.amb.start();
-    AU.ambGain.gain.linearRampToValueAtTime(state.soundOn?.05:0, AU.ctx.currentTime+3);
-  }catch(e){}
-}
-function tone(freq,dur,vol,type,when,bend){
-  if(!AU.ctx||!state.soundOn) return;
-  const t=(AU.ctx.currentTime)+(when||0);
-  const o=AU.ctx.createOscillator(), g=AU.ctx.createGain();
-  o.type=type||'sine'; o.frequency.setValueAtTime(freq,t);
-  if(bend) o.frequency.exponentialRampToValueAtTime(bend,t+dur);
-  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  o.connect(g); g.connect(AU.master); o.start(t); o.stop(t+dur+.02);
-}
-function noiseBurst(dur,vol,freq,q,when){
-  if(!AU.ctx||!state.soundOn) return;
-  const t=AU.ctx.currentTime+(when||0);
-  const len=Math.max(1,AU.ctx.sampleRate*dur|0), buf=AU.ctx.createBuffer(1,len,AU.ctx.sampleRate), d=buf.getChannelData(0);
-  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
-  const s=AU.ctx.createBufferSource(); s.buffer=buf;
-  const f=AU.ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=q||1.4;
-  const g=AU.ctx.createGain(); g.gain.value=vol;
-  s.connect(f); f.connect(g); g.connect(AU.master); s.start(t);
-}
-const SND={
-  pick:  ()=>{noiseBurst(.03,.22,2600,1.2);},
-  click: ()=>{noiseBurst(.035,.5,3200,1.5); tone(1900,.05,.10,'triangle');},
-  seat:  ()=>{noiseBurst(.05,.55,2400,1.2); tone(1500,.07,.10,'triangle'); tone(340,.09,.13,'sine',.012);},
-  tick:  (v)=>{noiseBurst(.011,(v||1)*.11,5200,2.4); noiseBurst(.014,(v||1)*.07,2400,2,.012);},
-  thud:  ()=>{tone(92,.28,.4,'sine',0,50); noiseBurst(.1,.25,300,.8);},
-  ratchet:(n)=>{for(let i=0;i<(n||3);i++){noiseBurst(.018,.28,3400,2,i*.045); tone(2300,.02,.05,'square',i*.045);}},
-  chime: ()=>{[660,990,1318].forEach((f,i)=>tone(f,2.1-i*.3,.10-i*.02,'sine',i*.16));},
-  roll:  ()=>{noiseBurst(.5,.14,900,.6);},
-  woosh: ()=>{noiseBurst(.24,.12,500,.5);}
-};
-function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+    renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
+  }catch(e){fail('This experience needs WebGL. Please open it in a modern desktop browser (Chrome, Safari, Edge, Firefox) with hardware acceleration enabled.');return false;}
+  renderer.setPixelRatio(Math.min(devicePixelRatio,CFG.DPRmax));
+  renderer.setSize(W,H);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
 
-/* ---------------- build watch + tray ---------------- */
-const watchSVG=$('#watch'), backSVG=$('#watchBack');
-buildWatchSkeleton(watchSVG,false);
-buildWatchSkeleton(backSVG,true);
+  scene=new THREE.Scene();
+  scene.background=null;
 
-const trayInner=$('#trayInner');
-PARTS.forEach(p=>{
-  const el=document.createElement('div');
-  el.className='part'; el.dataset.id=p.id; el.tabIndex=0;
-  el.setAttribute('role','button'); el.setAttribute('aria-label',p.name);
-  el.innerHTML=ICON[p.id]+`<div class="lbl">${p.name}</div>`;
-  trayInner.appendChild(el);
-});
-function partStep(p){return p.step||p.id;}
-function expectedStep(){return STEPS[state.stepIdx];}
-function announce(t){$('#srLive').textContent=t;}
-function updateProgress(){
-  $('#progress').textContent = state.complete ? 'complete' : (ROMAN[state.stepIdx]||'')+'  of  XXI';
-  $('#progressFill').style.width=(state.stepIdx/STEPS.length*100)+'%';
-}
-updateProgress();
+  // Image-based lighting from a soft studio room (no external asset)
+  pmrem=new THREE.PMREMGenerator(renderer);
+  const env=new RoomEnvironment(renderer);
+  scene.environment=pmrem.fromScene(env,0.04).texture;
+  env.dispose();
 
-/* ---------------- ghost drag with inertia ---------------- */
-const ghost=$('#ghost');
-let drag=null; // {part, el, x,y, gx,gy, vx,vy, raf}
-function benchCenter(){
-  const r=$('#benchWrap').getBoundingClientRect();
-  return {x:r.left+r.width/2, y:r.top+r.height*(310/620), r:Math.min(r.width,r.height)*.42, rect:r};
+  camera=new THREE.PerspectiveCamera(34,W/H,0.1,400);
+  camera.position.set(0,26,30);
+  camera.lookAt(0,1.5,0);
+
+  controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;controls.dampingFactor=0.06;
+  controls.target.set(0,1.5,0);
+  controls.minDistance=14;controls.maxDistance=52;
+  controls.minPolarAngle=0.15;controls.maxPolarAngle=Math.PI*0.49;
+  controls.rotateSpeed=0.55;controls.zoomSpeed=0.7;
+  controls.enablePan=false;
+  controls.enabled=false; // enabled after intro
+
+  clock=new THREE.Clock();
+  addEventListener('resize',onResize);
+  return true;
 }
-function startDrag(partEl,x,y){
-  if(state.complete&&!partEl) return;
-  const p=PARTS.find(q=>q.id===partEl.dataset.id);
-  ghost.innerHTML=ICON[p.id];
-  ghost.style.display='block';
-  drag={part:p, el:partEl, x,y, gx:x, gy:y, vx:0, vy:0};
-  partEl.classList.add('dragging');
-  SND.pick(); buzz(4);
-  showWhisper(p.whisper);
-  cancelAnimationFrame(drag&&drag.raf);
-  const follow=()=>{
-    if(!drag) return;
-    const k=.22;
-    drag.vx=(drag.x-drag.gx)*k; drag.vy=(drag.y-drag.gy)*k;
-    drag.gx+=drag.vx; drag.gy+=drag.vy;
-    const tilt=Math.max(-16,Math.min(16,drag.vx*1.4));
-    ghost.style.transform=`translate(${drag.gx-33}px,${drag.gy-33}px) rotate(${tilt}deg)`;
-    // magnetic pull preview
-    const c=benchCenter(), dx=c.x-drag.gx, dy=c.y-drag.gy, dist=Math.hypot(dx,dy);
-    if(dist<c.r&&partStep(drag.part)===expectedStep()){
-      drag.gx+=dx*.045; drag.gy+=dy*.045;
-      ghost.style.filter='drop-shadow(0 0 14px rgba(233,205,122,.6))';
-    } else ghost.style.filter='';
-    drag.raf=requestAnimationFrame(follow);
+function onResize(){
+  W=innerWidth;H=innerHeight;
+  renderer.setSize(W,H);camera.aspect=W/H;camera.updateProjectionMatrix();
+}
+
+/* ===================================================================
+   PROCEDURAL TEXTURES (canvas → no external assets)
+   =================================================================== */
+function cv(s){const c=document.createElement('canvas');c.width=c.height=s;return c;}
+function tex(canvas,{srgb=false,rep=1}={}){const t=new THREE.CanvasTexture(canvas);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep,rep);t.anisotropy=8;
+  if(srgb)t.colorSpace=THREE.SRGBColorSpace;t.needsUpdate=true;return t;}
+
+function woodTextures(){
+  const s=1024,c=cv(s),x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,s,s);g.addColorStop(0,'#4a2e1b');g.addColorStop(.5,'#3a2314');g.addColorStop(1,'#2c1a0f');
+  x.fillStyle=g;x.fillRect(0,0,s,s);
+  // long grain
+  for(let i=0;i<520;i++){
+    const y=Math.random()*s, amp=6+Math.random()*22, hue=Math.random();
+    x.strokeStyle=`rgba(${hue<.5?'20,12,6':'92,62,34'},${0.05+Math.random()*0.12})`;
+    x.lineWidth=0.6+Math.random()*1.6;x.beginPath();
+    for(let px=0;px<=s;px+=16){const yy=y+Math.sin((px/s)*Math.PI*(1+Math.random())+i)*amp*0.3;px===0?x.moveTo(px,yy):x.lineTo(px,yy);}
+    x.stroke();
+  }
+  // plank seams
+  for(let p=1;p<4;p++){const px=p*s/4+(Math.random()*20-10);x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=2.4;x.beginPath();x.moveTo(px,0);x.lineTo(px,s);x.stroke();}
+  // roughness
+  const rc=cv(512),rx=rc.getContext('2d');rx.fillStyle='#8a8a8a';rx.fillRect(0,0,512,512);
+  for(let i=0;i<9000;i++){rx.fillStyle=`rgba(${Math.random()<.5?0:255},0,0,${Math.random()*0.06})`;rx.fillRect(Math.random()*512,Math.random()*512,2,2);}
+  return {map:tex(c,{srgb:true,rep:1}),rough:tex(rc,{rep:1})};
+}
+function leatherTextures(){
+  const s=512,c=cv(s),x=c.getContext('2d');x.fillStyle='#241a12';x.fillRect(0,0,s,s);
+  for(let i=0;i<26000;i++){const v=Math.random();x.fillStyle=`rgba(${v<.5?10:70},${v<.5?7:48},${v<.5?4:28},${Math.random()*0.5})`;x.fillRect(Math.random()*s,Math.random()*s,1.4,1.4);}
+  // faint pebble veins
+  for(let i=0;i<800;i++){x.strokeStyle='rgba(0,0,0,.18)';x.lineWidth=0.7;const px=Math.random()*s,py=Math.random()*s,r=3+Math.random()*7;
+    x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.stroke();}
+  const bc=cv(s),bx=bc.getContext('2d');bx.fillStyle='#808080';bx.fillRect(0,0,s,s);
+  for(let i=0;i<20000;i++){const g=Math.random()*255;bx.fillStyle=`rgba(${g},${g},${g},.5)`;bx.fillRect(Math.random()*s,Math.random()*s,2,2);}
+  return {map:tex(c,{srgb:true,rep:3}),bump:tex(bc,{rep:3})};
+}
+function genevaBump(){ // côtes de Genève stripes for bridges
+  const s=256,c=cv(s),x=c.getContext('2d');x.fillStyle='#808080';x.fillRect(0,0,s,s);
+  x.save();x.translate(s/2,s/2);x.rotate(0.5);x.translate(-s,-s);
+  for(let i=0;i<40;i++){const g=x.createLinearGradient(0,i*14,0,i*14+14);g.addColorStop(0,'#5a5a5a');g.addColorStop(.5,'#c8c8c8');g.addColorStop(1,'#5a5a5a');
+    x.fillStyle=g;x.fillRect(0,i*14,s*2,13);}
+  x.restore();
+  return tex(c,{rep:1});
+}
+function sunburstTexture(hex){
+  const s=512,c=cv(s),x=c.getContext('2d');const col='#'+new THREE.Color(hex).getHexString();
+  x.fillStyle=col;x.fillRect(0,0,s,s);
+  x.translate(s/2,s/2);
+  for(let i=0;i<720;i++){x.rotate(Math.PI*2/720);x.strokeStyle=`rgba(255,255,255,${Math.random()*0.06})`;x.lineWidth=1;x.beginPath();x.moveTo(0,0);x.lineTo(0,s/2);x.stroke();
+    x.strokeStyle=`rgba(0,0,0,${Math.random()*0.05})`;x.beginPath();x.moveTo(0,0);x.lineTo(0,s/2);x.stroke();}
+  return tex(c,{srgb:true});
+}
+
+/* ===================================================================
+   MATERIALS
+   =================================================================== */
+let MAT={};
+function buildMaterials(){
+  const wood=woodTextures(), leather=leatherTextures(), gv=genevaBump();
+  MAT.wood=new THREE.MeshStandardMaterial({map:wood.map,roughnessMap:wood.rough,roughness:0.72,metalness:0.02});
+  MAT.wood.map.repeat.set(2,1.4);MAT.wood.roughnessMap.repeat.set(2,1.4);
+  MAT.leather=new THREE.MeshStandardMaterial({map:leather.map,bumpMap:leather.bump,bumpScale:0.04,roughness:0.9,metalness:0});
+  MAT.gilt=new THREE.MeshStandardMaterial({color:CFG.gilt,metalness:1,roughness:0.32,envMapIntensity:1.1});
+  MAT.giltStriped=new THREE.MeshStandardMaterial({color:CFG.gilt,metalness:1,roughness:0.34,bumpMap:gv,bumpScale:0.05,envMapIntensity:1.15});
+  MAT.steel=new THREE.MeshStandardMaterial({color:CFG.steel,metalness:1,roughness:0.22,envMapIntensity:1.2});
+  MAT.steelSat=new THREE.MeshStandardMaterial({color:0xb9bfc6,metalness:1,roughness:0.4,envMapIntensity:1});
+  MAT.blued=new THREE.MeshStandardMaterial({color:CFG.blued,metalness:1,roughness:0.18,envMapIntensity:1.3});
+  MAT.brass=new THREE.MeshStandardMaterial({color:0xb08a4a,metalness:1,roughness:0.42,envMapIntensity:1});
+  MAT.dark=new THREE.MeshStandardMaterial({color:0x14100c,metalness:0.4,roughness:0.6});
+  MAT.ruby=new THREE.MeshPhysicalMaterial({color:CFG.ruby,metalness:0,roughness:0.15,transmission:0.55,thickness:0.4,ior:1.76,envMapIntensity:1.4});
+  MAT.sapphire=new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:0.02,transmission:1,thickness:0.6,ior:1.52,clearcoat:1,clearcoatRoughness:0.02,envMapIntensity:1.5});
+  MAT.lume=new THREE.MeshStandardMaterial({color:0xcfeede,emissive:0x2c5a44,emissiveIntensity:0.5,roughness:0.6,metalness:0});
+  MAT.sunburst=hex=>new THREE.MeshStandardMaterial({map:sunburstTexture(hex),metalness:0.75,roughness:0.38,envMapIntensity:1});
+  MAT.dialMatte=hex=>new THREE.MeshStandardMaterial({color:hex,metalness:0.1,roughness:0.7});
+}
+
+/* ===================================================================
+   WORLD: desk, mat, holder, trays, tools, lamp, dust
+   =================================================================== */
+let dust, lampSpot, ASSEM={x:0,y0:1.25,z:0}, holderTopY=1.0;
+const MR=5; // movement outer radius (units)
+
+function buildWorld(){
+  buildMaterials();
+  // desk
+  const desk=new THREE.Mesh(new THREE.BoxGeometry(160,8,110),MAT.wood);
+  desk.position.y=-4;desk.receiveShadow=true;scene.add(desk);
+  // leather work mat (rounded)
+  const mat=new THREE.Mesh(roundedBox(56,0.7,40,2.2),MAT.leather);
+  mat.position.y=0.35;mat.receiveShadow=true;scene.add(mat);
+  // stitched border (thin line loop)
+  const stitch=new THREE.Mesh(new THREE.TorusGeometry(1,1,4,4),MAT.dark);stitch.visible=false;scene.add(stitch);
+
+  buildHolder();
+  buildTrays();
+  buildTools();
+  buildLamp();
+  buildDust();
+}
+
+function roundedBox(w,h,d,r){
+  const shape=new THREE.Shape();const x=-w/2,y=-d/2,ww=w,dd=d;
+  shape.moveTo(x+r,y);shape.lineTo(x+ww-r,y);shape.quadraticCurveTo(x+ww,y,x+ww,y+r);
+  shape.lineTo(x+ww,y+dd-r);shape.quadraticCurveTo(x+ww,y+dd,x+ww-r,y+dd);
+  shape.lineTo(x+r,y+dd);shape.quadraticCurveTo(x,y+dd,x,y+dd-r);
+  shape.lineTo(x,y+r);shape.quadraticCurveTo(x,y,x+r,y);
+  const g=new THREE.ExtrudeGeometry(shape,{depth:h,bevelEnabled:true,bevelThickness:0.12,bevelSize:0.12,bevelSegments:2,steps:1});
+  g.rotateX(-Math.PI/2);g.translate(0,h/2,0);g.computeVertexNormals();return g;
+}
+
+function buildHolder(){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(MR+2.6,MR+3.2,1.6,64),MAT.steelSat);
+  base.position.y=0.7+0.35;base.castShadow=base.receiveShadow=true;g.add(base);
+  const pot=new THREE.Mesh(new THREE.CylinderGeometry(MR+0.6,MR+0.6,0.9,64,1,true),MAT.steel);
+  pot.position.y=holderTopY+0.9;pot.castShadow=true;g.add(pot);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(MR+0.6,64),MAT.dark);
+  floor.rotation.x=-Math.PI/2;floor.position.y=holderTopY+0.46;g.add(floor);
+  g.position.set(ASSEM.x,0,ASSEM.z);scene.add(g);
+}
+
+function buildTrays(){
+  [[-18,6],[18,6],[0,15]].forEach(([tx,tz])=>{
+    const tray=new THREE.Group();
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(4.4,0.5,16,48),MAT.brass);
+    ring.rotation.x=Math.PI/2;ring.position.y=0.9;ring.castShadow=true;tray.add(ring);
+    const flr=new THREE.Mesh(new THREE.CircleGeometry(4.4,48),new THREE.MeshStandardMaterial({color:0x1c130b,roughness:0.8,metalness:0.2}));
+    flr.rotation.x=-Math.PI/2;flr.position.y=0.72;flr.receiveShadow=true;tray.add(flr);
+    // tiny screws scattered
+    for(let i=0;i<5;i++){const s=screw(0.34);s.position.set((Math.random()-.5)*5,0.8,(Math.random()-.5)*5);s.rotation.y=Math.random()*6;tray.add(s);}
+    tray.position.set(tx,0,tz);scene.add(tray);
+  });
+}
+
+function screw(r){
+  const g=new THREE.Group();
+  const head=new THREE.Mesh(new THREE.CylinderGeometry(r,r,r*0.5,20),MAT.blued);head.castShadow=true;g.add(head);
+  const slot=new THREE.Mesh(new THREE.BoxGeometry(r*1.7,r*0.12,r*0.34),MAT.dark);slot.position.y=r*0.26;g.add(slot);
+  return g;
+}
+
+function buildTools(){
+  // brass tweezers
+  const tw=new THREE.Group();
+  const a=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.34,13,8),MAT.brass);
+  const b=a.clone();a.geometry=new THREE.CylinderGeometry(0.05,0.34,13,8);
+  a.position.set(0.35,0,0);b.position.set(-0.35,0,0);a.rotation.z=0.06;b.rotation.z=-0.06;
+  a.castShadow=b.castShadow=true;tw.add(a,b);
+  tw.rotation.set(0,0.5,Math.PI/2);tw.position.set(-15,0.9,-9);tw.rotation.z=Math.PI/2-0.3;
+  tw.rotation.y=0.7;scene.add(tw);
+
+  // screwdriver
+  const sd=new THREE.Group();
+  const handle=new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.9,7,24),new THREE.MeshStandardMaterial({color:0x8b1a1a,metalness:0.2,roughness:0.5}));
+  const collar=new THREE.Mesh(new THREE.CylinderGeometry(0.95,0.95,0.6,24),MAT.steel);collar.position.y=-3.6;
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,7,16),MAT.steel);shaft.position.y=-7.3;
+  const tip=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.02,0.7,12),MAT.steel);tip.position.y=-11;
+  handle.castShadow=shaft.castShadow=true;sd.add(handle,collar,shaft,tip);
+  sd.rotation.z=Math.PI/2;sd.position.set(16,1.1,-10);sd.rotation.y=0.4;scene.add(sd);
+
+  // loupe
+  const lp=new THREE.Group();
+  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,3.2,32,1,true),MAT.dark);
+  const lens=new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.1,0.3,32),MAT.sapphire);lens.position.y=1.4;
+  barrel.castShadow=true;lp.add(barrel,lens);
+  lp.position.set(-17,1.6,9);lp.rotation.z=0.25;scene.add(lp);
+
+  // dust blower
+  const bl=new THREE.Group();
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(2.4,24,20),new THREE.MeshStandardMaterial({color:0x111,roughness:0.55,metalness:0}));
+  bulb.scale.set(1,0.9,1.2);const noz=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.5,3,16),new THREE.MeshStandardMaterial({color:0x111,roughness:0.5}));
+  noz.position.set(0,0.4,2.4);noz.rotation.x=1.3;bulb.castShadow=true;bl.add(bulb,noz);
+  bl.position.set(17,2.2,9);scene.add(bl);
+
+  // pegwood
+  const peg=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.05,10,12),new THREE.MeshStandardMaterial({color:0xcaa46a,roughness:0.8,metalness:0}));
+  peg.castShadow=true;peg.rotation.z=Math.PI/2;peg.position.set(-4,0.9,13);peg.rotation.y=0.3;scene.add(peg);
+}
+
+function buildLamp(){
+  const grp=new THREE.Group();
+  const foot=new THREE.Mesh(new THREE.CylinderGeometry(3,3.4,0.8,32),MAT.steelSat);foot.position.set(-26,0.4,-16);grp.add(foot);
+  const arm1=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,22,16),MAT.steelSat);arm1.position.set(-26,11,-16);grp.add(arm1);
+  const arm2=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,20,16),MAT.steelSat);
+  arm2.position.set(-18,20,-11);arm2.rotation.z=Math.PI/2.6;arm2.rotation.y=0.5;grp.add(arm2);
+  const shade=new THREE.Mesh(new THREE.CylinderGeometry(2.2,4.2,4.5,32,1,true),
+    new THREE.MeshStandardMaterial({color:0x1a1512,metalness:0.6,roughness:0.5,side:THREE.DoubleSide}));
+  shade.position.set(-10,17,-6);shade.rotation.set(0.9,0,0.5);grp.add(shade);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(1,16,16),new THREE.MeshStandardMaterial({color:0xfff2d0,emissive:0xffcf88,emissiveIntensity:2.4}));
+  bulb.position.copy(shade.position);grp.add(bulb);
+  arm1.castShadow=arm2.castShadow=true;
+  scene.add(grp);
+
+  lampSpot=new THREE.SpotLight(0xffe6b8,900,120,0.62,0.85,1.4);
+  lampSpot.position.set(-10,17,-6);
+  lampSpot.target.position.set(1,0.5,1);
+  lampSpot.castShadow=true;lampSpot.shadow.mapSize.set(2048,2048);
+  lampSpot.shadow.bias=-0.0004;lampSpot.shadow.camera.near=4;lampSpot.shadow.camera.far=80;lampSpot.shadow.radius=6;
+  scene.add(lampSpot,lampSpot.target);
+
+  const fill=new THREE.DirectionalLight(0x8aa0c8,0.5);fill.position.set(18,16,14);scene.add(fill);
+  const hemi=new THREE.HemisphereLight(0xffe9cf,0x120c07,0.25);scene.add(hemi);
+  const rim=new THREE.DirectionalLight(0xfff0d8,0.35);rim.position.set(0,10,-24);scene.add(rim);
+}
+
+function buildDust(){
+  const N=240,pos=new Float32Array(N*3),spd=new Float32Array(N);
+  for(let i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*40;pos[i*3+1]=Math.random()*22;pos[i*3+2]=(Math.random()-.5)*30;spd[i]=0.2+Math.random()*0.5;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const spr=cv(32),sx=spr.getContext('2d');const rg=sx.createRadialGradient(16,16,0,16,16,16);
+  rg.addColorStop(0,'rgba(255,240,210,1)');rg.addColorStop(1,'rgba(255,240,210,0)');sx.fillStyle=rg;sx.fillRect(0,0,32,32);
+  const m=new THREE.PointsMaterial({size:0.28,map:new THREE.CanvasTexture(spr),transparent:true,opacity:0.5,depthWrite:false,blending:THREE.AdditiveBlending});
+  dust=new THREE.Points(g,m);dust.userData.spd=spd;scene.add(dust);
+}
+function updateDust(dt,t){
+  if(!dust)return;const p=dust.geometry.attributes.position,spd=dust.userData.spd;
+  for(let i=0;i<spd.length;i++){let y=p.getY(i)+spd[i]*dt;let x=p.getX(i)+Math.sin(t*0.3+i)*0.004;
+    if(y>23)y=0;p.setY(i,y);p.setX(i,x);}
+  p.needsUpdate=true;
+}
+
+/* ===================================================================
+   MOVEMENT GEOMETRY BUILDERS
+   =================================================================== */
+function makeGear({teeth=40,rTip=3,rRoot=2.7,rHub=0.7,holeR=0.28,thick=0.34,mat=MAT.gilt,lighten=0,spokes=0}){
+  const shape=new THREE.Shape();const step=Math.PI*2/teeth;
+  for(let i=0;i<teeth;i++){
+    const a=i*step;
+    const p=[[rRoot,a],[rTip,a+step*0.16],[rTip,a+step*0.42],[rRoot,a+step*0.58]];
+    p.forEach(([r,ang],k)=>{const x=Math.cos(ang)*r,y=Math.sin(ang)*r;(i===0&&k===0)?shape.moveTo(x,y):shape.lineTo(x,y);});
+  }
+  shape.closePath();
+  const hole=new THREE.Path();hole.absarc(0,0,holeR,0,Math.PI*2,true);shape.holes.push(hole);
+  if(lighten>0){const rr=(rHub+rRoot)/2, hr=(rRoot-rHub)*0.32;
+    for(let i=0;i<lighten;i++){const a=i/lighten*Math.PI*2;const h=new THREE.Path();
+      h.absarc(Math.cos(a)*rr,Math.sin(a)*rr,hr,0,Math.PI*2,true);shape.holes.push(h);}}
+  const g=new THREE.ExtrudeGeometry(shape,{depth:thick,bevelEnabled:true,bevelThickness:0.05,bevelSize:0.05,bevelSegments:2,steps:1,curveSegments:24});
+  g.rotateX(-Math.PI/2);g.translate(0,thick/2,0);g.computeVertexNormals();
+  const grp=new THREE.Group();
+  const mesh=new THREE.Mesh(g,mat);mesh.castShadow=mesh.receiveShadow=true;grp.add(mesh);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(rHub,rHub*1.1,thick+0.5,20),MAT.steel);hub.position.y=thick/2;hub.castShadow=true;grp.add(hub);
+  const arbor=new THREE.Mesh(new THREE.CylinderGeometry(holeR*0.7,holeR*0.7,thick+1.4,12),MAT.steel);arbor.position.y=thick/2;grp.add(arbor);
+  if(spokes>0){for(let i=0;i<spokes;i++){const a=i/spokes*Math.PI*2;
+    const s=new THREE.Mesh(new THREE.BoxGeometry(rRoot*0.9,thick*0.7,0.28),mat);
+    s.position.set(0,thick/2,0);s.rotation.y=a;s.translateX(rRoot*0.45);grp.add(s);}}
+  return grp;
+}
+function jewel(r=0.34){const j=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.16,16),MAT.ruby);j.castShadow=false;return j;}
+
+function buildMainPlate(){
+  const g=new THREE.Group();
+  const plate=new THREE.Mesh(new THREE.CylinderGeometry(MR,MR,0.7,72),MAT.gilt);
+  plate.castShadow=plate.receiveShadow=true;g.add(plate);
+  // rim step
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(MR-0.15,0.14,10,72),MAT.giltDark?MAT.gilt:MAT.gilt);
+  rim.rotation.x=Math.PI/2;rim.position.y=0.35;g.add(rim);
+  // countersinks + jewels + screw bosses
+  const spots=[[2.6,0.9],[-2.4,1.2],[0.6,-2.2],[3.0,-1.6],[-1.6,-2.8],[1.4,2.6]];
+  spots.forEach(([x,z],i)=>{
+    const sink=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.16,20),MAT.dark);sink.position.set(x,0.36,z);g.add(sink);
+    const j=jewel(0.34);j.position.set(x,0.44,z);g.add(j);
+  });
+  // perlage hint: faint rings via extra dark torus
+  for(let i=1;i<=3;i++){const c=new THREE.Mesh(new THREE.TorusGeometry(i*1.2,0.03,6,64),new THREE.MeshStandardMaterial({color:0xbfa763,metalness:1,roughness:0.5}));
+    c.rotation.x=Math.PI/2;c.position.y=0.355;g.add(c);}
+  g.userData.solid=true;return g;
+}
+function buildBarrel(){
+  const g=makeGear({teeth:56,rTip:2.4,rRoot:2.1,rHub:0.5,holeR:0.3,thick:0.9,mat:MAT.gilt,lighten:0});
+  const drum=new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,0.6,40),MAT.gilt);drum.position.y=0.9;drum.castShadow=true;g.add(drum);
+  const ratchet=makeGear({teeth:30,rTip:1.6,rRoot:1.35,rHub:0.4,holeR:0.28,thick:0.3,mat:MAT.steel});ratchet.position.y=1.2;g.add(ratchet);
+  const bluescrew=screw(0.4);bluescrew.position.y=1.5;g.add(bluescrew);
+  return g;
+}
+function buildWheel(kind){
+  if(kind==='center')return makeGear({teeth:50,rTip:2.2,rRoot:1.95,rHub:0.5,holeR:0.3,thick:0.34,mat:MAT.gilt,lighten:5});
+  if(kind==='third')return makeGear({teeth:44,rTip:1.7,rRoot:1.5,rHub:0.45,holeR:0.28,thick:0.34,mat:MAT.gilt,lighten:4});
+  if(kind==='fourth')return makeGear({teeth:40,rTip:1.5,rRoot:1.32,rHub:0.4,holeR:0.26,thick:0.34,mat:MAT.gilt,lighten:4});
+  return makeGear({});
+}
+function buildBridges(){
+  const g=new THREE.Group();
+  const mk=(pts,scr,jw)=>{
+    const s=new THREE.Shape();pts.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();
+    const geo=new THREE.ExtrudeGeometry(s,{depth:0.5,bevelEnabled:true,bevelThickness:0.08,bevelSize:0.1,bevelSegments:2,curveSegments:20});
+    geo.rotateX(-Math.PI/2);geo.translate(0,0.25,0);geo.computeVertexNormals();
+    const m=new THREE.Mesh(geo,MAT.giltStriped);m.castShadow=m.receiveShadow=true;g.add(m);
+    scr.forEach(([x,z])=>{const sc=screw(0.36);sc.position.set(x,0.5,z);g.add(sc);});
+    jw.forEach(([x,z])=>{const j=jewel(0.34);j.position.set(x,0.55,z);g.add(j);});
   };
-  drag.raf=requestAnimationFrame(follow);
+  // barrel bridge (left) & train bridge (right) — organic rounded polygons
+  mk([[-4.2,-1.2],[-3.6,1.8],[-1.4,2.6],[0.4,1.4],[0.2,-1.4],[-1.8,-2.8],[-3.6,-2.4]],[[-3.4,0.6],[-0.4,-1.6]],[[-2.4,-1.0],[-0.6,1.0]]);
+  mk([[0.8,-2.6],[0.6,1.2],[2.2,2.8],[4.0,1.6],[4.2,-1.0],[2.6,-2.8]],[[3.4,0.4],[1.4,-1.8]],[[2.4,0.4],[1.2,-1.6]]);
+  return g;
 }
-function endDrag(){
-  if(!drag) return;
-  cancelAnimationFrame(drag.raf);
-  const c=benchCenter(), dist=Math.hypot(c.x-drag.gx,c.y-drag.gy);
-  const p=drag.part, el=drag.el;
-  const onTarget=dist<c.r*1.15;
-  ghost.style.filter='';
-  if(onTarget&&partStep(p)===expectedStep()){
-    // snap home
-    animateGhostTo(c.x,c.y,120,()=>{ghost.style.display='none'; install(p,el);});
-  } else if(onTarget){
-    jam(p,el);
-    returnGhost(el);
-  } else {
-    returnGhost(el);
-  }
-  drag=null;
+function buildEscape(){
+  const g=makeGear({teeth:20,rTip:1.15,rRoot:0.85,rHub:0.3,holeR:0.2,thick:0.16,mat:MAT.steel});
+  g.userData.escape=true;return g;
 }
-function animateGhostTo(tx,ty,ms,done){
-  const sx=drag?drag.gx:parseFloat(ghost.dataset.x||0), sy=drag?drag.gy:0;
-  const gx0=drag.gx, gy0=drag.gy, t0=performance.now();
-  (function step(t){
-    const k=Math.min(1,(t-t0)/ms), e=1-Math.pow(1-k,3);
-    ghost.style.transform=`translate(${gx0+(tx-gx0)*e-33}px,${gy0+(ty-gy0)*e-33}px) scale(${1-.35*e})`;
-    if(k<1) requestAnimationFrame(step); else done&&done();
-  })(t0);
+function buildLever(){
+  const g=new THREE.Group();
+  const s=new THREE.Shape();
+  const pts=[[0,-1.6],[0.35,-0.4],[1.3,0.6],[1.1,1.0],[0.2,0.5],[-0.2,0.5],[-1.1,1.0],[-1.3,0.6],[-0.35,-0.4]];
+  pts.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();
+  const geo=new THREE.ExtrudeGeometry(s,{depth:0.14,bevelEnabled:true,bevelThickness:0.03,bevelSize:0.03,bevelSegments:1,curveSegments:16});
+  geo.rotateX(-Math.PI/2);geo.translate(0,0.07,0);geo.computeVertexNormals();
+  const m=new THREE.Mesh(geo,MAT.steel);m.castShadow=true;g.add(m);
+  const pin=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.6,12),MAT.steel);pin.position.set(0,0.1,-1.2);g.add(pin);
+  // pallet jewels
+  [[1.05,0.75],[-1.05,0.75]].forEach(([x,z])=>{const j=jewel(0.16);j.position.set(x,0.14,z);j.rotation.x=0.6;g.add(j);});
+  g.userData.lever=true;return g;
 }
-function returnGhost(el){
-  const r=el.getBoundingClientRect(), tx=r.left+r.width/2, ty=r.top+r.height/2;
-  const gx0=drag.gx, gy0=drag.gy, t0=performance.now();
-  (function step(t){
-    const k=Math.min(1,(t-t0)/380), e=1-Math.pow(1-k,3);
-    ghost.style.transform=`translate(${gx0+(tx-gx0)*e-33}px,${gy0+(ty-gy0)*e-33}px) rotate(${(1-e)*10}deg)`;
-    if(k<1) requestAnimationFrame(step);
-    else {ghost.style.display='none'; el.classList.remove('dragging');}
-  })(t0);
+function buildBalance(){
+  const g=new THREE.Group();
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(1.9,0.22,16,64),MAT.gilt);rim.rotation.x=Math.PI/2;rim.position.y=0.5;rim.castShadow=true;g.add(rim);
+  for(let i=0;i<3;i++){const a=i/3*Math.PI*2;const arm=new THREE.Mesh(new THREE.BoxGeometry(3.6,0.16,0.34),MAT.gilt);arm.position.y=0.5;arm.rotation.y=a;g.add(arm);}
+  const collet=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.1,16),MAT.steel);collet.position.y=0.55;g.add(collet);
+  // timing screws on rim
+  for(let i=0;i<8;i++){const a=i/8*Math.PI*2;const s=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.5,10),MAT.steel);
+    s.position.set(Math.cos(a)*1.9,0.5,Math.sin(a)*1.9);s.rotation.z=Math.PI/2;s.rotation.y=a;g.add(s);}
+  // hairspring — flat blued spiral
+  const pts=[];const turns=4.2;const N=260;
+  for(let i=0;i<N;i++){const th=i/N*turns*Math.PI*2;const r=0.34+i/N*1.5;pts.push(new THREE.Vector3(Math.cos(th)*r,0.92,Math.sin(th)*r));}
+  const curve=new THREE.CatmullRomCurve3(pts);
+  const hs=new THREE.Mesh(new THREE.TubeGeometry(curve,240,0.045,8,false),MAT.blued);g.add(hs);
+  // balance cock cap jewel
+  const cap=jewel(0.22);cap.position.y=0.62;g.add(cap);
+  g.userData.balance=true;return g;
 }
-
-trayInner.addEventListener('pointerdown',e=>{
-  const el=e.target.closest('.part'); if(!el||el.classList.contains('done')) return;
-  e.preventDefault();
-  startDrag(el,e.clientX,e.clientY);
-});
-addEventListener('pointermove',e=>{
-  if(drag){drag.x=e.clientX; drag.y=e.clientY;}
-});
-addEventListener('pointerup',endDrag);
-addEventListener('pointercancel',endDrag);
-// keyboard placement
-trayInner.addEventListener('keydown',e=>{
-  if(e.key!=='Enter'&&e.key!==' ') return;
-  const el=e.target.closest('.part'); if(!el||el.classList.contains('done')) return;
-  e.preventDefault();
-  const p=PARTS.find(q=>q.id===el.dataset.id);
-  if(partStep(p)===expectedStep()){install(p,el); announce(p.name+' installed.');}
-  else {jam(p,el); announce('The '+p.name+' does not fit yet.');}
-});
-
-/* ---------------- whisper hint ---------------- */
-let whisperT=null;
-function showWhisper(txt,long){
-  const h=$('#hint'); h.textContent=txt; h.classList.add('show');
-  clearTimeout(whisperT);
-  whisperT=setTimeout(()=>h.classList.remove('show'),long||2600);
+function buildDial(){
+  const g=new THREE.Group();
+  const face=new THREE.Mesh(new THREE.CylinderGeometry(MR-0.1,MR-0.1,0.18,72),MAT.sunburst(0x0c1016));
+  face.receiveShadow=true;g.add(face);
+  // minute track
+  const track=new THREE.Mesh(new THREE.TorusGeometry(MR-0.6,0.03,6,80),MAT.steel);track.rotation.x=Math.PI/2;track.position.y=0.1;g.add(track);
+  // applied baton indices + 12 triangle
+  for(let i=0;i<12;i++){const a=i/12*Math.PI*2;const r=MR-1.1;
+    if(i===0){const tri=new THREE.Mesh(new THREE.CylinderGeometry(0,0.4,0.9,3),MAT.steel);tri.position.set(0,0.16,-(r));tri.rotation.x=Math.PI/2;g.add(tri);continue;}
+    const bt=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.14,0.9),MAT.steel);
+    bt.position.set(Math.sin(a)*r,0.16,-Math.cos(a)*r);bt.rotation.y=a;
+    const lu=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.06,0.6),MAT.lume);lu.position.set(Math.sin(a)*r,0.2,-Math.cos(a)*r);lu.rotation.y=a;
+    g.add(bt,lu);}
+  g.userData.solid=true;return g;
 }
-function armIdleHint(){
-  clearTimeout(state.idleTimer);
-  if(state.complete) return;
-  state.idleTimer=setTimeout(()=>{
-    const next=STEPS[state.stepIdx];
-    $$('.part').forEach(el=>{
-      const p=PARTS.find(q=>q.id===el.dataset.id);
-      el.classList.toggle('beckon',!el.classList.contains('done')&&partStep(p)===next);
-    });
-  },9000);
+function buildHands(){
+  const g=new THREE.Group();
+  const mkHand=(len,w,col)=>{const s=new THREE.Shape();s.moveTo(-w,0.4);s.lineTo(0,-len);s.lineTo(w,0.4);s.lineTo(w*0.6,0.9);s.lineTo(-w*0.6,0.9);s.closePath();
+    const geo=new THREE.ExtrudeGeometry(s,{depth:0.1,bevelEnabled:true,bevelThickness:0.03,bevelSize:0.03,bevelSegments:1});
+    geo.rotateX(-Math.PI/2);geo.computeVertexNormals();const m=new THREE.Mesh(geo,col);m.castShadow=true;return m;};
+  const hour=new THREE.Group();hour.add(mkHand(2.4,0.34,MAT.blued));
+  const min=new THREE.Group();min.add(mkHand(3.6,0.26,MAT.blued));
+  const sec=new THREE.Group();const sm=mkHand(3.9,0.1,MAT.steel);sec.add(sm);
+  hour.position.y=0.1;min.position.y=0.32;sec.position.y=0.5;
+  const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.28,0.7,16),MAT.steel);cap.position.y=0.55;
+  g.add(hour,min,sec,cap);
+  g.userData.hands={hour,min,sec};g.userData.solid=true;return g;
 }
-
-/* ---------------- install & movement life ---------------- */
-function layerFor(id){return $('#L'+id);}
-function install(p,el){
-  el.classList.add('done'); el.classList.remove('dragging','beckon');
-  $$('.part.beckon').forEach(x=>x.classList.remove('beckon'));
-  const id=p.id, stepId=partStep(p);
-  // populate front layer
-  if(stepId==='strap'){
-    renderStrap(id==='leather'?'Leather':'Oyster');
-    state.config.strap=id==='leather'?'Leather':'Oyster';
-    ['LstrapTop','LstrapBot'].forEach(i=>{const g=$('#'+i); g.classList.add('on','placing'); setTimeout(()=>g.classList.remove('placing'),700);});
-    // the unchosen one becomes a customization option
-    PARTS.filter(q=>q.step==='strap').forEach(q=>{const t=$(`.part[data-id="${q.id}"]`); t&&t.classList.add('done');});
-  } else if(id==='caseback'){
-    $('#Bcaseback').innerHTML=casebackArt();
-    $('#Bcaseback').classList.add('on');
-    $('#btnFlip').classList.remove('hidden');
-    showWhisper('It can be turned over now.',3400);
-  } else {
-    const g=layerFor(id);
-    if(g){g.innerHTML=ART[id](); g.classList.add('on','placing'); setTimeout(()=>g.classList.remove('placing'),700);}
-    // mirror movement-side parts to exhibition back
-    const bg=$('#B'+id);
-    if(bg&&ART[id]){bg.innerHTML=ART[id](); bg.classList.add('on');}
-  }
-  SND.seat(); buzz([12,30,8]);
-  const ring=$('#snapRing'); ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
-  // life effects
-  effects(id,stepId);
-  state.stepIdx++;
-  updateProgress(); armIdleHint();
-  if(state.stepIdx>=STEPS.length) finale();
+function buildCrystal(){
+  const g=new THREE.Group();
+  const pts=[];for(let i=0;i<=14;i++){const t=i/14;const r=(MR+0.2)*Math.cos(t*Math.PI*0.32);const y=Math.sin(t*Math.PI*0.32)*1.5;pts.push(new THREE.Vector2(r,y));}
+  const dome=new THREE.Mesh(new THREE.LatheGeometry(pts,64),MAT.sapphire);dome.castShadow=false;g.add(dome);
+  return g;
 }
-function effects(id,stepId){
-  switch(id){
-    case 'barrel':
-      state.level=1;
-      // tiny tension shiver
-      pulseLayer('Lbarrel');
-      break;
-    case 'escape':
-      state.level=2; // gear train creeps to life
-      showWhisper('Something stirs.',3000);
-      break;
-    case 'escapement':
-      state.level=3; // faint tick
-      break;
-    case 'balance':
-      state.level=4; // the heartbeat
-      showWhisper('A heartbeat.',3000);
-      break;
-    case 'bridges':
-      state.level=5; SND.chime(); buzz([10,40,10,40,20]);
-      showWhisper('Everything, in time, synchronizes.',3600);
-      break;
-    case 'hands':
-      state.startTime=new Date(); state.handsClk=0;
-      break;
-    case 'crown':
-      applyCase(state.config.caseMat);
-      break;
-    case 'dial':
-      applyDial(state.config.dial); break;
-    case 'chapter':
-      applyDial(state.config.dial); break;
-  }
-  if(id==='hands') applyHands(state.config.hands);
-  if(id==='bezel') applyBezel(state.config.bezel);
-  if(id==='case') applyCase(state.config.caseMat);
+function buildCase(){
+  const g=new THREE.Group();
+  const band=new THREE.Mesh(new THREE.CylinderGeometry(MR+1.1,MR+1.1,3.2,72),MAT.steel);band.castShadow=band.receiveShadow=true;g.add(band);
+  const inner=new THREE.Mesh(new THREE.CylinderGeometry(MR+0.2,MR+0.2,3.4,72,1,true),MAT.dark);g.add(inner);
+  const bezel=new THREE.Mesh(new THREE.TorusGeometry(MR+0.9,0.4,16,72),MAT.steel);bezel.rotation.x=Math.PI/2;bezel.position.y=1.6;g.add(bezel);
+  const back=new THREE.Mesh(new THREE.CylinderGeometry(MR+1,MR+1,0.4,72),MAT.steelSat);back.position.y=-1.6;g.add(back);
+  // lugs
+  [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([sx,sz])=>{const lug=new THREE.Mesh(roundedBox(1.6,3.4,2.4,0.6),MAT.steel);
+    lug.position.set(sx*(MR+1.1),0,sz*(MR-0.5));lug.castShadow=true;g.add(lug);});
+  // crown at 3
+  const crown=new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.9,1.2,24),MAT.steel);crown.rotation.z=Math.PI/2;crown.position.set(MR+1.8,0,0);g.add(crown);
+  return g;
 }
-function pulseLayer(id){
-  const g=$('#'+id); if(!g||!g.animate) return;
-  g.animate([{transform:'rotate(0deg)'},{transform:'rotate(1.6deg)'},{transform:'rotate(-.8deg)'},{transform:'rotate(0deg)'}],
-    {duration:650,easing:'ease-out'});
-}
-function jam(p,el){
-  state.jammed=true;
-  $('#bench').classList.add('jam');
-  SND.thud(); buzz([40,60,40]);
-  showWhisper('The movement jams. Not yet, not there.',2800);
-  setTimeout(()=>{$('#bench').classList.remove('jam'); state.jammed=false;},700);
-  if(Math.random()<.4) looseScrew();
-}
-function looseScrew(){
-  const c=benchCenter();
-  const s=document.createElement('div'); s.className='looseScrew';
-  s.innerHTML=`<svg viewBox="-8 -8 16 16">${screw(0,0,0,6)}</svg>`;
-  document.body.appendChild(s);
-  SND.roll();
-  const dir=Math.random()<.5?-1:1, vy0=(Math.random()*.4+.2);
-  let x=c.x, y=c.y+40, vx=dir*(4+Math.random()*3), rot=0, t0=performance.now(), lastT=t0;
-  (function step(t){
-    const dt=Math.min(40,t-lastT); lastT=t;
-    x+=vx*dt/16; y+=vy0*dt/16; vx*=.995; rot+=vx*3;
-    s.style.transform=`translate(${x}px,${y}px) rotate(${rot}deg)`;
-    if(t-t0<2600&&x>-30&&x<innerWidth+30) requestAnimationFrame(step);
-    else {s.style.transition='opacity .6s'; s.style.opacity='0'; setTimeout(()=>s.remove(),650);}
-  })(t0);
+function buildStrap(){
+  const g=new THREE.Group();
+  const seg=(z,dir)=>{const s=new THREE.Mesh(roundedBox(7,1.2,10,1.4),MAT.leather);s.position.set(0,0,z);s.castShadow=true;g.add(s);
+    for(let i=-2;i<=2;i++){const st=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.08,8),new THREE.MeshStandardMaterial({color:0xd8c49a,roughness:0.6}));st.position.set(i*1.4,0.65,z);g.add(st);}};
+  seg(-9);seg(9);
+  const buckle=new THREE.Mesh(new THREE.TorusGeometry(1.6,0.3,12,24),MAT.steel);buckle.position.set(0,0,15);buckle.rotation.x=Math.PI/2;g.add(buckle);
+  return g;
 }
 
-/* ---------------- movement animation loop ---------------- */
-const SPEED={rotBarrel:2.2, rotCenter:6, rotThird:-16, rotFourth:36};
-const LEVEL_GAIN=[0,0,.22,.45,.78,1];
-function setRot(cls,deg){
-  $$('.'+cls).forEach(el=>el.setAttribute('transform',`rotate(${deg.toFixed(2)})`));
-}
-let lastT=0, tickPhase=0;
-function loop(t){
-  const dt=Math.min(.05,(t-lastT)/1000||0); lastT=t;
-  state.ts+=(state.tsTarget-state.ts)*.06;
-  const gain=LEVEL_GAIN[state.level]||0;
-  const run=!state.jammed&&gain>0;
-  if(run){
-    state.clk+=dt*state.ts;               // beat clock (balance phase, ticks)
-    state.rotClk=(state.rotClk||0)+dt*state.ts*gain;  // integrated train rotation
-    if(state.level>=4&&layerFor('hands').classList.contains('on')) state.handsClk+=dt*state.ts;
-  }
-  const rc=state.rotClk||0;
-  if(state.level>=2){
-    setRot('rotBarrel',rc*SPEED.rotBarrel);
-    setRot('rotCenter',rc*SPEED.rotCenter);
-    setRot('rotThird',rc*SPEED.rotThird);
-    setRot('rotFourth',rc*SPEED.rotFourth);
-    if(state.level>=3){
-      // escape wheel steps tooth by tooth, locked to the beat
-      const si=Math.floor(state.clk/0.4), frac=Math.min(1,(state.clk%0.4)/0.07);
-      setRot('rotEscape',(si+frac)*24);
-    } else {
-      setRot('rotEscape',rc*40);
-    }
-  }
-  if(state.level>=3){
-    const ph=state.clk*2*Math.PI/0.8;
-    const lever=7*Math.tanh(3.4*Math.sin(ph));
-    setRot('rotLever',lever);
-    // ticking
-    if(state.soundOn&&run){
-      tickPhase+=dt*state.ts/0.4;
-      if(tickPhase>=1){tickPhase%=1; SND.tick(state.level>=5?1:state.level>=4?.7:.32);}
-    }
-  }
-  if(state.level>=4){
-    const ph=state.clk*2*Math.PI/0.8;
-    const amp=reduceMotion?14:38;
-    setRot('rotBalance',amp*Math.sin(ph));
-    $$('.rotSpring').forEach(el=>el.setAttribute('transform',`rotate(${(14*Math.sin(ph)).toFixed(2)}) scale(${(1+.05*Math.sin(ph)).toFixed(3)})`));
-  }
-  if(state.startTime&&layerFor('hands').classList.contains('on')){
-    const base=state.startTime;
-    const el=state.handsClk;
-    const secs=base.getSeconds()+base.getMilliseconds()/1000+el;
-    const mins=base.getMinutes()+secs/60;
-    const hrs=base.getHours()%12+mins/60;
-    setRot('rotSec',secs*6);
-    setRot('rotMin',mins*6);
-    setRot('rotHour',hrs*30);
-  }
-  updateDust(dt);
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
+/* ===================================================================
+   PARTS — ordered assembly with tray homes + snap targets
+   =================================================================== */
+let PARTS=[];
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function eulQ(x,y,z){return new THREE.Quaternion().setFromEuler(new THREE.Euler(x,y,z));}
 
-/* ---------------- dust motes ---------------- */
-const dustC=$('#dust'), dctx=dustC.getContext('2d');
-let motes=[];
-function sizeDust(){dustC.width=innerWidth; dustC.height=innerHeight;}
-sizeDust(); addEventListener('resize',sizeDust);
-if(!reduceMotion){
-  for(let i=0;i<46;i++) motes.push({
-    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
-    r:Math.random()*1.3+.35, s:Math.random()*.35+.08,
-    ph:Math.random()*Math.PI*2, a:Math.random()*.1+.04
-  });
-}
-function updateDust(dt){
-  if(!motes.length) return;
-  dctx.clearRect(0,0,dustC.width,dustC.height);
-  const warm=state.night?'170,190,220':'255,225,170';
-  for(const m of motes){
-    m.ph+=dt*.6; m.y-=m.s; m.x+=Math.sin(m.ph)*.18;
-    if(m.y<-4){m.y=innerHeight+4; m.x=Math.random()*innerWidth;}
-    dctx.beginPath(); dctx.arc(m.x,m.y,m.r,0,7);
-    dctx.fillStyle=`rgba(${warm},${(m.a*(0.7+0.3*Math.sin(m.ph*2))).toFixed(3)})`;
-    dctx.fill();
-  }
+function addPart(def){
+  const g=def.build();
+  g.traverse(o=>{if(o.isMesh){o.castShadow=o.castShadow||true;}});
+  g.position.copy(def.home);g.quaternion.copy(def.homeQuat||new THREE.Quaternion());
+  g.userData.part=def;g.visible=true;
+  scene.add(g);
+  def.group=g;def.installed=false;
+  PARTS.push(def);
 }
 
-/* ================================================================
-   C. CUSTOMIZATION, EASTER EGGS, LOUPE, FINALE, INTRO
-   ================================================================ */
-const MATERIALS={
-  'Steel':      ['#f2f2f4','#a2a4ac','#6c6e78'],
-  'Titanium':   ['#d4d7db','#8f959c','#5c636b'],
-  'White Gold': ['#f6f4ef','#cdc9c0','#8f8b82'],
-  'Yellow Gold':['#f8e6a8','#d4af37','#8a6d1f'],
-  'Rose Gold':  ['#f6cfb5','#d99a76','#8e5a3c'],
-  'Bronze':     ['#e0af72','#a06a34','#5c3a1a'],
-  'Platinum':   ['#f0f2f4','#bcc0c7','#7e838b']
-};
-const DIALCOLORS={
-  'Black':'#0f1013','White':'#f1eee5','Blue':'#16324f','Green':'#12402e',
-  'Burgundy':'#4a1420','Salmon':'#e8a87c','Meteorite':'url(#patMeteor)',
-  'Skeleton':'skeleton','Mother of Pearl':'url(#gMOP)'
-};
-const LIGHT_DIALS=['White','Salmon','Mother of Pearl','Meteorite'];
-const HANDSETS={
-  Dauphine:{
-    hr:`<path d="M0,13 L7,3 L0,-64 L-7,3 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.45)" stroke-width=".7"/><path d="M0,13 L0,-64 L-7,3 Z" fill="rgba(0,0,0,.22)"/>`,
-    mn:`<path d="M0,15 L5.6,3 L0,-100 L-5.6,3 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.45)" stroke-width=".7"/><path d="M0,15 L0,-100 L-5.6,3 Z" fill="rgba(0,0,0,.22)"/>`},
-  Sword:{
-    hr:`<path d="M-4.6,10 L4.6,10 L3,-56 L0,-66 L-3,-56 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.45)" stroke-width=".7"/>`,
-    mn:`<path d="M-4,12 L4,12 L2.4,-90 L0,-100 L-2.4,-90 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.45)" stroke-width=".7"/>`},
-  Leaf:{
-    hr:`<path d="M0,10 C8,-10 6,-42 0,-64 C-6,-42 -8,-10 0,10 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.4)" stroke-width=".6"/>`,
-    mn:`<path d="M0,12 C6.6,-18 4.6,-68 0,-100 C-4.6,-68 -6.6,-18 0,12 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.4)" stroke-width=".6"/>`},
-  Mercedes:{
-    hr:`<path d="M-4.4,10 L4.4,10 L3.4,-26 L-3.4,-26 Z" fill="url(#gCase)"/><circle cy="-42" r="15" fill="none" stroke="url(#gCase)" stroke-width="6"/><path d="M0,-42 L0,-56 M0,-42 L-11,-35 M0,-42 L11,-35" stroke="url(#gCase)" stroke-width="4"/><path d="M0,-57 L4,-64 L-4,-64 Z" fill="url(#gCase)"/>`,
-    mn:`<path d="M-4,12 L4,12 L2.6,-84 L0,-100 L-2.6,-84 Z" fill="url(#gCase)" stroke="rgba(0,0,0,.4)" stroke-width=".6"/>`},
-  Breguet:{
-    hr:`<path d="M-2.6,11 L2.6,11 L1.7,-36 L-1.7,-36 Z" fill="url(#gCase)"/><circle cy="-47" r="9.5" fill="none" stroke="url(#gCase)" stroke-width="4.6"/><path d="M-1.5,-56 L1.5,-56 L0,-66 Z" fill="url(#gCase)"/>`,
-    mn:`<path d="M-2.2,13 L2.2,13 L1.5,-70 L-1.5,-70 Z" fill="url(#gCase)"/><circle cy="-80" r="8" fill="none" stroke="url(#gCase)" stroke-width="4"/><path d="M-1.3,-88 L1.3,-88 L0,-100 Z" fill="url(#gCase)"/>`}
-};
-function applyCase(mat){
-  state.config.caseMat=mat;
-  const [a,b,c]=MATERIALS[mat];
-  [['cs0',a],['cs1',b],['cs2',c],['cv0',a],['cv1',b],['cv2',c]].forEach(([id,col])=>{
-    $$('#'+id).forEach(s=>s.setAttribute('stop-color',col));
-    const el=document.getElementById(id); if(el) el.setAttribute('stop-color',col);
-  });
-  // both svgs share ids; update every matching stop in both documents' defs
-  [watchSVG,backSVG].forEach(svg=>{
-    ['cs0','cs1','cs2','cv0','cv1','cv2'].forEach((id,i)=>{
-      const s=svg.querySelector('#'+id); if(s) s.setAttribute('stop-color',[a,b,c,a,b,c][i]);
-    });
-  });
-}
-function applyDial(name){
-  state.config.dial=name;
-  const face=$('#dialFace'), tex=$('#dialTex'); if(!face) return;
-  const dialG=layerFor('dial');
-  dialG.classList.remove('skel');
-  let v=DIALCOLORS[name];
-  if(v==='skeleton'){
-    face.setAttribute('fill','rgba(16,14,10,.14)');
-    tex.setAttribute('fill','none');
-    face.setAttribute('stroke','rgba(201,162,39,.5)'); face.setAttribute('stroke-width','1');
-  } else {
-    face.removeAttribute('stroke');
-    face.setAttribute('fill',v.startsWith('url')?'#888':v);
-    if(v.startsWith('url')){face.setAttribute('fill','#20242a'); tex.setAttribute('fill',v); tex.setAttribute('r','150');}
-    else tex.setAttribute('fill','none');
-  }
-  const light=LIGHT_DIALS.includes(name);
-  const ink=light?'#2b2b30':'#e6ddc2', sub=light?'rgba(60,55,45,.75)':'#a3915e';
-  const brand=$('#dialBrand'), subEl=$('#dialSub');
-  if(brand){brand.setAttribute('fill',light?'#4a4436':'#cbb476');}
-  if(subEl){subEl.setAttribute('fill',sub);}
-  $$('#chapterG .tickMin').forEach(l=>l.setAttribute('stroke',light?'rgba(40,40,46,.75)':'rgba(233,221,196,.8)'));
-  $$('#chapterG .tickMaj').forEach(l=>l.setAttribute('stroke',light?'#3a3a40':'#e9ddc4'));
-  $$('#chapterG .chapRing').forEach(l=>l.setAttribute('stroke',light?'rgba(40,40,46,.4)':'rgba(233,221,196,.35)'));
-}
-function applyHands(name){
-  state.config.hands=name;
-  const h=$('#handHour'), m=$('#handMin'); if(!h) return;
-  h.innerHTML=HANDSETS[name].hr; m.innerHTML=HANDSETS[name].mn;
-}
-function applyBezel(name){
-  state.config.bezel=name;
-  const g=$('#bezelG'); if(!g) return;
-  const ann=(o,i,fill,extra)=>`<path d="M200,${200-o} A${o},${o} 0 1 1 ${199.9},${200-o} Z M200,${200-i} A${i},${i} 0 1 0 ${200.1},${200-i} Z" fill-rule="evenodd" fill="${fill}" stroke="rgba(0,0,0,.5)" stroke-width="1.2"/>`+(extra||'');
-  let m='';
-  if(name==='Smooth'){
-    m=ann(181,152,'url(#gCase)')+`<path d="M84,94 A158,158 0 0 1 196,42" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" filter="url(#fBlur1)"/>`;
-  } else if(name==='Coin Edge'){
-    let ticks='';
-    for(let i=0;i<120;i++){const a=i*3*Math.PI/180;
-      ticks+=`<line x1="${(200+174*Math.cos(a)).toFixed(1)}" y1="${(200+174*Math.sin(a)).toFixed(1)}" x2="${(200+181*Math.cos(a)).toFixed(1)}" y2="${(200+181*Math.sin(a)).toFixed(1)}" stroke="rgba(0,0,0,.42)" stroke-width="1.6"/>`;}
-    m=ann(181,152,'url(#gCase)')+ticks;
-  } else if(name==='Fluted'){
-    let w='';
-    for(let i=0;i<44;i++){
-      const a0=i*(360/44)*Math.PI/180, a1=(i+1)*(360/44)*Math.PI/180, mid=(a0+a1)/2;
-      const shade=i%2?'rgba(255,255,255,.34)':'rgba(0,0,0,.30)';
-      w+=`<path d="M${(200+153*Math.cos(a0)).toFixed(1)},${(200+153*Math.sin(a0)).toFixed(1)} L${(200+181*Math.cos(mid)).toFixed(1)},${(200+181*Math.sin(mid)).toFixed(1)} L${(200+153*Math.cos(a1)).toFixed(1)},${(200+153*Math.sin(a1)).toFixed(1)} Z" fill="${shade}"/>`;
-    }
-    m=ann(181,152,'url(#gCase)')+w;
-  } else { // Ceramic
-    m=ann(181,152,'#0c0d10')+`<path d="M84,94 A158,158 0 0 1 196,42" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2.6" filter="url(#fBlur1)"/>
-      <path d="M200,${200-166.5} A166.5,166.5 0 1 1 199.9,${200-166.5}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
-  }
-  g.innerHTML=m;
-}
-function renderStrap(name){
-  state.config.strap=name;
-  const top=$('#LstrapTop'), bot=$('#LstrapBot'); if(!top) return;
-  const link=(y,h,w,x,fill,rx)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx==null?3:rx}" fill="${fill}" stroke="rgba(0,0,0,.5)" stroke-width="1"/>`;
-  function leatherish(base,edge,tex){
-    const body=(flip)=>{
-      const y0=flip?486:0, y1=flip?620:136;
-      return `<path d="M146,${flip?y1:y0} L254,${flip?y1:y0} L${flip?258:260},${flip?y0+12:y1} L${flip?142:140},${flip?y0+12:y1} Z"
-        fill="${base}" stroke="#1c1208" stroke-width="1.5"/>
-      <path d="M150,${flip?y1-6:y0+8} L${flip?153:151},${flip?y0+18:y1-8} M250,${flip?y1-6:y0+8} L${flip?247:249},${flip?y0+18:y1-8}"
-        stroke="${edge}" stroke-width="1.1" stroke-dasharray="3 3" fill="none"/>
-      ${tex||''}
-      ${flip?'':`<ellipse cx="200" cy="52" rx="3" ry="4.2" fill="#170e05"/><ellipse cx="200" cy="80" rx="3" ry="4.2" fill="#170e05"/><ellipse cx="200" cy="108" rx="3" ry="4.2" fill="#170e05"/>`}
-      ${flip?`<rect x="152" y="${y1-46}" width="96" height="12" rx="4" fill="rgba(0,0,0,.28)"/>`:''}`;
-    };
-    top.innerHTML=body(false); bot.innerHTML=body(true);
-  }
-  if(name==='Leather') leatherish('#53341d','rgba(240,215,170,.5)');
-  else if(name==='Suede') leatherish('#6e5638','rgba(240,225,190,.35)',`<rect x="146" y="6" width="108" height="124" fill="url(#perlage)" opacity=".12"/>`);
-  else if(name==='Rubber') leatherish('#191b1e','rgba(255,255,255,.14)',`<path d="M200,8 L200,128" stroke="rgba(0,0,0,.6)" stroke-width="5"/>`);
-  else if(name==='Milanese'){
-    top.innerHTML=`<path d="M146,0 L254,0 L258,136 L142,136 Z" fill="url(#patMesh)" stroke="rgba(0,0,0,.55)" stroke-width="1.4"/>`;
-    bot.innerHTML=`<path d="M146,620 L254,620 L258,486 L142,486 Z" fill="url(#patMesh)" stroke="rgba(0,0,0,.55)" stroke-width="1.4"/>`;
-  } else {
-    // link bracelets
-    const rows=(flip)=>{
-      let m=''; const n=7;
-      for(let i=0;i<n;i++){
-        const y=flip?486+i*19.5:136-((i+1)*19.5), h=17;
-        if(y<-20||y>620) continue;
-        if(name==='Oyster'){
-          m+=link(y,h,34,145,'url(#gCaseV)')+link(y,h,40,180,'rgba(255,255,255,.001)')+link(y,h,42,179,'url(#gCase)')+link(y,h,34,221,'url(#gCaseV)');
-        } else if(name==='Jubilee'){
-          m+=link(y,h,26,145,'url(#gCaseV)')+link(y,h,17,172,'url(#gCase)')+link(y,h,16,192,'url(#gCaseV)',4)+link(y,h,17,211,'url(#gCase)')+link(y,h,26,229,'url(#gCaseV)');
-        } else { // President
-          m+=link(y,h,36,146,'url(#gCaseV)',7)+link(y,h,32,184,'url(#gCase)',7)+link(y,h,36,218,'url(#gCaseV)',7);
-        }
-        m+=`<line x1="145" y1="${y+h+1.2}" x2="255" y2="${y+h+1.2}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>`;
-      }
-      return m;
-    };
-    top.innerHTML=rows(false); bot.innerHTML=rows(true);
-  }
+function buildParts(){
+  const y0=ASSEM.y0;
+  // tray home slots (spread across the three trays), flat resting orientation
+  const homes=[
+    V(-18,1.4,4),V(-18,1.4,8),V(-19,1.4,6),V(17,1.4,4),V(18,1.4,8),
+    V(19,1.4,5),V(-2,1.4,14),V(2,1.4,16),V(0,1.4,13),V(-16,1.4,10),
+    V(16,1.4,11),V(0,1.4,18)
+  ];
+  let hi=0;const H=()=>homes[hi++]||V((Math.random()-.5)*30,1.4,10+Math.random()*6);
+  const defs=[
+    {id:'plate',name:'Main Plate',hint:'The foundation — set it into the movement holder',build:buildMainPlate,
+      target:V(0,y0+0.35,0),targetQuat:new THREE.Quaternion(),snapR:6},
+    {id:'barrel',name:'Mainspring Barrel',hint:'It stores the power',build:buildBarrel,
+      target:V(-2.4,y0+0.75,-1.4),targetQuat:new THREE.Quaternion(),snapR:5,spin:{type:'wheel',speed:0.18}},
+    {id:'center',name:'Centre Wheel',hint:'First of the gear train',build:()=>buildWheel('center'),
+      target:V(0.6,y0+0.72,0.6),targetQuat:new THREE.Quaternion(),snapR:5,spin:{type:'wheel',speed:-0.5}},
+    {id:'third',name:'Third Wheel',hint:'The train takes shape',build:()=>buildWheel('third'),
+      target:V(2.6,y0+0.72,1.6),targetQuat:new THREE.Quaternion(),snapR:5,spin:{type:'wheel',speed:1.1}},
+    {id:'fourth',name:'Fourth Wheel',hint:'Drives the seconds',build:()=>buildWheel('fourth'),
+      target:V(1.2,y0+0.72,3.2),targetQuat:new THREE.Quaternion(),snapR:5,spin:{type:'wheel',speed:-2.2}},
+    {id:'bridges',name:'Bridges',hint:'Côtes de Genève — cap the train',build:buildBridges,
+      target:V(0,y0+1.15,0),targetQuat:new THREE.Quaternion(),snapR:6},
+    {id:'escape',name:'Escape Wheel',hint:'It releases the power, tooth by tooth',build:buildEscape,
+      target:V(-0.6,y0+1.35,3.2),targetQuat:new THREE.Quaternion(),snapR:4,spin:{type:'escape'}},
+    {id:'lever',name:'Pallet Lever',hint:'The anchor that locks and releases',build:buildLever,
+      target:V(-0.3,y0+1.45,2.2),targetQuat:eulQ(0,0.5,0),snapR:4,spin:{type:'lever'}},
+    {id:'balance',name:'Balance Wheel',hint:'The heart. Set it — and the watch will breathe',build:buildBalance,
+      target:V(0.2,y0+1.5,3.4),targetQuat:new THREE.Quaternion(),snapR:4.5,spin:{type:'balance'},hero:true},
+    {id:'dial',name:'Dial',hint:'The face of the watch',build:buildDial,
+      target:V(0,y0+2.2,0),targetQuat:new THREE.Quaternion(),snapR:6},
+    {id:'hands',name:'Hands',hint:'Now it can tell the time',build:buildHands,
+      target:V(0,y0+2.45,0),targetQuat:new THREE.Quaternion(),snapR:5,tellsTime:true},
+    {id:'crystal',name:'Sapphire Crystal',hint:'Seal the dial beneath glass',build:buildCrystal,
+      target:V(0,y0+2.5,0),targetQuat:new THREE.Quaternion(),snapR:6},
+    {id:'case',name:'The Case',hint:'House the movement — then it is a watch',build:buildCase,
+      target:V(0,y0+0.7,0),targetQuat:new THREE.Quaternion(),snapR:7,cases:true},
+    {id:'strap',name:'Leather Strap',hint:'The final touch',build:buildStrap,
+      target:V(0,y0-0.4,0),targetQuat:new THREE.Quaternion(),snapR:8,finishes:true},
+  ];
+  defs.forEach(d=>{d.home=H();d.homeQuat=eulQ(-Math.PI/2*0.06,Math.random()*6,0);addPart(d);});
 }
 
-/* ---------------- customization panel ---------------- */
-const CUST=[
-  {label:'Case', type:'sw', get:()=>state.config.caseMat, opts:Object.keys(MATERIALS),
-    color:k=>`linear-gradient(135deg,${MATERIALS[k][0]},${MATERIALS[k][1]} 55%,${MATERIALS[k][2]})`, fn:applyCase},
-  {label:'Dial', type:'sw', get:()=>state.config.dial, opts:Object.keys(DIALCOLORS),
-    color:k=>({'Meteorite':'linear-gradient(135deg,#b8bec6,#7e848c)','Skeleton':'repeating-linear-gradient(45deg,#3a2c14 0 4px,#c9a86a 4px 6px)','Mother of Pearl':'linear-gradient(135deg,#fdfbf6,#f0dfe9 45%,#dbe7f2 75%,#efe9da)'}[k]||DIALCOLORS[k]), fn:applyDial},
-  {label:'Hands', type:'txt', get:()=>state.config.hands, opts:Object.keys(HANDSETS), fn:applyHands},
-  {label:'Bezel', type:'txt', get:()=>state.config.bezel, opts:['Smooth','Coin Edge','Fluted','Ceramic'], fn:applyBezel},
-  {label:'Strap', type:'txt', get:()=>state.config.strap, opts:['Leather','Suede','Rubber','Milanese','Oyster','Jubilee','President'], fn:renderStrap},
-];
-function buildCustPanel(){
-  const host=$('#custGroups'); host.innerHTML='';
-  CUST.forEach(gr=>{
-    const div=document.createElement('div'); div.className='cGroup';
-    div.innerHTML=`<h4>${gr.label}</h4>`;
-    const row=document.createElement('div'); row.className='swRow';
-    gr.opts.forEach(opt=>{
-      let el;
-      if(gr.type==='sw'){
-        el=document.createElement('div'); el.className='sw';
-        el.style.background=gr.color(opt);
-        el.innerHTML=`<span class="tip2">${opt}</span>`;
-      } else {
-        el=document.createElement('div'); el.className='swTxt'; el.textContent=opt;
-      }
-      el.setAttribute('role','button'); el.tabIndex=0; el.setAttribute('aria-label',gr.label+': '+opt);
-      if(gr.get()===opt) el.classList.add('sel');
-      const choose=()=>{
-        gr.fn(opt); SND.click(); buzz(6);
-        row.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
-        el.classList.add('sel');
-      };
-      el.addEventListener('click',choose);
-      el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
-      row.appendChild(el);
-    });
-    div.appendChild(row); host.appendChild(div);
-  });
+/* ===================================================================
+   TWEEN SYSTEM
+   =================================================================== */
+let tweens=[];
+const easeInOut=t=>t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const easeOut=t=>1-Math.pow(1-t,3);
+function addTween(o){o.t=0;o.ease=o.ease||easeInOut;tweens.push(o);return o;}
+function updateTweens(dt){
+  for(let i=tweens.length-1;i>=0;i--){const tw=tweens[i];tw.t+=dt;let f=Math.min(tw.t/tw.dur,1);
+    tw.update(tw.ease(f));if(f>=1){tweens.splice(i,1);tw.done&&tw.done();}}
+}
+function tweenCamera(pos,tgt,dur=1.6,ease=easeInOut,done){
+  const sp=camera.position.clone(),st=controls.target.clone();controls.enabled=false;
+  addTween({dur,ease,update(f){camera.position.lerpVectors(sp,pos,f);controls.target.lerpVectors(st,tgt,f);},
+    done(){controls.target.copy(tgt);done&&done();}});
 }
 
-/* ---------------- toolbar: sound, night, flip ---------------- */
-$('#btnSound').classList.add('active');
-$('#btnSound').addEventListener('click',()=>{
-  state.soundOn=!state.soundOn;
-  $('#btnSound').classList.toggle('active',state.soundOn);
-  if(AU.ambGain) AU.ambGain.gain.linearRampToValueAtTime(state.soundOn?.05:0,AU.ctx.currentTime+.5);
-});
-$('#btnNight').addEventListener('click',()=>{
-  state.night=!state.night;
-  document.body.classList.toggle('night',state.night);
-  $('#btnNight').classList.toggle('active',state.night);
-  SND.woosh();
-});
-$('#btnFlip').addEventListener('click',()=>{
-  state.flipped=!state.flipped;
-  $('#bench').classList.toggle('flipped',state.flipped);
-  SND.woosh(); buzz(8);
-});
-addEventListener('keydown',e=>{
-  if(e.key==='n'||e.key==='N') $('#btnNight').click();
-});
+/* ===================================================================
+   AUDIO — synthesized, subtle
+   =================================================================== */
+let AC=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function blip(freq,dur,vol,type='triangle',q=6){const a=ac();if(!a)return;
+  const o=a.createOscillator(),g=a.createGain(),f=a.createBiquadFilter();
+  f.type='bandpass';f.frequency.value=freq;f.Q.value=q;o.type=type;o.frequency.value=freq;
+  o.connect(f);f.connect(g);g.connect(a.destination);const t=a.currentTime;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.start(t);o.stop(t+dur+0.02);}
+const sClick=()=>{blip(340,0.08,0.16,'square',4);setTimeout(()=>blip(1500,0.05,0.07),35);};
+const sTick=(hi)=>blip(hi?2700:2350,0.028,0.05,'triangle',8);
+const sSoft=()=>blip(180,0.12,0.05,'sine',2);
 
-/* ---------------- tilt parallax ("rotate the watch") ---------------- */
-const tiltEl=$('#tilt');
-if(!reduceMotion){
-  addEventListener('pointermove',e=>{
-    if(drag) {tiltEl.style.transform='';return;}
-    const cx=innerWidth/2, cy=innerHeight/2;
-    const rx=((e.clientY-cy)/cy)*-4.5, ry=((e.clientX-cx)/cx)*5.5;
-    tiltEl.style.transform=`rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
-  });
+/* ===================================================================
+   INTERACTION — raycast drag, order gating, magnetic snap
+   =================================================================== */
+let ray,ndc,dragPlane,drag=null,currentIndex=0,socket,started=false,liftY;
+function initInteraction(){
+  ray=new THREE.Raycaster();ndc=new THREE.Vector2();
+  liftY=ASSEM.y0+7;
+  dragPlane=new THREE.Plane(new THREE.Vector3(0,1,0),-liftY);
+  const ringGeo=new THREE.TorusGeometry(2.4,0.09,10,60);
+  socket=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xe7cf8f,transparent:true,opacity:0}));
+  socket.rotation.x=Math.PI/2;scene.add(socket);
+  const dom=renderer.domElement;
+  dom.addEventListener('pointerdown',onDown);
+  addEventListener('pointermove',onMove);
+  addEventListener('pointerup',onUp);
 }
-
-/* ---------------- crown winding ---------------- */
-let crownWind={active:false,lastY:0,acc:0};
-document.addEventListener('pointerdown',e=>{
-  const eg=e.target.closest&&e.target.closest('[data-eg="crown"]');
-  if(eg){crownWind.active=true; crownWind.lastY=e.clientY; e.preventDefault();}
-},true);
-document.addEventListener('pointermove',e=>{
-  if(!crownWind.active) return;
-  const dy=e.clientY-crownWind.lastY; crownWind.lastY=e.clientY;
-  crownWind.acc+=Math.abs(dy);
-  if(crownWind.acc>26){
-    crownWind.acc=0; SND.ratchet(1); buzz(5); crownJiggle();
-  }
-});
-document.addEventListener('pointerup',()=>crownWind.active=false);
-function crownJiggle(){
-  $$('.crownHead').forEach(el=>{
-    el.animate&&el.animate([{transform:'translateX(0)'},{transform:'translateX(1.6px)'},{transform:'translateX(0)'}],{duration:110});
-  });
-}
-document.addEventListener('dblclick',e=>{
-  const eg=e.target.closest&&e.target.closest('[data-eg="crown"]');
-  if(eg){ // fast wind
-    SND.ratchet(7); buzz([6,20,6,20,6]);
-    $$('.crownHead').forEach(el=>{
-      el.animate&&el.animate([{transform:'translateX(0)'},{transform:'translateX(2px)'},{transform:'translateX(-1px)'},{transform:'translateX(2px)'},{transform:'translateX(0)'}],{duration:600,iterations:2});
-    });
-    const sc=$('#springCoil');
-    if(sc&&sc.animate) sc.animate([{transform:'scale(1)'},{transform:'scale(.94)'},{transform:'scale(1)'}],{duration:700,easing:'ease-in-out'});
-    showWhisper('Fully wound.',2000);
-  }
-});
-
-/* ---------------- long-press balance = slow motion ---------------- */
-let balHold=null;
-document.addEventListener('pointerdown',e=>{
-  const eg=e.target.closest&&e.target.closest('[data-eg="balance"]');
-  if(eg&&state.level>=4){
-    balHold=setTimeout(()=>{
-      state.slow=true; state.tsTarget=.10;
-      $('#stage').classList.add('slowmo'); $('#slowVin').classList.add('on');
-      SND.woosh(); buzz(20);
-      showWhisper('Time, examined closely.',3200);
-    },550);
-  }
-},true);
-function releaseSlow(){
-  clearTimeout(balHold); balHold=null;
-  if(state.slow){state.slow=false; state.tsTarget=1;
-    $('#stage').classList.remove('slowmo'); $('#slowVin').classList.remove('on');}
-}
-document.addEventListener('pointerup',releaseSlow);
-document.addEventListener('pointercancel',releaseSlow);
-
-/* ---------------- loupe ---------------- */
-const lens=$('#lens'), lensInner=$('#lensInner');
-let lensClone=null;
-$('#propLoupe').addEventListener('click',toggleLoupe);
-$('#propLoupe').addEventListener('keydown',e=>{if(e.key==='Enter')toggleLoupe();});
-function toggleLoupe(){
-  state.loupe=!state.loupe;
-  document.body.classList.toggle('loupeOn',state.loupe);
-  $('#propLoupe').style.opacity=state.loupe?'.35':'.9';
-  SND.click();
-  if(state.loupe){
-    lensClone=(state.flipped?backSVG:watchSVG).cloneNode(true);
-    lensClone.removeAttribute('id');
-    lensInner.innerHTML=''; lensInner.appendChild(lensClone);
-  } else {lens.style.display='none'; lensInner.innerHTML=''; lensClone=null;}
-}
-addEventListener('pointermove',e=>{
-  if(!state.loupe||drag) {if(state.loupe)lens.style.display='none'; return;}
-  const wr=$('#benchWrap').getBoundingClientRect();
-  if(e.clientX<wr.left-40||e.clientX>wr.right+40||e.clientY<wr.top-40||e.clientY>wr.bottom+40){
-    lens.style.display='none'; return;
-  }
-  // refresh clone if flipped state changed
-  lens.style.display='block';
-  lens.style.left=(e.clientX-105)+'px'; lens.style.top=(e.clientY-105)+'px';
-  const Z=3.1;
-  const lx=e.clientX-wr.left, ly=e.clientY-wr.top;
-  if(lensClone){
-    lensClone.style.width=wr.width+'px'; lensClone.style.height=wr.height+'px';
-    lensClone.style.position='absolute';
-    lensInner.style.transform=`translate(${105-lx*Z}px,${105-ly*Z}px) scale(${Z})`;
-  }
-});
-
-/* ---------------- finale ---------------- */
-function finale(){
-  state.complete=true;
-  clearTimeout(state.idleTimer);
+function setPointer(e){ndc.x=(e.clientX/W)*2-1;ndc.y=-(e.clientY/H)*2+1;}
+function activePart(){return PARTS[currentIndex];}
+function focusPart(){
+  const p=activePart();if(!p){return;}
+  socket.position.set(p.target.x,p.target.y+0.15,p.target.z);
+  const rr=Math.max(2,p.snapR*0.62);socket.scale.setScalar(rr/2.4);
+  caption(p.name,p.hint);
   updateProgress();
-  buildCustPanel();
-  setTimeout(()=>{
-    // the workshop falls silent; the camera pulls back
-    if(AU.ambGain&&AU.ctx) AU.ambGain.gain.linearRampToValueAtTime(0,AU.ctx.currentTime+2.5);
-    $('#stage').style.transform='scale(.86)';
-    $('#tray').style.opacity='0'; $('#tray').style.transform='translateX(-50%) translateY(40px)';
-    $('#tray').style.pointerEvents='none';
-    $('#masthead').style.opacity='.25';
-    const ov=$('#overlayFinal'); ov.classList.add('show');
-    setTimeout(()=>{$('#finalMsg').classList.add('go'); SND.chime();},900);
-    setTimeout(()=>ov.classList.add('acts'),5200);
-    announce('The watch is complete. It is ticking.');
-  },1400);
 }
-$('#btnCustomize').addEventListener('click',()=>{
-  closeFinal(); $('#custPanel').classList.add('open');
-});
-$('#btnAgain').addEventListener('click',()=>{
-  closeFinal(); resetAtelier();
-});
-function closeFinal(){
-  const ov=$('#overlayFinal'); ov.classList.remove('show','acts');
-  $('#finalMsg').classList.remove('go');
-  $('#stage').style.transform='';
-  if(AU.ambGain&&AU.ctx&&state.soundOn) AU.ambGain.gain.linearRampToValueAtTime(.05,AU.ctx.currentTime+2);
+function onDown(e){
+  if(!started||drag)return;const p=activePart();if(!p)return;
+  setPointer(e);ray.setFromCamera(ndc,camera);
+  const hit=ray.intersectObject(p.group,true);
+  if(hit.length){
+    drag={p,last:p.group.position.clone(),vx:0,vz:0,yaw:0};
+    controls.enabled=false;sSoft();
+  }
 }
-function resetAtelier(){
-  state.stepIdx=0; state.level=0; state.complete=false; state.clk=0; state.handsClk=0; state.rotClk=0;
-  state.startTime=null; state.flipped=false;
-  $('#bench').classList.remove('flipped');
-  $('#btnFlip').classList.add('hidden');
-  $('#custPanel').classList.remove('open');
-  $$('#watch .layer, #watchBack .layer').forEach(g=>{g.classList.remove('on'); g.innerHTML='';});
-  $$('.part').forEach(el=>el.classList.remove('done'));
-  $('#tray').style.opacity=''; $('#tray').style.transform='translateX(-50%)'; $('#tray').style.pointerEvents='';
-  $('#masthead').style.opacity='';
-  updateProgress(); armIdleHint();
-  showWhisper('A fresh movement awaits.',3000);
+function onMove(e){if(drag)setPointer(e);}
+function updateDrag(){
+  if(!drag)return;ray.setFromCamera(ndc,camera);
+  const pt=new THREE.Vector3();
+  if(ray.ray.intersectPlane(dragPlane,pt)){
+    const g=drag.p.group;
+    drag.vx=pt.x-g.position.x;drag.vz=pt.z-g.position.z;
+    g.position.set(pt.x,liftY,pt.z);
+    drag.yaw+=0.02;
+    // lift, slight motion tilt (weighty, no bounce)
+    const tiltX=THREE.MathUtils.clamp(-drag.vz*0.06,-0.25,0.25);
+    const tiltZ=THREE.MathUtils.clamp(drag.vx*0.06,-0.25,0.25);
+    g.quaternion.setFromEuler(new THREE.Euler(tiltX,drag.yaw,tiltZ));
+  }
+}
+function onUp(){
+  if(!drag)return;const {p}=drag;const g=p.group;
+  const dx=g.position.x-p.target.x, dz=g.position.z-p.target.z;
+  const dist=Math.hypot(dx,dz);
+  const home=drag;drag=null;
+  if(dist<=p.snapR){snapIn(p);}else{returnHome(p);controls.enabled=(currentIndex<PARTS.length);}
+}
+function snapIn(p){
+  const g=p.group;const sp=g.position.clone(),sq=g.quaternion.clone();
+  socketFade(0);
+  addTween({dur:0.55,ease:easeInOut,
+    update(f){g.position.lerpVectors(sp,p.target,f);g.quaternion.slerpQuaternions(sq,p.targetQuat,f);},
+    done(){g.position.copy(p.target);g.quaternion.copy(p.targetQuat);sClick();onInstalled(p);}});
+}
+function returnHome(p){
+  const g=p.group;const sp=g.position.clone(),sq=g.quaternion.clone();
+  addTween({dur:0.6,ease:easeOut,update(f){g.position.lerpVectors(sp,p.home,f);g.quaternion.slerpQuaternions(sq,p.homeQuat,f);}});
+}
+function socketFade(to){const m=socket.material;const from=m.opacity;addTween({dur:0.5,update(f){m.opacity=from+(to-from)*f;}});}
+
+let socketPulse=0;
+function updateSocket(dt){
+  if(!started||!activePart()||drag)return;
+  socketPulse+=dt;socket.material.opacity=0.35+Math.sin(socketPulse*2.2)*0.28;
+  // gentle bob on the active part while it waits in the tray
+  const p=activePart();if(p&&!p.installed){p.group.position.y=p.home.y+Math.sin(socketPulse*1.6)*0.18;}
 }
 
-/* ---------------- intro ---------------- */
-$('#overlayIntro').addEventListener('click',()=>{
-  if(state.entered) return; state.entered=true;
-  auInit();
-  const ov=$('#overlayIntro');
-  ov.style.opacity='0';
-  setTimeout(()=>ov.style.display='none',2400);
-  armIdleHint();
-  setTimeout(()=>showWhisper('The bench is yours.',3600),1600);
-});
+/* ===================================================================
+   INSTALL FLOW + MECHANISM
+   =================================================================== */
+let mech={running:false,armed:false,beat:0,hands:false,handObj:null,spins:[]};
+function onInstalled(p){
+  p.installed=true;
+  if(p.spin){if(p.spin.type==='lever')p.group.userData.base=p.group.rotation.y;mech.spins.push({obj:p.group,def:p.spin});}
+  if(p.tellsTime){mech.hands=true;mech.handObj=p.group.userData.hands;}
+  currentIndex++;
+  if(p.hero){magicMoment();}
+  if(p.cases){caseCinematic();}
+  if(currentIndex>=PARTS.length){finishAssembly();return;}
+  if(!p.hero){ // hero handles its own camera; others just advance
+    focusPart();socketFade(1);
+    controls.enabled=true;
+  }
+}
+function magicMoment(){
+  // everything pauses, camera pushes in on the balance
+  caption('The Balance','…');
+  socketFade(0);controls.enabled=false;
+  const bpos=activePartTargetWorld(PARTS.find(p=>p.id==='balance'));
+  tweenCamera(new THREE.Vector3(bpos.x+3,bpos.y+7,bpos.z+11),new THREE.Vector3(bpos.x,bpos.y,bpos.z),2.0,easeInOut,()=>{
+    setTimeout(()=>{sTick(true);nudgeBalance();},700);
+    setTimeout(()=>{sTick(false);nudgeBalance();},1150);
+    setTimeout(()=>{sTick(true);mech.running=true;mech.armed=true;caption('It breathes','The movement is alive');},1650);
+    setTimeout(()=>{ // ease back out to admire, then continue
+      tweenCamera(new THREE.Vector3(0,18,24),new THREE.Vector3(0,ASSEM.y0+1.5,0),2.4,easeInOut,()=>{
+        focusPart();socketFade(1);controls.enabled=true;});
+    },3200);
+  });
+}
+function nudgeBalance(){const b=mech.spins.find(s=>s.def.type==='balance');if(b)b.obj.rotation.y=0.5;}
+function activePartTargetWorld(p){return new THREE.Vector3(p.target.x,p.target.y,p.target.z);}
 
+function updateMechanism(dt,t){
+  updateSocket(dt);
+  if(mech.running){
+    mech.beat+=dt;const period=0.25;
+    if(mech.beat>=period){mech.beat-=period;mech.tickHi=!mech.tickHi;sTick(mech.tickHi);
+      const esc=mech.spins.find(s=>s.def.type==='escape');if(esc)esc.obj.rotation.y+=Math.PI*2/20/2;}
+    for(const s of mech.spins){
+      if(s.def.type==='balance')s.obj.rotation.y=Math.sin(t*Math.PI*2*2.5)*0.6;
+      else if(s.def.type==='lever')s.obj.rotation.y=(s.obj.userData.base||0)+Math.sin(t*Math.PI*2*2.5)*0.12;
+      else if(s.def.type==='wheel')s.obj.rotation.y+=s.def.speed*dt*0.15;
+    }
+    if(mech.hands&&mech.handObj){
+      const d=new Date();const sec=d.getSeconds()+d.getMilliseconds()/1000;
+      const min=d.getMinutes()+sec/60, hr=(d.getHours()%12)+min/60;
+      mech.handObj.sec.rotation.y=-sec/60*Math.PI*2;
+      mech.handObj.min.rotation.y=-min/60*Math.PI*2;
+      mech.handObj.hour.rotation.y=-hr/12*Math.PI*2;
+    }
+  }
+}
+
+/* ===================================================================
+   CINEMATIC FINISH + EXPORT
+   =================================================================== */
+let autoTurn=false,finished=false;
+function caseCinematic(){
+  caption('Cased','A movement becomes a watch');
+  controls.enabled=false;
+  tweenCamera(new THREE.Vector3(13,12,18),new THREE.Vector3(0,ASSEM.y0+1.5,0),2.2,easeInOut,()=>{
+    focusPart();socketFade(1);controls.enabled=true;});
+}
+function finishAssembly(){
+  finished=true;socketFade(0);caption('','');
+  document.getElementById('cap').classList.remove('on');
+  controls.enabled=false;autoTurn=true;
+  // dim to a hero product light
+  addTween({dur:2.0,update(f){lampSpot.intensity=900+f*500;renderer.toneMappingExposure=1.05+f*0.15;}});
+  document.getElementById('vig').style.opacity='1.2';
+  tweenCamera(new THREE.Vector3(9,10,17),new THREE.Vector3(0,ASSEM.y0+1.4,0),2.6,easeInOut,()=>{
+    controls.enabled=true;controls.autoRotate=true;controls.autoRotateSpeed=0.6;
+    document.getElementById('finishActs').classList.add('on');
+    caption('Your Timepiece','Turn it in the light — or take the photograph');
+  });
+}
+
+function downloadPhoto(){
+  const wRatio=1600,hRatio=2000;const oldW=W,oldH=H;
+  renderer.setSize(wRatio,hRatio,false);camera.aspect=wRatio/hRatio;camera.updateProjectionMatrix();
+  renderer.render(scene,camera);
+  const url=renderer.domElement.toDataURL('image/png');
+  const a=document.createElement('a');a.href=url;a.download='watchmaking-table.png';a.click();
+  renderer.setSize(oldW,oldH,false);camera.aspect=oldW/oldH;camera.updateProjectionMatrix();
+  toastMsg('Photograph saved');
+}
+
+/* ===================================================================
+   UI
+   =================================================================== */
+function caption(n,h){const c=document.getElementById('cap');c.querySelector('.n').textContent=n;c.querySelector('.h').textContent=h;
+  if(n||h)c.classList.add('on');else c.classList.remove('on');}
+function toastMsg(m){caption(m,'');setTimeout(()=>{if(finished)caption('Your Timepiece','Turn it in the light — or take the photograph');},1600);}
+function buildProgress(){const p=document.getElementById('prog');PARTS.forEach(()=>{const i=document.createElement('i');p.appendChild(i);});p.classList.add('on');}
+function updateProgress(){const nodes=document.querySelectorAll('#prog i');nodes.forEach((n,i)=>{n.className='';if(i<currentIndex)n.classList.add('done');else if(i===currentIndex)n.classList.add('cur');});}
+function wireUI(){
+  document.getElementById('sit').addEventListener('click',startExperience);
+  document.getElementById('dlBtn').addEventListener('click',downloadPhoto);
+  document.getElementById('orbitBtn').addEventListener('click',()=>{controls.autoRotate=!controls.autoRotate;
+    document.getElementById('orbitBtn').textContent=controls.autoRotate?'Hold still':'Turn slowly';});
+  document.getElementById('againBtn').addEventListener('click',()=>location.reload());
+}
+function startExperience(){
+  ac();sSoft();
+  document.getElementById('intro').classList.add('gone');
+  buildProgress();
+  tweenCamera(new THREE.Vector3(0,18,24),new THREE.Vector3(0,ASSEM.y0+1.5,0),2.6,easeInOut,()=>{
+    started=true;controls.enabled=true;focusPart();socketFade(1);
+  });
+}
+
+/*__APPEND__*/
+
+/* ===================================================================
+   RENDER LOOP
+   =================================================================== */
+function tick(){
+  requestAnimationFrame(tick);
+  const dt=Math.min(clock.getDelta(),0.05), t=clock.elapsedTime;
+  if(controls)controls.update();
+  if(typeof updateTweens==='function') updateTweens(dt);
+  if(typeof updateDrag==='function') updateDrag();
+  if(typeof updateMechanism==='function') updateMechanism(dt,t);
+  if(typeof updateDust==='function') updateDust(dt,t);
+  renderer.render(scene,camera);
+}
+
+/* ===================================================================
+   BOOT
+   =================================================================== */
+function boot(){
+  window.__wmLoaded=true;
+  if(!initCore())return;
+  buildWorld();          // bench, tools, lamp, dust
+  buildParts();          // movement + finishing parts, placed in trays
+  initInteraction();     // raycast drag + snap + order
+  wireUI();
+  $('#loading').classList.add('gone');
+  tick();
+}
+boot();
 </script>
 </body>
 </html>
