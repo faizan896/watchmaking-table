@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Atelier — The Watchmaking Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0b0a; --bg-2:#151210; --ink:#f3ece0; --muted:#9a8f80;
+  --brass:#c8a24a; --brass-2:#e7cf8f; --brass-deep:#8a6d2c;
+  --steel:#c9ced4; --steel-deep:#6d7379;
+  --wood-1:#3a271a; --wood-2:#25170f; --felt:#171b1a;
+  --line:rgba(200,162,74,.18); --line-soft:rgba(243,236,224,.08);
+  --ok:#7fd1a6; --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  --shadow:0 30px 80px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans); background:var(--bg); color:var(--ink);
+  overflow:hidden; -webkit-font-smoothing:antialiased;
+  user-select:none; cursor:default;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;background:none;border:none}
+.hidden{display:none!important}
+
+/* ===================== INTRO ===================== */
+#intro{
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  background:
+    radial-gradient(120% 90% at 50% 8%, rgba(200,162,74,.10), transparent 55%),
+    radial-gradient(140% 120% at 50% 120%, #1a1411 0%, #0a0807 70%);
+  transition:opacity 1.2s ease;
+}
+#intro .kicker{letter-spacing:.5em;font-size:11px;color:var(--brass);text-transform:uppercase;margin-bottom:26px;opacity:.9}
+#intro h1{font-family:var(--serif);font-weight:500;font-size:clamp(52px,11vw,148px);line-height:.92;letter-spacing:.01em}
+#intro h1 em{font-style:italic;color:var(--brass-2)}
+#intro .lede{max-width:520px;margin:26px auto 0;color:var(--muted);font-size:15px;line-height:1.7;font-weight:300}
+#enterBtn{
+  margin-top:46px;padding:16px 40px;border:1px solid var(--brass);color:var(--brass-2);
+  letter-spacing:.28em;font-size:12px;text-transform:uppercase;border-radius:2px;
+  transition:.4s;position:relative;overflow:hidden;
+}
+#enterBtn:hover{background:var(--brass);color:#1a1207;box-shadow:0 0 40px rgba(200,162,74,.35)}
+.intro-mark{margin:0 auto 40px;width:64px;height:64px;opacity:.85}
+#intro .foot{position:absolute;bottom:26px;font-size:10px;letter-spacing:.35em;color:#5c534a;text-transform:uppercase}
+
+/* ===================== APP LAYOUT ===================== */
+#app{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;opacity:0;transition:opacity 1s ease}
+#app.on{opacity:1}
+
+/* top rail */
+#rail{
+  display:flex;align-items:center;gap:6px;justify-content:center;
+  padding:16px 22px;border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(180deg,rgba(20,16,13,.9),rgba(13,11,10,.6));
+  backdrop-filter:blur(6px);position:relative;z-index:10;
+}
+#brand{position:absolute;left:22px;font-family:var(--serif);font-size:20px;letter-spacing:.02em}
+#brand em{font-style:italic;color:var(--brass-2)}
+.step-pip{display:flex;align-items:center;gap:8px;opacity:.4;transition:.4s;padding:4px 6px}
+.step-pip .dot{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);
+  display:grid;place-items:center;font-size:10px;color:var(--muted);transition:.4s}
+.step-pip .nm{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.step-pip.active{opacity:1}
+.step-pip.active .dot{border-color:var(--brass);color:var(--brass-2);box-shadow:0 0 16px rgba(200,162,74,.4)}
+.step-pip.active .nm{color:var(--ink)}
+.step-pip.done .dot{background:var(--brass);border-color:var(--brass);color:#1a1207}
+.step-pip.done{opacity:.8}
+.rail-sep{width:14px;height:1px;background:var(--line-soft)}
+#resetBtn{position:absolute;right:22px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-soft);padding:7px 14px;border-radius:2px;transition:.3s}
+#resetBtn:hover{color:var(--brass-2);border-color:var(--line)}
+
+/* main */
+#stageWrap{position:relative;display:grid;grid-template-columns:1fr 340px;overflow:hidden;
+  background:
+    radial-gradient(90% 70% at 50% 42%, rgba(255,240,210,.05), transparent 60%),
+    radial-gradient(120% 120% at 50% 130%, #241812 0%, #0c0908 70%);
+}
+/* bench floor */
+#bench{position:absolute;left:0;right:340px;bottom:0;height:38%;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.35), transparent 40%),
+    repeating-linear-gradient(92deg, var(--wood-1) 0 22px, var(--wood-2) 22px 46px);
+  border-top:1px solid rgba(200,162,74,.12);
+  box-shadow:inset 0 30px 60px rgba(0,0,0,.5);filter:brightness(.9);
+}
+#bench::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 0%,rgba(255,230,190,.06),transparent 70%)}
+
+#stage{position:relative;display:grid;place-items:center;z-index:2}
+#watchHost{width:min(72vh,560px);aspect-ratio:0.8/1;position:relative;
+  transition:transform 1.4s cubic-bezier(.22,1,.36,1), filter 1.4s ease;transform-style:preserve-3d}
+#watchSVG{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 40px 60px rgba(0,0,0,.55))}
+
+/* ghost part in tweezers */
+#ghost{position:fixed;pointer-events:none;z-index:40;width:120px;height:120px;
+  transform:translate(-50%,-50%) rotate(-8deg);opacity:0;transition:opacity .2s}
+#ghost.on{opacity:1}
+#ghost svg{width:100%;height:100%;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
+body.placing{cursor:none}
+
+/* socket hint */
+.socket-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:3;pointer-events:none;opacity:0;transition:opacity .4s}
+.socket-hint.on{opacity:1;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+
+/* mechanism status readout */
+#status{position:absolute;left:26px;bottom:22px;z-index:5;max-width:320px}
+#status .lab{font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+#status .val{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1.15}
+#status .beat{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4a423a;margin-right:9px;transition:.3s;vertical-align:middle}
+#status.live .beat{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+#status .sub{font-size:11px;color:var(--muted);margin-top:6px;font-weight:300}
+
+/* ===================== TRAY ===================== */
+#tray{position:relative;z-index:6;border-left:1px solid var(--line-soft);
+  background:linear-gradient(180deg,rgba(23,19,16,.72),rgba(13,11,10,.86));
+  backdrop-filter:blur(10px);display:flex;flex-direction:column;overflow:hidden}
+#trayHead{padding:26px 26px 16px}
+#trayHead .idx{font-size:10px;letter-spacing:.3em;color:var(--brass);text-transform:uppercase}
+#trayHead h2{font-family:var(--serif);font-size:34px;font-weight:500;margin-top:6px}
+#trayHead p{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6;font-weight:300;min-height:38px}
+#trayList{flex:1;overflow-y:auto;padding:6px 18px 20px;display:flex;flex-direction:column;gap:10px}
+#trayList::-webkit-scrollbar{width:6px}#trayList::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.card{display:flex;gap:14px;align-items:center;padding:12px;border:1px solid var(--line-soft);
+  border-radius:6px;transition:.28s;cursor:pointer;background:rgba(255,255,255,.008)}
+.card:hover{border-color:var(--line);background:rgba(200,162,74,.05);transform:translateX(-3px)}
+.card.sel{border-color:var(--brass);background:rgba(200,162,74,.09);box-shadow:0 0 26px rgba(200,162,74,.14)}
+.card .sw{width:56px;height:56px;flex:none;border-radius:5px;background:radial-gradient(circle at 40% 30%,#20191300,#0000);
+  display:grid;place-items:center;border:1px solid var(--line-soft)}
+.card .sw svg{width:48px;height:48px}
+.card .meta .t{font-family:var(--serif);font-size:17px}
+.card .meta .d{font-size:11px;color:var(--muted);margin-top:2px;font-weight:300;line-height:1.4}
+.card.done-lock{opacity:.5;pointer-events:none}
+#trayFoot{padding:16px 26px 24px;border-top:1px solid var(--line-soft)}
+#installBtn,#nextBtn,#finaleBtn{width:100%;padding:15px;border:1px solid var(--brass);color:var(--brass-2);
+  letter-spacing:.24em;font-size:11px;text-transform:uppercase;border-radius:3px;transition:.3s}
+#installBtn:hover,#nextBtn:hover,#finaleBtn:hover{background:var(--brass);color:#1a1207;box-shadow:0 0 34px rgba(200,162,74,.3)}
+#installBtn:disabled{opacity:.3;pointer-events:none;border-color:var(--line-soft);color:var(--muted)}
+#nextBtn,#finaleBtn{background:var(--brass);color:#1a1207;border-color:var(--brass)}
+.toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:45;
+  padding:12px 26px;border:1px solid var(--line);border-radius:3px;background:rgba(20,16,13,.95);
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass-2);
+  opacity:0;transition:.4s;pointer-events:none}
+.toast.on{opacity:1}
+
+/* snap flash */
+#flash{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:radial-gradient(40% 40% at 50% 46%,rgba(255,238,200,.5),transparent 70%)}
+@keyframes flashK{0%{opacity:0}18%{opacity:.9}100%{opacity:0}}
+#flash.go{animation:flashK .5s ease}
+
+/* ===================== FINALE ===================== */
+#finale{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(80% 70% at 50% 38%,#141414 0%,#050505 72%);opacity:0;transition:opacity 1.4s ease}
+#finale.on{display:flex;opacity:1}
+#finaleStage{position:relative;width:min(70vh,560px);aspect-ratio:.8/1;perspective:1400px}
+#finaleStage .keylight{position:absolute;inset:-20% -10%;background:radial-gradient(45% 45% at 35% 25%,rgba(255,245,225,.16),transparent 70%);pointer-events:none;z-index:2}
+#finaleStage .reflect{position:absolute;left:8%;right:8%;top:calc(100% - 6px);height:22%;
+  transform:scaleY(-1);opacity:.16;filter:blur(2px);-webkit-mask-image:linear-gradient(#000,transparent 60%);mask-image:linear-gradient(#000,transparent 60%)}
+#finaleWatch{width:100%;height:100%;transform-style:preserve-3d;transition:transform .1s linear}
+#finaleWatch svg{width:100%;height:100%;filter:drop-shadow(0 50px 70px rgba(0,0,0,.7))}
+#finaleUI{position:absolute;bottom:36px;left:0;right:0;text-align:center}
+#finaleUI .title{font-family:var(--serif);font-size:30px;margin-bottom:4px}
+#finaleUI .spec{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+#finaleUI .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.fbtn{padding:13px 26px;border:1px solid var(--line);border-radius:3px;color:var(--ink);
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;transition:.3s}
+.fbtn:hover{border-color:var(--brass);color:var(--brass-2)}
+.fbtn.gold{background:var(--brass);color:#1a1207;border-color:var(--brass)}
+.fbtn.gold:hover{box-shadow:0 0 34px rgba(200,162,74,.35)}
+#finaleTop{position:absolute;top:30px;left:50%;transform:translateX(-50%);text-align:center}
+#finaleTop .k{font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:var(--brass);}
+@media (max-width:920px){
+  #stageWrap{grid-template-columns:1fr}#bench{right:0;height:30%}
+  #tray{position:absolute;right:0;top:0;bottom:0;width:300px}
+  #watchHost{width:64vw;max-width:360px}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<section id="intro">
+  <svg class="intro-mark" viewBox="0 0 64 64" fill="none" stroke="#c8a24a" stroke-width="1.2">
+    <circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="20" stroke-opacity=".5"/>
+    <line x1="32" y1="32" x2="32" y2="17"/><line x1="32" y1="32" x2="43" y2="38"/>
+    <circle cx="32" cy="32" r="2" fill="#c8a24a"/>
+  </svg>
+  <div class="kicker">Horological Craft Studio</div>
+  <h1>L'<em>Atelier</em></h1>
+  <p class="lede">An empty bench. A loupe. A tray of a hundred parts. Assemble a mechanical timepiece from the movement up — and watch it come alive in your hands.</p>
+  <button id="enterBtn">Enter the Atelier</button>
+  <div class="foot">Est. workbench · a digital craft experience</div>
+</section>
+
+<!-- APP -->
+<main id="app">
+  <header id="rail">
+    <div id="brand">L'<em>Atelier</em></div>
+    <div id="pips"></div>
+    <button id="resetBtn">Start Over</button>
+  </header>
+
+  <section id="stageWrap">
+    <div id="bench"></div>
+    <div id="stage">
+      <div id="watchHost">
+        <svg id="watchSVG" viewBox="0 0 400 500"></svg>
+        <div id="flash"></div>
+        <div class="socket-hint" id="socketHint"></div>
+      </div>
+      <div id="status">
+        <div class="lab">Mechanism</div>
+        <div class="val"><span class="beat"></span><span id="statusVal">Bench is empty</span></div>
+        <div class="sub" id="statusSub">Select a movement to begin the build.</div>
+      </div>
+    </div>
+
+    <aside id="tray">
+      <div id="trayHead">
+        <div class="idx" id="trayIdx">Step 1 / 7</div>
+        <h2 id="trayTitle">The Movement</h2>
+        <p id="trayDesc"></p>
+      </div>
+      <div id="trayList"></div>
+      <div id="trayFoot">
+        <button id="installBtn" disabled>Fit with tweezers</button>
+      </div>
+    </aside>
+  </section>
+
+  <footer style="display:none"></footer>
+</main>
+
+<!-- ghost, toast, finale -->
+<div id="ghost"></div>
+<div class="toast" id="toast"></div>
+
+<section id="finale">
+  <div id="finaleTop"><div class="k">The Photograph</div></div>
+  <div id="finaleStage">
+    <div class="keylight"></div>
+    <div id="finaleWatch"></div>
+    <div class="reflect" id="finaleReflect"></div>
+  </div>
+  <div id="finaleUI">
+    <div class="title" id="finaleTitle">Your Timepiece</div>
+    <div class="spec" id="finaleSpec"></div>
+    <div class="btns">
+      <button class="fbtn" id="rotateBtn">Auto-rotate: On</button>
+      <button class="fbtn gold" id="downloadBtn">Download Wallpaper</button>
+      <button class="fbtn" id="rebuildBtn">Build Another</button>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ==========================================================================
+   L'ATELIER — interactive watchmaking bench
+   Single-file. SVG component library + assembly engine + live mechanism.
+   ========================================================================== */
+"use strict";
+const CX=200, CY=225, R=118; // dial center + radius in watch viewBox (400x500)
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const svgNS="http://www.w3.org/2000/svg";
+
+/* ---------- shared gradients / filters ---------- */
+function DEFS(){return `
+<defs>
+  <radialGradient id="gBrass" cx="38%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#f3e0aa"/><stop offset="42%" stop-color="#c8a24a"/>
+    <stop offset="100%" stop-color="#7c611f"/>
+  </radialGradient>
+  <linearGradient id="gBrassBar" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#e7cf8f"/><stop offset="50%" stop-color="#b8933f"/><stop offset="100%" stop-color="#6f561d"/>
+  </linearGradient>
+  <radialGradient id="gSteel" cx="34%" cy="26%" r="90%">
+    <stop offset="0%" stop-color="#ffffff"/><stop offset="30%" stop-color="#d7dbe0"/>
+    <stop offset="70%" stop-color="#9aa1a8"/><stop offset="100%" stop-color="#565c62"/>
+  </radialGradient>
+  <linearGradient id="gSteelRim" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#f4f6f8"/><stop offset="45%" stop-color="#aeb4ba"/>
+    <stop offset="55%" stop-color="#7c8288"/><stop offset="100%" stop-color="#cfd4d9"/>
+  </linearGradient>
+  <radialGradient id="gDialSun" cx="50%" cy="42%" r="70%">
+    <stop offset="0%" stop-color="#2a2f36"/><stop offset="60%" stop-color="#171b21"/><stop offset="100%" stop-color="#0a0d11"/>
+  </radialGradient>
+  <radialGradient id="gDialSilver" cx="50%" cy="42%" r="72%">
+    <stop offset="0%" stop-color="#f2efe6"/><stop offset="65%" stop-color="#d8d2c2"/><stop offset="100%" stop-color="#a99f89"/>
+  </radialGradient>
+  <radialGradient id="gLume" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#eafff0"/><stop offset="100%" stop-color="#bfe9cf"/>
+  </radialGradient>
+  <radialGradient id="gCrystal" cx="38%" cy="26%" r="85%">
+    <stop offset="0%" stop-color="rgba(255,255,255,.42)"/><stop offset="30%" stop-color="rgba(255,255,255,.06)"/>
+    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+  </radialGradient>
+  <radialGradient id="gRuby" cx="40%" cy="35%" r="70%">
+    <stop offset="0%" stop-color="#ff8f8f"/><stop offset="100%" stop-color="#8e1f2b"/>
+  </radialGradient>
+  <radialGradient id="gPlate" cx="45%" cy="40%" r="75%">
+    <stop offset="0%" stop-color="#d8bf7e"/><stop offset="55%" stop-color="#a9863c"/><stop offset="100%" stop-color="#6b5220"/>
+  </radialGradient>
+  <linearGradient id="gStrapL" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#3a2416"/><stop offset="45%" stop-color="#5e3a22"/><stop offset="100%" stop-color="#2c1a0f"/>
+  </linearGradient>
+  <linearGradient id="gStrapK" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#20130a"/><stop offset="50%" stop-color="#3a241a"/><stop offset="100%" stop-color="#16100c"/>
+  </linearGradient>
+  <radialGradient id="gStripe" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="#2a3550"/><stop offset="100%" stop-color="#141b2b"/>
+  </radialGradient>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
+</defs>`;}
+
+/* ---------- geometry helpers ---------- */
+const pol=(cx,cy,r,deg)=>{const a=(deg-90)*Math.PI/180;return[cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+function tick(cx,cy,r1,r2,deg,w,col){const[x1,y1]=pol(cx,cy,r1,deg),[x2,y2]=pol(cx,cy,r2,deg);
+  return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;}
+function ruby(x,y,r=3.4){return `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#gRuby)" stroke="#5c1018" stroke-width=".5"/>`;}
+function screwHead(x,y,r=4.2){return `<g><circle cx="${x}" cy="${y}" r="${r}" fill="url(#gSteelRim)" stroke="#5a6066" stroke-width=".6"/><line x1="${x-r*0.7}" y1="${y-r*0.4}" x2="${x+r*0.7}" y2="${y+r*0.4}" stroke="#41474d" stroke-width="1"/></g>`;}
+
+/* =====================================================================
+   COMPONENT LIBRARY
+   ===================================================================== */
+const LIB={};
+
+/* ---- MOVEMENTS (mechanism visible; balance/rotor/tourbillon animate) ---- */
+function movementBase(extra="",hideBalance=false){ // mainplate, bridges, jewels, gear train, barrel, escapement, balance
+  return `
+  <circle cx="${CX}" cy="${CY}" r="${R-4}" fill="url(#gPlate)" stroke="#5b471d" stroke-width="1.5"/>
+  <circle cx="${CX}" cy="${CY}" r="${R-4}" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="7"/>
+  <!-- perlage texture rings -->
+  ${[...Array(7)].map((_,i)=>`<circle cx="${CX}" cy="${CY}" r="${(R-14)-i*13}" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="9" stroke-dasharray="3 6"/>`).join("")}
+  <!-- barrel (mainspring) top-left -->
+  <g><circle cx="${CX-52}" cy="${CY-46}" r="30" fill="url(#gBrass)" stroke="#5b471d" stroke-width="1"/>
+     ${[...Array(48)].map((_,i)=>tick(CX-52,CY-46,30,26,i*7.5,1,"#6a521e")).join("")}
+     <circle cx="${CX-52}" cy="${CY-46}" r="8" fill="url(#gBrassBar)" stroke="#5b471d"/>${ruby(CX-52,CY-46,3)}</g>
+  <!-- gear train -->
+  ${gearStatic(CX+2,CY-58,17,26)}
+  ${gearStatic(CX+40,CY-30,13,20)}
+  ${gearStatic(CX+30,CY+16,10,16)}
+  <!-- bridges (brass overlay shapes) -->
+  <path d="M ${CX-84} ${CY-8} Q ${CX-40} ${CY-40} ${CX+18} ${CY-30} Q ${CX+60} ${CY-24} ${CX+66} ${CY+14} L ${CX+40} ${CY+30} Q ${CX-10} ${CY+10} ${CX-50} ${CY+34} Q ${CX-84} ${CY+30} ${CX-84} ${CY-8} Z"
+     fill="url(#gPlate)" stroke="#5b471d" stroke-width="1.2" opacity=".96"/>
+  ${screwHead(CX-70,CY+6)}${screwHead(CX+52,CY+2)}${ruby(CX-30,CY-14)}${ruby(CX+18,CY+2)}
+  <!-- escapement + balance at 6h -->
+  ${hideBalance?"":`<g transform="translate(${CX},${CY+58})">
+     <circle r="34" fill="#0f0c07" stroke="#5b471d" stroke-width="1"/>
+     <path d="M-22 8 L0 -6 L22 8" fill="none" stroke="url(#gSteelRim)" stroke-width="2.4" id="palletFork"/>
+     <g id="balanceWheel">
+        <circle r="26" fill="none" stroke="url(#gBrassBar)" stroke-width="4.5"/>
+        <line x1="-26" y1="0" x2="26" y2="0" stroke="url(#gBrassBar)" stroke-width="3.4"/>
+        <line x1="0" y1="-26" x2="0" y2="26" stroke="url(#gBrassBar)" stroke-width="3.4"/>
+        ${[0,90,180,270].map(a=>{const[x,y]=pol(0,0,26,a);return `<circle cx="${x}" cy="${y}" r="3.3" fill="url(#gSteelRim)"/>`;}).join("")}
+     </g>
+     <circle r="3" fill="url(#gRuby)"/>
+  </g>`}
+  ${extra}`;
+}
+function gearStatic(x,y,rin,rout){return `<g><circle cx="${x}" cy="${y}" r="${rout}" fill="url(#gBrassBar)" stroke="#5b471d" stroke-width=".8"/>${[...Array(Math.round(rout*1.4))].map((_,i,a)=>tick(x,y,rout+2,rin,i*(360/a.length),1.4,"#7c611f")).join("")}<circle cx="${x}" cy="${y}" r="4" fill="url(#gBrass)"/>${ruby(x,y,2.4)}</g>`;}
+function gear(){return "";}
+
+LIB.movement={
+  auto:{name:"Automatic",desc:"Self-winding — a gold oscillating rotor tops the plate.",
+    render:()=>movementBase(`
+      <g id="rotorWeight" transform="rotate(0 ${CX} ${CY})">
+        <path d="M ${CX} ${CY} m 0 -${R-12} A ${R-12} ${R-12} 0 0 1 ${CX+ (R-12)*Math.sin(Math.PI*0.9)} ${CY- (R-12)*Math.cos(Math.PI*0.9)} L ${CX} ${CY} Z"
+          fill="url(#gBrass)" stroke="#5b471d" stroke-width="1.4" opacity=".9"/>
+        <path d="M ${CX} ${CY} m 0 -${R-12} A ${R-12} ${R-12} 0 0 1 ${CX+ (R-12)*Math.sin(Math.PI*0.9)} ${CY- (R-12)*Math.cos(Math.PI*0.9)}"
+          fill="none" stroke="#e7cf8f" stroke-width="3"/>
+        <circle cx="${CX}" cy="${CY}" r="12" fill="url(#gSteelRim)" stroke="#5b471d"/><circle cx="${CX}" cy="${CY}" r="4" fill="#2a2117"/>
+        <text x="${CX}" y="${CY-70}" font-family="serif" font-size="9" fill="#5b471d" text-anchor="middle" transform="rotate(45 ${CX} ${CY-70})">L'ATELIER</text>
+      </g>`),
+    thumb:`<g transform="translate(24 24)"><circle r="21" fill="url(#gPlate)" stroke="#5b471d"/><path d="M0 0 L0 -20 A20 20 0 0 1 17 10 Z" fill="url(#gBrass)" stroke="#5b471d"/><circle r="5" fill="url(#gSteelRim)"/></g>`},
+  manual:{name:"Hand-Wound",desc:"Manual calibre — no rotor, the gear train laid bare.",
+    render:()=>movementBase(`
+      ${gearStatic(CX+8,CY-70,15,22)}${gearStatic(CX-40,CY-64,11,17)}
+      <path d="M ${CX-70} ${CY-70} Q ${CX} ${CY-96} ${CX+70} ${CY-70}" fill="none" stroke="url(#gBrassBar)" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+      ${screwHead(CX-64,CY-64)}${screwHead(CX+64,CY-64)}${ruby(CX+8,CY-70,3)}`),
+    thumb:`<g transform="translate(24 24)"><circle r="21" fill="url(#gPlate)" stroke="#5b471d"/>${gearStatic(-6,-4,7,11).replace(/gBrassBar|gBrass/g,'gBrassBar')}${gearStatic(9,7,5,8)}</g>`},
+  tourbillon:{name:"Tourbillon",desc:"A rotating carriage carries the escapement — hypnotic.",
+    render:()=>movementBase(`<circle cx="${CX}" cy="${CY+58}" r="36" fill="#0b0906"/>
+      <g id="tourbillon" transform="rotate(0 ${CX} ${CY+58})">
+        <g transform="translate(${CX},${CY+58})">
+          ${[0,120,240].map(a=>{const[x,y]=pol(0,0,32,a);return `<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="#dfe4e9" stroke-width="2"/>`;}).join("")}
+          <circle r="32" fill="none" stroke="url(#gSteelRim)" stroke-width="2.4"/>
+          <circle r="20" fill="none" stroke="#d8b45c" stroke-width="3.2"/>
+          <line x1="-20" y1="0" x2="20" y2="0" stroke="#d8b45c" stroke-width="2.4"/>
+          <line x1="0" y1="-20" x2="0" y2="20" stroke="#d8b45c" stroke-width="2.4"/>
+          ${ruby(0,0,3)}
+        </g></g>`,true),
+    thumb:`<g transform="translate(24 24)"><circle r="21" fill="url(#gPlate)" stroke="#5b471d"/><circle cy="7" r="11" fill="#0b0906" stroke="url(#gSteelRim)"/><circle cy="7" r="6" fill="none" stroke="url(#gBrassBar)" stroke-width="2"/></g>`},
+  gmt:{name:"GMT",desc:"A second time zone — 24-hour wheel drives an extra hand.",
+    render:()=>movementBase(`
+      <g transform="translate(${CX+46},${CY-6})"><circle r="24" fill="#12100a" stroke="#5b471d"/>
+        ${[...Array(24)].map((_,i)=>tick(0,0,22,17,i*15,i%6?1:2,"#c8a24a")).join("")}
+        <circle r="5" fill="url(#gBrassBar)"/></g>
+      <g id="rotorWeight" transform="rotate(0 ${CX} ${CY})">
+        <path d="M ${CX} ${CY} m 0 -${R-12} A ${R-12} ${R-12} 0 0 1 ${CX+ (R-12)*Math.sin(Math.PI*0.85)} ${CY- (R-12)*Math.cos(Math.PI*0.85)} L ${CX} ${CY} Z"
+          fill="url(#gBrass)" stroke="#5b471d" stroke-width="1.4" opacity=".82"/>
+        <circle cx="${CX}" cy="${CY}" r="11" fill="url(#gSteelRim)" stroke="#5b471d"/></g>`),
+    hasGMT:true,
+    thumb:`<g transform="translate(24 24)"><circle r="21" fill="url(#gPlate)" stroke="#5b471d"/><circle cx="8" r="9" fill="#12100a" stroke="#c8a24a"/><path d="M0 0 L0 -20 A20 20 0 0 1 16 12 Z" fill="url(#gBrass)" opacity=".8"/></g>`},
+};
+
+/* ---- CASES (silhouette varies, round crystal opening stays) ---- */
+const LUG_T=CY-R-6, LUG_B=CY+R+6;
+function lugs(){return `
+  <g fill="url(#gSteelRim)" stroke="#4a5056" stroke-width="1">
+    <path d="M ${CX-70} ${LUG_T} q -18 -34 6 -52 q 16 22 30 40 Z"/>
+    <path d="M ${CX+70} ${LUG_T} q 18 -34 -6 -52 q -16 22 -30 40 Z"/>
+    <path d="M ${CX-70} ${LUG_B} q -18 34 6 52 q 16 -22 30 -40 Z"/>
+    <path d="M ${CX+70} ${LUG_B} q 18 34 -6 52 q -16 -22 -30 -40 Z"/>
+  </g>`;}
+function caseWrap(bodyPath){return `${lugs()}
+  <path d="${bodyPath}" fill="url(#gSteel)" stroke="#4a5056" stroke-width="1.5"/>
+  <path d="${bodyPath}" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1"/>`;}
+function bezel(rIn=R+2,rOut=R+22,style="plain"){
+  // annulus only — never fill the dial opening
+  let ring=`<circle cx="${CX}" cy="${CY}" r="${(rIn+rOut)/2}" fill="none" stroke="url(#gSteelRim)" stroke-width="${rOut-rIn}"/>
+    <circle cx="${CX}" cy="${CY}" r="${rOut}" fill="none" stroke="#4a5056" stroke-width="1"/>
+    <circle cx="${CX}" cy="${CY}" r="${rIn}" fill="none" stroke="#3a4046" stroke-width="1"/>`;
+  if(style==="dive"){ring=`<circle cx="${CX}" cy="${CY}" r="${(rIn+rOut)/2}" fill="none" stroke="#12161b" stroke-width="${rOut-rIn}"/>`+
+    [...Array(60)].map((_,i)=>tick(CX,CY,rOut-2,rOut-8,i*6,i%5?1:2.4,"#aab0b6")).join("")+
+    `<circle cx="${CX}" cy="${CY}" r="${rOut}" fill="none" stroke="url(#gSteelRim)" stroke-width="2"/>
+     <path d="${describeTri(CX,CY,rOut-6,0,5)}" fill="#7fd1a6"/>`;}
+  if(style==="gold")ring=ring.replace(/gSteelRim/g,"gBrassBar");
+  return ring;}
+function describeTri(cx,cy,r,deg,w){const[ax,ay]=pol(cx,cy,r,deg-w),[bx,by]=pol(cx,cy,r,deg+w),[tx,ty]=pol(cx,cy,r-9,deg);return `M ${ax} ${ay} L ${bx} ${by} L ${tx} ${ty} Z`;}
+
+LIB.case={
+  round:{name:"Round",desc:"The timeless circle — slim polished bezel.",bezelStyle:"plain",
+    body:()=>caseWrap(`M ${CX} ${CY-R-24} a ${R+24} ${R+24} 0 1 0 0.1 0 Z`),
+    thumb:`<circle cx="24" cy="24" r="19" fill="url(#gSteel)" stroke="#4a5056"/><circle cx="24" cy="24" r="12" fill="#0a0d11"/>`},
+  cushion:{name:"Cushion",desc:"Soft square — vintage warmth, rounded corners.",bezelStyle:"plain",
+    body:()=>caseWrap(`M ${CX-R-6} ${CY-R+26} Q ${CX-R-6} ${CY-R-18} ${CX-R+26} ${CY-R-18} L ${CX+R-26} ${CY-R-18} Q ${CX+R+6} ${CY-R-18} ${CX+R+6} ${CY-R+26} L ${CX+R+6} ${CY+R-26} Q ${CX+R+6} ${CY+R+18} ${CX+R-26} ${CY+R+18} L ${CX-R+26} ${CY+R+18} Q ${CX-R-6} ${CY+R+18} ${CX-R-6} ${CY+R-26} Z`),
+    thumb:`<rect x="6" y="6" width="36" height="36" rx="12" fill="url(#gSteel)" stroke="#4a5056"/><circle cx="24" cy="24" r="12" fill="#0a0d11"/>`},
+  tonneau:{name:"Tonneau",desc:"The barrel — curved flanks, taller than wide.",bezelStyle:"plain",
+    body:()=>caseWrap(`M ${CX-R+6} ${CY-R-24} Q ${CX} ${CY-R-40} ${CX+R-6} ${CY-R-24} Q ${CX+R+30} ${CY} ${CX+R-6} ${CY+R+24} Q ${CX} ${CY+R+40} ${CX-R+6} ${CY+R+24} Q ${CX-R-30} ${CY} ${CX-R+6} ${CY-R-24} Z`),
+    thumb:`<path d="M10 6 Q24 2 38 6 Q46 24 38 42 Q24 46 10 42 Q2 24 10 6 Z" fill="url(#gSteel)" stroke="#4a5056"/><circle cx="24" cy="24" r="11" fill="#0a0d11"/>`},
+  octagonal:{name:"Octagonal",desc:"Eight facets — integrated sports luxury.",bezelStyle:"gold",
+    body:()=>{const p=[...Array(8)].map((_,i)=>pol(CX,CY,R+26,i*45+22.5)).map(([x,y],i)=>(i?"L":"M")+` ${x.toFixed(1)} ${y.toFixed(1)}`).join(" ")+" Z";return caseWrap(p);},
+    thumb:`<polygon points="14,6 34,6 44,16 44,32 34,42 14,42 4,32 4,16" fill="url(#gSteel)" stroke="#4a5056"/><circle cx="24" cy="24" r="11" fill="#0a0d11"/>`},
+  dive:{name:"Diver",desc:"Rugged case with a 60-minute rotating bezel.",bezelStyle:"dive",
+    body:()=>caseWrap(`M ${CX} ${CY-R-30} a ${R+30} ${R+30} 0 1 0 0.1 0 Z`),
+    thumb:`<circle cx="24" cy="24" r="20" fill="#12161b" stroke="#4a5056"/><circle cx="24" cy="24" r="20" fill="none" stroke="#aab0b6" stroke-width="1.5" stroke-dasharray="1.5 2.5"/><circle cx="24" cy="24" r="12" fill="#0a0d11"/>`},
+};
+
+/* ---- DIALS (architecture varies; opening = circle R) ---- */
+function dialBase(fill){return `<circle cx="${CX}" cy="${CY}" r="${R}" fill="${fill}"/>`;}
+function chapter(col="#cbd0d6"){return [...Array(60)].map((_,i)=>tick(CX,CY,R-8,i%5?R-13:R-19,i*6,i%5?1:2.4,col)).join("");}
+function idxBaton(col="#eae6da"){return [...Array(12)].map((_,i)=>{if(i===0)return "";const[x,y]=pol(CX,CY,R-30,i*30);return `<rect x="${x-3}" y="${y-9}" width="6" height="18" rx="2" fill="${col}" transform="rotate(${i*30} ${x} ${y})"/>`;}).join("")+
+  `<polygon points="${CX-9},${CY-R+18} ${CX+9},${CY-R+18} ${CX},${CY-R+34}" fill="${col}"/>`;}
+function numeral(n,r,col,size=17,font="'Cormorant Garamond',serif"){const[x,y]=pol(CX,CY,r,n*30);return `<text x="${x}" y="${y+size*0.35}" font-family="${font}" font-size="${size}" fill="${col}" text-anchor="middle">${n===0?12:n}</text>`;}
+const ROM=["","I","II","III","IIII","V","VI","VII","VIII","IX","X","XI"];
+function logo(y=CY-46){return `<text x="${CX}" y="${y}" font-family="'Cormorant Garamond',serif" font-size="15" letter-spacing="1.5" fill="#cbd0d6" text-anchor="middle">L'ATELIER</text><text x="${CX}" y="${y+15}" font-family="Inter,sans-serif" font-size="6.5" letter-spacing="3" fill="#8a8172" text-anchor="middle">AUTOMATIQUE</text>`;}
+
+LIB.dial={
+  sector:{name:"Sector",desc:"Concentric printed tracks — instrument elegance.",skeleton:false,
+    render:()=>dialBase("url(#gDialSilver)")+`
+      <circle cx="${CX}" cy="${CY}" r="${R-14}" fill="none" stroke="#8a8172" stroke-width="1"/>
+      <circle cx="${CX}" cy="${CY}" r="${R-46}" fill="none" stroke="#8a8172" stroke-width="1"/>
+      ${[...Array(12)].map((_,i)=>tick(CX,CY,R-14,R-46,i*30,2.2,"#2a251c")).join("")}
+      ${chapter("#3a3428")}
+      ${[1,2,4,5,7,8,10,11].map(n=>numeral(n,R-30,"#2a251c",15)).join("")}
+      <text x="${CX}" y="${CY-R+40}" font-family="'Cormorant Garamond',serif" font-size="15" fill="#2a251c" text-anchor="middle">XII</text>
+      <text x="${CX}" y="${CY+R-30}" font-family="'Cormorant Garamond',serif" font-size="15" fill="#2a251c" text-anchor="middle">VI</text>
+      <text x="${CX}" y="${CY+34}" font-family="'Cormorant Garamond',serif" font-size="11" fill="#6a6252" text-anchor="middle" letter-spacing="1">L'ATELIER</text>`,
+    thumb:`<circle cx="24" cy="24" r="19" fill="url(#gDialSilver)"/><circle cx="24" cy="24" r="14" fill="none" stroke="#3a3428"/><circle cx="24" cy="24" r="8" fill="none" stroke="#3a3428"/>`},
+  california:{name:"California",desc:"Half Roman, half Arabic — 1930s collector code.",skeleton:false,
+    render:()=>dialBase("url(#gDialSun)")+`${chapter("#cbd0d6")}
+      ${[1,2].map(n=>numeral(n,R-30,"#eae6da",17)).join("")}
+      <text x="${CX}" y="${CY-R+40}" font-family="'Cormorant Garamond',serif" font-size="17" fill="#eae6da" text-anchor="middle">XII</text>
+      ${[10,11].map(n=>`<text x="${pol(CX,CY,R-30,n*30)[0]}" y="${pol(CX,CY,R-30,n*30)[1]+6}" font-family="'Cormorant Garamond',serif" font-size="17" fill="#eae6da" text-anchor="middle">${ROM[n]}</text>`).join("")}
+      ${[7,8].map(n=>`<text x="${pol(CX,CY,R-30,n*30)[0]}" y="${pol(CX,CY,R-30,n*30)[1]+6}" font-family="'Cormorant Garamond',serif" font-size="17" fill="#eae6da" text-anchor="middle">${ROM[n]}</text>`).join("")}
+      ${[4,5].map(n=>numeral(n,R-30,"#eae6da",17)).join("")}
+      <polygon points="${CX-8},${CY-R+22} ${CX+8},${CY-R+22} ${CX},${CY-R+36}" fill="#eae6da"/>
+      ${[3,6,9].map(n=>{const[x,y]=pol(CX,CY,R-28,n*30);return `<rect x="${x-2.5}" y="${y-8}" width="5" height="16" rx="1.5" fill="url(#gLume)" transform="rotate(${n*30} ${x} ${y})"/>`;}).join("")}
+      ${logo(CY-44)}`,
+    thumb:`<circle cx="24" cy="24" r="19" fill="url(#gDialSun)"/><text x="24" y="14" font-size="9" fill="#eae6da" text-anchor="middle" font-family="serif">XII</text><text x="24" y="40" font-size="9" fill="#eae6da" text-anchor="middle">6</text>`},
+  skeleton:{name:"Skeleton",desc:"Open-worked — the movement breathes through the dial.",skeleton:true,
+    render:()=>`<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="#1a1e24" stroke-width="16"/>
+      <circle cx="${CX}" cy="${CY}" r="${R-8}" fill="none" stroke="#0a0d11" stroke-width="2"/>
+      ${chapter("#cdb877")}
+      ${idxBaton("#e7cf8f")}
+      <circle cx="${CX}" cy="${CY}" r="${R-30}" fill="none" stroke="#5b471d" stroke-width=".6" stroke-dasharray="2 4"/>`,
+    thumb:`<circle cx="24" cy="24" r="19" fill="none" stroke="#1a1e24" stroke-width="6"/><circle cx="24" cy="24" r="10" fill="url(#gPlate)" opacity=".7"/>`},
+  explorer:{name:"Explorer",desc:"3-6-9 numerals, bold lume — legible at a glance.",skeleton:false,
+    render:()=>dialBase("#0a0d11")+`${chapter("#e6e2d6")}
+      ${[3,6,9].map(n=>numeral(n,R-32,"#f2efe6",26,"Inter,sans-serif")).join("")}
+      <polygon points="${CX-11},${CY-R+20} ${CX+11},${CY-R+20} ${CX},${CY-R+40}" fill="url(#gLume)"/>
+      ${[1,2,4,5,7,8,10,11].map(i=>{const[x,y]=pol(CX,CY,R-28,i*30);return `<circle cx="${x}" cy="${y}" r="5" fill="url(#gLume)" stroke="#cbd0d6" stroke-width=".8"/>`;}).join("")}
+      ${logo(CY-44)}`,
+    thumb:`<circle cx="24" cy="24" r="19" fill="#0a0d11"/><text x="34" y="28" font-size="10" fill="#f2efe6" font-family="Inter">3</text><text x="22" y="40" font-size="10" fill="#f2efe6">6</text><text x="10" y="28" font-size="10" fill="#f2efe6">9</text>`},
+};
+
+/* ---- HANDS (shape varies; rotated live) ---- */
+const HANDS={
+  dauphine:{name:"Dauphine",desc:"Faceted tapered blades — mid-century sharpness.",
+    hour:`<polygon points="0,10 -6,-6 0,-62 6,-6" fill="url(#gSteelRim)" stroke="#3a4046" stroke-width=".6"/>`,
+    min:`<polygon points="0,10 -5,-6 0,-92 5,-6" fill="url(#gSteelRim)" stroke="#3a4046" stroke-width=".6"/>`,
+    sec:`<line x1="0" y1="22" x2="0" y2="-98" stroke="#c8a24a" stroke-width="1.6"/><circle cy="-98" r="0" />`},
+  sword:{name:"Sword",desc:"Straight, symmetrical points — quiet formality.",
+    hour:`<polygon points="0,8 -4,-40 0,-60 4,-40" fill="url(#gSteelRim)" stroke="#3a4046" stroke-width=".6"/>`,
+    min:`<polygon points="0,8 -3.5,-64 0,-90 3.5,-64" fill="url(#gSteelRim)" stroke="#3a4046" stroke-width=".6"/>`,
+    sec:`<line x1="0" y1="24" x2="0" y2="-96" stroke="#c8a24a" stroke-width="1.4"/>`},
+  breguet:{name:"Breguet",desc:"Hollow 'pomme' moon tip — the classic signature.",
+    hour:`<line x1="0" y1="8" x2="0" y2="-52" stroke="url(#gBrassBar)" stroke-width="3"/><circle cy="-46" r="6.5" fill="none" stroke="url(#gBrassBar)" stroke-width="2.4"/>`,
+    min:`<line x1="0" y1="8" x2="0" y2="-84" stroke="url(#gBrassBar)" stroke-width="2.6"/><circle cy="-76" r="6" fill="none" stroke="url(#gBrassBar)" stroke-width="2.2"/>`,
+    sec:`<line x1="0" y1="22" x2="0" y2="-96" stroke="#c8a24a" stroke-width="1.3"/>`},
+  mercedes:{name:"Mercedes",desc:"Tool-watch three-spoke lume — instantly iconic.",
+    hour:`<line x1="0" y1="10" x2="0" y2="-40" stroke="url(#gSteelRim)" stroke-width="6"/><circle cy="-40" r="10" fill="url(#gLume)" stroke="url(#gSteelRim)" stroke-width="2"/>${[90,210,330].map(a=>`<line x1="0" y1="-40" x2="${(9*Math.cos((a-90)*Math.PI/180)).toFixed(1)}" y2="${(-40+9*Math.sin((a-90)*Math.PI/180)).toFixed(1)}" stroke="url(#gSteelRim)" stroke-width="1.6"/>`).join("")}`,
+    min:`<line x1="0" y1="12" x2="0" y2="-88" stroke="url(#gSteelRim)" stroke-width="6"/><rect x="-4" y="-84" width="8" height="46" rx="3" fill="url(#gLume)"/>`,
+    sec:`<line x1="0" y1="26" x2="0" y2="-92" stroke="#c8a24a" stroke-width="1.5"/><circle cy="-70" r="6" fill="none" stroke="#c8a24a" stroke-width="1.4"/>`},
+};
+LIB.hands={};for(const k in HANDS){LIB.hands[k]={name:HANDS[k].name,desc:HANDS[k].desc,
+  thumb:`<g transform="translate(24,24) scale(.34)">${HANDS[k].min}${HANDS[k].hour.replace(/gSteelRim|gBrassBar/g,'gBrass')}</g><circle cx="24" cy="24" r="3" fill="#c8a24a"/>`};}
+
+/* ---- CROWN / CRYSTAL / STRAP ---- */
+LIB.crown={
+  onion:{name:"Onion",desc:"Rounded vintage crown — easy to grip.",
+    thumb:`<circle cx="24" cy="24" r="12" fill="url(#gSteelRim)"/><circle cx="24" cy="24" r="7" fill="none" stroke="#4a5056"/>`},
+  flat:{name:"Flat",desc:"Low-profile fluted crown — modern restraint.",
+    thumb:`<rect x="12" y="16" width="24" height="16" rx="3" fill="url(#gSteelRim)"/>`},
+  screwdown:{name:"Screw-Down",desc:"Sealed crown with guards — water resistance.",
+    thumb:`<rect x="14" y="14" width="20" height="20" rx="4" fill="url(#gSteelRim)"/><circle cx="24" cy="24" r="5" fill="#0a0d11"/>`},
+};
+LIB.crystal={
+  flat:{name:"Flat Sapphire",desc:"Perfectly flat, AR-coated — no distortion.",arc:0,
+    thumb:`<rect x="8" y="20" width="32" height="8" rx="2" fill="rgba(200,220,255,.35)" stroke="#8fb"/>`},
+  domed:{name:"Domed",desc:"Gently curved crystal — a warm vintage glow.",arc:16,
+    thumb:`<path d="M8 30 Q24 8 40 30" fill="rgba(200,220,255,.28)" stroke="#8fb"/>`},
+  boxed:{name:"Box Sapphire",desc:"Steep 'box' profile — dramatic edge refraction.",arc:26,
+    thumb:`<path d="M10 32 L10 18 Q24 8 38 18 L38 32" fill="rgba(200,220,255,.25)" stroke="#8fb"/>`},
+};
+function strapPath(topY,botY,neck,belly){return {
+  top:`M ${CX-neck} ${LUG_T-2} C ${CX-belly} ${LUG_T-60} ${CX-belly} ${topY+40} ${CX-neck+4} ${topY} L ${CX+neck-4} ${topY} C ${CX+belly} ${topY+40} ${CX+belly} ${LUG_T-60} ${CX+neck} ${LUG_T-2} Z`,
+  bot:`M ${CX-neck} ${LUG_B+2} C ${CX-belly} ${LUG_B+60} ${CX-belly} ${botY-40} ${CX-neck+4} ${botY} L ${CX+neck-4} ${botY} C ${CX+belly} ${botY-40} ${CX+belly} ${LUG_B+60} ${CX+neck} ${LUG_B+2} Z`};}
+LIB.strap={
+  leather:{name:"Leather",desc:"Padded calf with cream stitching — dress standard.",
+    render:()=>{const p=strapPath(20,480,46,58);return `<path d="${p.top}" fill="url(#gStrapL)" stroke="#1a0f08" stroke-width="1.5"/><path d="${p.bot}" fill="url(#gStrapL)" stroke="#1a0f08" stroke-width="1.5"/>
+      <path d="${p.top}" fill="none" stroke="#d8c49a" stroke-width="1" stroke-dasharray="4 4" stroke-opacity=".6" transform="scale(.9)" transform-origin="${CX}px ${CY}px"/>
+      <rect x="${CX-30}" y="30" width="60" height="10" rx="3" fill="#2c1a0f"/>`;},
+    thumb:`<rect x="16" y="4" width="16" height="40" rx="4" fill="url(#gStrapL)"/><line x1="20" y1="6" x2="20" y2="42" stroke="#d8c49a" stroke-dasharray="3 3"/>`},
+  bracelet:{name:"Steel Bracelet",desc:"Brushed three-link — integrated sport.",
+    render:()=>{let s="";for(let i=0;i<6;i++){const y=LUG_T-2-i*22;s+=`<rect x="${CX-44}" y="${y-20}" width="88" height="20" rx="6" fill="url(#gSteelRim)" stroke="#3a4046"/>`;}
+      for(let i=0;i<6;i++){const y=LUG_B+2+i*22;s+=`<rect x="${CX-44}" y="${y}" width="88" height="20" rx="6" fill="url(#gSteelRim)" stroke="#3a4046"/>`;}return s;},
+    thumb:`${[0,1,2,3].map(i=>`<rect x="14" y="${4+i*11}" width="20" height="9" rx="3" fill="url(#gSteelRim)" stroke="#3a4046"/>`).join("")}`},
+  nato:{name:"NATO",desc:"Woven single-pass strap — casual and secure.",
+    render:()=>{const p=strapPath(16,484,42,44);return `<path d="${p.top}" fill="url(#gStripe)"/><path d="${p.bot}" fill="url(#gStripe)"/>
+      ${[-24,0,24].map(x=>`<rect x="${CX+x-5}" y="16" width="10" height="${LUG_T-16}" fill="#3a4a2c" opacity=".8"/><rect x="${CX+x-5}" y="${LUG_B}" width="10" height="${484-LUG_B}" fill="#3a4a2c" opacity=".8"/>`).join("")}
+      <rect x="${CX-46}" y="${CY-14}" width="92" height="28" rx="4" fill="url(#gSteelRim)" opacity=".9"/>`;},
+    thumb:`<rect x="16" y="4" width="16" height="40" fill="url(#gStripe)"/><rect x="18" y="4" width="4" height="40" fill="#3a4a2c"/><rect x="26" y="4" width="4" height="40" fill="#3a4a2c"/>`},
+  rubber:{name:"Rubber",desc:"Textured vulcanised rubber — dive-ready.",
+    render:()=>{const p=strapPath(24,476,48,56);return `<path d="${p.top}" fill="#14171b" stroke="#000" stroke-width="1.5"/><path d="${p.bot}" fill="#14171b" stroke="#000" stroke-width="1.5"/>
+      ${[...Array(9)].map((_,i)=>`<rect x="${CX-40}" y="${LUG_T-14-i*20}" width="80" height="4" rx="2" fill="#22262b"/>`).join("")}
+      ${[...Array(9)].map((_,i)=>`<rect x="${CX-40}" y="${LUG_B+12+i*20}" width="80" height="4" rx="2" fill="#22262b"/>`).join("")}`;},
+    thumb:`<rect x="16" y="4" width="16" height="40" rx="4" fill="#14171b"/>${[0,1,2,3].map(i=>`<rect x="18" y="${8+i*9}" width="12" height="3" fill="#22262b"/>`).join("")}`},
+};
+
+/* =====================================================================
+   STEP FLOW + STATE
+   ===================================================================== */
+const STEPS=[
+  {id:"movement",title:"The Movement",lib:LIB.movement,verb:"Drop into the holder",
+   hint:"Choose a calibre. Once seated, the mechanism awakens."},
+  {id:"case",title:"The Case",lib:LIB.case,verb:"Seat the movement",
+   hint:"The case defines the character — and the bezel frames the dial."},
+  {id:"dial",title:"The Dial",lib:LIB.dial,verb:"Lay the dial",
+   hint:"The face of the watch. Skeleton dials reveal the movement beneath."},
+  {id:"hands",title:"The Hands",lib:LIB.hands,verb:"Fit the hands",
+   hint:"Press the hands onto the centre — now it can tell the time."},
+  {id:"crown",title:"The Crown",lib:LIB.crown,verb:"Thread the crown",
+   hint:"The crown winds the mainspring and sets the time."},
+  {id:"crystal",title:"The Crystal",lib:LIB.crystal,verb:"Close the crystal",
+   hint:"Sapphire glass seals the dial. Closing it takes you to the studio."},
+  {id:"strap",title:"The Strap",lib:LIB.strap,verb:"Attach the strap",
+   hint:"The final touch before the timepiece leaves the bench."},
+];
+const state={sel:{},installed:{},step:0,pending:null};
+
+/* ---------- compose the watch (shared by bench + finale + export) ---------- */
+function composeInner(inst,forExport){
+  let s=DEFS();
+  const mv=inst.movement&&LIB.movement[inst.movement];
+  const cs=inst.case&&LIB.case[inst.case];
+  const dl=inst.dial&&LIB.dial[inst.dial];
+  const hd=inst.hands;
+  const cr=inst.crown;
+  const cy=inst.crystal&&LIB.crystal[inst.crystal];
+  const st=inst.strap&&LIB.strap[inst.strap];
+  // strap (back)
+  if(st) s+=`<g class="L">${LIB.strap[inst.strap].render()}</g>`;
+  // case body + lugs
+  if(cs) s+=`<g class="L">${cs.body()}</g>`;
+  // movement
+  if(mv) s+=`<g class="L" id="movLayer">${mv.render()}</g>`;
+  // dial (skeleton keeps movement visible)
+  if(dl) s+=`<g class="L">${dl.render()}</g>`;
+  // bezel over dial edge
+  if(cs) s+=`<g class="L">${bezel(R+2,R+22,cs.bezelStyle)}</g>`;
+  // hands
+  if(hd){const H=HANDS[hd];
+    s+=`<g class="L" id="handsLayer">
+      <g id="handHour" transform="rotate(0 ${CX} ${CY})"><g transform="translate(${CX} ${CY})">${H.hour}</g></g>
+      <g id="handMin" transform="rotate(0 ${CX} ${CY})"><g transform="translate(${CX} ${CY})">${H.min}</g></g>
+      ${mv==LIB.movement.gmt?`<g id="handGMT" transform="rotate(0 ${CX} ${CY})"><g transform="translate(${CX} ${CY})"><line x1="0" y1="14" x2="0" y2="-70" stroke="#7fd1a6" stroke-width="2.4"/><circle cy="-70" r="5" fill="none" stroke="#7fd1a6" stroke-width="2"/></g></g>`:""}
+      <g id="handSec" transform="rotate(0 ${CX} ${CY})"><g transform="translate(${CX} ${CY})">${H.sec}</g></g>
+      <circle cx="${CX}" cy="${CY}" r="5.5" fill="url(#gBrass)" stroke="#5b471d"/><circle cx="${CX}" cy="${CY}" r="2" fill="#1a1207"/>
+    </g>`;}
+  // crown at 3 o'clock
+  if(cr){const cx=CX+R+ (cs?26:22), cyy=CY;
+    let shape=`<rect x="${cx-2}" y="${cyy-10}" width="14" height="20" rx="3" fill="url(#gSteelRim)" stroke="#3a4046"/>`;
+    if(cr==="onion")shape=`<rect x="${cx-2}" y="${cyy-4}" width="8" height="8" fill="url(#gSteelRim)"/><circle cx="${cx+9}" cy="${cyy}" r="10" fill="url(#gSteelRim)" stroke="#3a4046"/>`;
+    if(cr==="screwdown")shape=`<rect x="${cx-6}" y="${cyy-13}" width="8" height="26" rx="2" fill="url(#gSteelRim)"/><rect x="${cx-1}" y="${cyy-9}" width="15" height="18" rx="4" fill="url(#gSteelRim)" stroke="#3a4046"/><circle cx="${cx+6}" cy="${cyy}" r="4" fill="#0a0d11"/>`;
+    s+=`<g class="L">${shape}</g>`;}
+  // crystal glare
+  if(cy) s+=`<g class="L"><circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#gCrystal)"/><ellipse cx="${CX-38}" cy="${CY-46}" rx="${34+cy.arc}" ry="${18+cy.arc*0.6}" fill="#ffffff" opacity="${0.10+cy.arc*0.004}" transform="rotate(-32 ${CX-38} ${CY-46})"/></g>`;
+  return s;
+}
+function renderBench(){$("#watchSVG").innerHTML=composeInner(state.installed,false);refreshRefs();}
+
+/* ---------- refs for animation ---------- */
+let R_bal,R_rotor,R_tour,R_hH,R_hM,R_hS,R_hG;
+function refreshRefs(){
+  R_bal=$("#balanceWheel");R_rotor=$("#rotorWeight");R_tour=$("#tourbillon");
+  R_hH=$("#handHour");R_hM=$("#handMin");R_hS=$("#handSec");R_hG=$("#handGMT");
+}
+
+/* =====================================================================
+   UI: pips, tray, install flow
+   ===================================================================== */
+function buildPips(){
+  const w=$("#pips");w.innerHTML="";
+  STEPS.forEach((st,i)=>{
+    if(i)w.insertAdjacentHTML("beforeend",`<span class="rail-sep"></span>`);
+    w.insertAdjacentHTML("beforeend",
+      `<div class="step-pip" data-i="${i}"><span class="dot">${i+1}</span><span class="nm">${st.title.replace(/^The /,"")}</span></div>`);
+  });
+}
+function updatePips(){
+  $$(".step-pip").forEach(p=>{const i=+p.dataset.i;p.classList.toggle("active",i===state.step);
+    p.classList.toggle("done",!!state.installed[STEPS[i].id]);});
+}
+function renderTray(){
+  const st=STEPS[state.step];
+  $("#trayIdx").textContent=`Step ${state.step+1} / ${STEPS.length}`;
+  $("#trayTitle").textContent=st.title;
+  $("#trayDesc").textContent=st.hint;
+  const list=$("#trayList");list.innerHTML="";
+  Object.entries(st.lib).forEach(([key,v])=>{
+    const el=document.createElement("div");el.className="card";el.dataset.key=key;
+    el.innerHTML=`<div class="sw"><svg viewBox="0 0 48 48">${v.thumb}${DEFS()}</svg></div>
+      <div class="meta"><div class="t">${v.name}</div><div class="d">${v.desc}</div></div>`;
+    el.addEventListener("click",()=>selectVariant(key));
+    list.appendChild(el);
+  });
+  const btn=$("#installBtn");btn.textContent=st.verb;btn.disabled=true;
+  state.pending=null;stopGhost();
+}
+function selectVariant(key){
+  state.pending=key;
+  $$(".card").forEach(c=>c.classList.toggle("sel",c.dataset.key===key));
+  $("#installBtn").disabled=false;
+  startGhost(STEPS[state.step].lib[key].thumb);
+  $("#socketHint").classList.add("on");
+  toast(`Take the ${STEPS[state.step].lib[key].name} with your tweezers — click the bench to fit it`);
+}
+
+/* ghost part following the cursor */
+function startGhost(thumb){
+  $("#ghost").innerHTML=`<svg viewBox="0 0 48 48">${thumb}${DEFS()}</svg>`;
+  document.body.classList.add("placing");$("#ghost").classList.add("on");
+}
+function stopGhost(){document.body.classList.remove("placing");$("#ghost").classList.remove("on");}
+document.addEventListener("pointermove",e=>{if(state.pending){const g=$("#ghost");g.style.left=e.clientX+"px";g.style.top=e.clientY+"px";}});
+
+/* install on stage click or button */
+function tryInstall(){
+  if(!state.pending)return;
+  const st=STEPS[state.step],key=state.pending;
+  state.installed[st.id]=key;state.sel[st.id]=key;
+  renderBench();snap();
+  const layers=$$("#watchSVG .L");const last=layers[layers.length-1];
+  if(last&&last.animate){last.style.transformOrigin=`${CX}px ${CY}px`;last.animate(
+    [{transform:"scale(1.14) translateY(-6px)",opacity:0},{transform:"scale(1)",opacity:1}],
+    {duration:620,easing:"cubic-bezier(.22,1,.36,1)"});}
+  onInstalled(st.id,key);
+  state.pending=null;stopGhost();$("#socketHint").classList.remove("on");
+  $$(".card").forEach(c=>c.classList.remove("sel"));
+  // advance
+  if(state.step<STEPS.length-1){state.step++;updatePips();setTimeout(renderTray,240);}
+  else{finishAssembly();}
+  updatePips();
+}
+
+function onInstalled(id,key){
+  if(id==="movement"){startMechanism();
+    setStatus("Ticking",`${LIB.movement[key].name} calibre is running — 28,800 vph.`,true);}
+  else if(id==="dial"){setStatus("Ticking",`${LIB.dial[key].name} dial fitted over the movement.`,true);}
+  else if(id==="hands"){handsLive=true;setStatus("Telling time",`${LIB.hands[key].name} hands set to the current hour.`,true);}
+  else if(id==="crystal"){setStatus("Sealed",`Crystal closed — ready for the studio.`,true);}
+  else if(id==="crown"){setStatus("Ticking",`Crown threaded — the mainspring can be wound.`,true);}
+  else if(id==="case"){setStatus("Ticking",`Movement cased in the ${LIB.case[key].name.toLowerCase()} case.`,true);}
+}
+function setStatus(val,sub,live){$("#statusVal").textContent=val;$("#statusSub").textContent=sub;
+  $("#status").classList.toggle("live",!!live);}
+
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2600);}
+
+/* =====================================================================
+   AUDIO — soft mechanical tick + snap
+   ===================================================================== */
+let AC=null;
+function audio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC;}
+function click(freq,dur,vol,type="triangle"){const ac=audio();if(!ac)return;
+  const o=ac.createOscillator(),g=ac.createGain(),f=ac.createBiquadFilter();
+  f.type="bandpass";f.frequency.value=freq;f.Q.value=6;o.type=type;o.frequency.value=freq;
+  o.connect(f);f.connect(g);g.connect(ac.destination);
+  const t=ac.currentTime;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.start(t);o.stop(t+dur+0.02);}
+function snap(){click(320,0.09,0.16,"square");setTimeout(()=>click(1400,0.05,0.06),40);}
+let tickToggle=false,tickTimer=null;
+function startTicking(){if(tickTimer)return;
+  tickTimer=setInterval(()=>{tickToggle=!tickToggle;click(tickToggle?2600:2300,0.03,0.05);},250);}
+
+/* =====================================================================
+   MECHANISM ANIMATION LOOP
+   ===================================================================== */
+let mechOn=false,handsLive=false,t0=0;
+function startMechanism(){if(mechOn)return;mechOn=true;startTicking();}
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(!t0)t0=ts;const t=(ts-t0)/1000;
+  if(mechOn){
+    if(R_bal)R_bal.setAttribute("transform",`rotate(${(Math.sin(t*Math.PI*2*1.2)*32).toFixed(2)} ${CX} ${CY+58})`);
+    if(R_rotor)R_rotor.setAttribute("transform",`rotate(${((t*46)+Math.sin(t*1.3)*20).toFixed(2)} ${CX} ${CY})`);
+    if(R_tour)R_tour.setAttribute("transform",`rotate(${((t*24)%360).toFixed(2)} ${CX} ${CY+58})`);
+  }
+  if(handsLive){
+    const d=new Date();
+    const sec=d.getSeconds()+d.getMilliseconds()/1000;
+    const min=d.getMinutes()+sec/60;
+    const hr=(d.getHours()%12)+min/60;
+    if(R_hS)R_hS.setAttribute("transform",`rotate(${sec*6} ${CX} ${CY})`);
+    if(R_hM)R_hM.setAttribute("transform",`rotate(${min*6} ${CX} ${CY})`);
+    if(R_hH)R_hH.setAttribute("transform",`rotate(${hr*30} ${CX} ${CY})`);
+    if(R_hG)R_hG.setAttribute("transform",`rotate(${((d.getHours()+min/60)*15)} ${CX} ${CY})`);
+  }
+}
+requestAnimationFrame(loop);
+function fFlash(){const f=$("#flash");f.classList.remove("go");void f.offsetWidth;f.classList.add("go");}
+
+/* =====================================================================
+   FINALE + WALLPAPER EXPORT
+   ===================================================================== */
+let autoRotate=true,frx=0;
+function finishAssembly(){
+  $("#installBtn").textContent="Enter the studio";
+  $("#installBtn").disabled=false;state.pending="__finale__";
+  toast("Assembly complete — enter the studio");
+  $("#installBtn").onclick=openFinale;
+  $("#stage").onclick=openFinale;
+  setStatus("Complete","Your timepiece is finished. Enter the studio to photograph it.",true);
+}
+function openFinale(){
+  const svg=`<svg viewBox="0 0 400 500" xmlns="${svgNS}">${composeInner(state.installed,true)}</svg>`;
+  $("#finaleWatch").innerHTML=svg;
+  $("#finaleReflect").innerHTML=svg;
+  refreshRefs();
+  const spec=[LIB.movement[state.sel.movement].name,LIB.case[state.sel.case].name,LIB.dial[state.sel.dial].name].join(" · ");
+  $("#finaleSpec").textContent=spec;
+  $("#finale").classList.add("on");
+  fLoop();
+}
+function fLoop(){
+  if(!$("#finale").classList.contains("on"))return;
+  requestAnimationFrame(fLoop);
+  if(autoRotate)frx+=0.25;
+  const ry=Math.sin(frx*Math.PI/180)*16, rx=Math.cos(frx*Math.PI/180)*4-2;
+  $("#finaleWatch").style.transform=`rotateY(${ry}deg) rotateX(${rx}deg)`;
+  // keep hands live in finale too
+  if(handsLive){const d=new Date();const sec=d.getSeconds()+d.getMilliseconds()/1000;const min=d.getMinutes()+sec/60;const hr=(d.getHours()%12)+min/60;
+    const fw=$("#finaleWatch");
+    const set=(id,a)=>{const el=fw.querySelector(id);if(el)el.setAttribute("transform",`rotate(${a} ${CX} ${CY})`);};
+    set("#handSec",sec*6);set("#handMin",min*6);set("#handHour",hr*30);
+    const b=fw.querySelector("#balanceWheel");if(b)b.setAttribute("transform",`rotate(${Math.sin(performance.now()/1000*Math.PI*2*1.2)*32} ${CX} ${CY+58})`);
+    const rt=fw.querySelector("#rotorWeight");if(rt)rt.setAttribute("transform",`rotate(${performance.now()/1000*46%360} ${CX} ${CY})`);
+  }
+}
+$("#rotateBtn").addEventListener("click",()=>{autoRotate=!autoRotate;$("#rotateBtn").textContent="Auto-rotate: "+(autoRotate?"On":"Off");});
+$("#rebuildBtn").addEventListener("click",resetAll);
+
+function downloadWallpaper(){
+  const W=1600,H=2000;
+  const watch=composeInner(state.installed,true);
+  const svg=`<svg xmlns="${svgNS}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+        <stop offset="0%" stop-color="#20201f"/><stop offset="55%" stop-color="#101010"/><stop offset="100%" stop-color="#040404"/>
+      </radialGradient>
+      <radialGradient id="key" cx="36%" cy="26%" r="55%">
+        <stop offset="0%" stop-color="rgba(255,246,228,.16)"/><stop offset="100%" stop-color="rgba(255,246,228,0)"/>
+      </radialGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#bg)"/>
+    <rect width="${W}" height="${H}" fill="url(#key)"/>
+    <g transform="translate(${W/2-400} ${H/2-560}) scale(2)">${watch}</g>
+    <text x="${W/2}" y="${H-150}" font-family="Georgia,serif" font-size="52" fill="#e7cf8f" text-anchor="middle" letter-spacing="6">L'ATELIER</text>
+    <text x="${W/2}" y="${H-108}" font-family="Arial,sans-serif" font-size="22" fill="#9a8f80" text-anchor="middle" letter-spacing="8">${[LIB.movement[state.sel.movement].name,LIB.case[state.sel.case].name].join("  ·  ").toUpperCase()}</text>
+  </svg>`;
+  const blob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.createElement("canvas");c.width=W;c.height=H;
+    const x=c.getContext("2d");x.fillStyle="#040404";x.fillRect(0,0,W,H);
+    x.drawImage(img,0,0,W,H);URL.revokeObjectURL(url);
+    c.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);
+      a.download="latelier-timepiece.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("Wallpaper downloaded");},"image/png");
+  };
+  img.onerror=()=>toast("Export failed — try again");
+  img.src=url;
+}
+$("#downloadBtn").addEventListener("click",downloadWallpaper);
+
+/* =====================================================================
+   BOOT / RESET
+   ===================================================================== */
+function resetAll(){
+  state.sel={};state.installed={};state.step=0;state.pending=null;
+  mechOn=false;handsLive=false;t0=0;if(tickTimer){clearInterval(tickTimer);tickTimer=null;}
+  $("#finale").classList.remove("on");
+  $("#installBtn").onclick=tryInstall;$("#stage").onclick=e=>{if(state.pending&&state.pending!=="__finale__")tryInstall();};
+  renderBench();buildPips();updatePips();renderTray();
+  setStatus("Bench is empty","Select a movement to begin the build.",false);
+}
+$("#enterBtn").addEventListener("click",()=>{
+  audio();
+  $("#intro").style.opacity="0";
+  setTimeout(()=>{$("#intro").classList.add("hidden");$("#app").classList.add("on");},700);
+  boot();
+});
+$("#resetBtn").addEventListener("click",resetAll);
+let booted=false;
+function boot(){if(booted)return;booted=true;
+  $("#installBtn").onclick=tryInstall;
+  $("#stage").onclick=()=>{if(state.pending==="__finale__")openFinale();else if(state.pending)tryInstall();};
+  renderBench();buildPips();updatePips();renderTray();
+  setStatus("Bench is empty","Select a movement to begin the build.",false);
+}
+</script>
+</body>
+</html>
