@@ -988,7 +988,9 @@ addEventListener('pointermove',e=>{if(drag){drag.x=e.clientX;drag.y=e.clientY;}}
 addEventListener('pointerup',()=>{
   if(!drag) return;
   cancelAnimationFrame(drag.raf);
-  const t=targetFor(drag.st), d=Math.hypot(t.x-drag.gx,t.y-drag.gy);
+  const t=targetFor(drag.st);
+  /* judge the drop by where the FINGER is, not where the lerped ghost has reached */
+  const d=Math.hypot(t.x-drag.x,t.y-drag.y);
   const {i,st,el}=drag; const g0={x:drag.gx,y:drag.gy}; drag=null;
   if(d<95&&i===state.idx){
     animGhost(g0,t,()=>{ghost.style.display='none'; install(st,el);});
