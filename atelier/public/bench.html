@@ -1069,7 +1069,10 @@ function auInit(){
     AU.amb=AU.ctx.createGain(); AU.amb.gain.value=0;
     src.connect(lp); lp.connect(AU.amb); AU.amb.connect(AU.master); src.start();
     AU.amb.gain.linearRampToValueAtTime(state.sound?.045:0,AU.ctx.currentTime+3);
-  }catch(e){}
+  }catch(e){
+    console.warn('Audio initialization failed; continuing without sound.',e);
+    AU.ctx=AU.master=AU.amb=null;
+  }
 }
 function tone(f,dur,v,type,when,bend){
   if(!AU.ctx||!state.sound) return;
@@ -1103,7 +1106,7 @@ const SND={
   shutter:()=>{burst(.02,.4,2600,1);burst(.04,.28,900,1,.05);},
   woosh:()=>burst(.26,.1,480,.5),
 };
-function buzz(p){try{navigator.vibrate&&navigator.vibrate(p);}catch(e){}}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p);}catch(e){console.warn('Haptic feedback failed.',e);}}
 
 /* ═══════════ the movement lives ═══════════ */
 function setRot(cls,deg){$$('.'+cls).forEach(el=>el.setAttribute('transform',`rotate(${deg.toFixed(2)})`));}
@@ -1263,26 +1266,38 @@ function wallpaper(w,h){
   const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
   const img=new Image();
   img.onload=()=>{
-    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-    const g=cv.getContext('2d');
-    const gr=g.createRadialGradient(w/2,h*.4,60,w/2,h*.45,Math.max(w,h)*.75);
-    gr.addColorStop(0,'#2b2115'); gr.addColorStop(.45,'#171009'); gr.addColorStop(1,'#070402');
-    g.fillStyle=gr; g.fillRect(0,0,w,h);
-    const wh=h*.78, ww=wh*480/760;
-    g.shadowColor='rgba(0,0,0,.7)'; g.shadowBlur=70; g.shadowOffsetY=40;
-    g.drawImage(img,(w-ww)/2,h*.07,ww,wh);
-    g.shadowColor='transparent';
-    const c=state.cfg;
-    g.fillStyle='rgba(233,223,202,.85)'; g.textAlign='center';
-    g.font=`${Math.round(h*.023)}px Didot, Georgia, serif`;
-    g.fillText('A T E L I E R',w/2,h*.915);
-    g.fillStyle='rgba(201,162,75,.85)';
-    g.font=`italic ${Math.round(h*.013)}px Georgia`;
-    g.fillText(`${c.movement} · ${c.case} · ${c.dial} · assembled at The Bench`,w/2,h*.945);
-    const a=document.createElement('a');
-    a.download=`the-bench-${c.movement.toLowerCase().replace(/\s/g,'-')}.png`;
-    a.href=cv.toDataURL('image/png'); a.click();
+    try{
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      const g=cv.getContext('2d');
+      if(!g) throw new Error('Canvas 2D context is unavailable');
+      const gr=g.createRadialGradient(w/2,h*.4,60,w/2,h*.45,Math.max(w,h)*.75);
+      gr.addColorStop(0,'#2b2115'); gr.addColorStop(.45,'#171009'); gr.addColorStop(1,'#070402');
+      g.fillStyle=gr; g.fillRect(0,0,w,h);
+      const wh=h*.78, ww=wh*480/760;
+      g.shadowColor='rgba(0,0,0,.7)'; g.shadowBlur=70; g.shadowOffsetY=40;
+      g.drawImage(img,(w-ww)/2,h*.07,ww,wh);
+      g.shadowColor='transparent';
+      const c=state.cfg;
+      g.fillStyle='rgba(233,223,202,.85)'; g.textAlign='center';
+      g.font=`${Math.round(h*.023)}px Didot, Georgia, serif`;
+      g.fillText('A T E L I E R',w/2,h*.915);
+      g.fillStyle='rgba(201,162,75,.85)';
+      g.font=`italic ${Math.round(h*.013)}px Georgia`;
+      g.fillText(`${c.movement} · ${c.case} · ${c.dial} · assembled at The Bench`,w/2,h*.945);
+      const a=document.createElement('a');
+      a.download=`the-bench-${c.movement.toLowerCase().replace(/\s/g,'-')}.png`;
+      a.href=cv.toDataURL('image/png'); a.click();
+    }catch(e){
+      console.error('Wallpaper export failed.',e);
+      showTip('The wallpaper could not be saved. Please try again.',3200);
+    }finally{
+      URL.revokeObjectURL(url);
+    }
+  };
+  img.onerror=e=>{
+    console.error('Wallpaper image preparation failed.',e);
     URL.revokeObjectURL(url);
+    showTip('The wallpaper could not be saved. Please try again.',3200);
   };
   img.src=url;
 }

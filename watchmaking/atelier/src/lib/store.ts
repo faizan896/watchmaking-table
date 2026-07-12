@@ -19,6 +19,7 @@ interface AtelierState {
   windPulse: number;
   /** incremented to ask the renderer for a still capture */
   capturePulse: number;
+  captureError: string | null;
 
   enter: () => void;
   set: <K extends keyof WatchConfig>(key: K, value: WatchConfig[K]) => void;
@@ -26,12 +27,13 @@ interface AtelierState {
   toggleFlip: () => void;
   toggleMacro: () => void;
   setStoryOpen: (v: boolean) => void;
-  toggleSound: () => void;
+  setSoundOn: (v: boolean) => void;
   setMode: (m: Mode) => void;
   setPhotoBg: (b: PhotoBg) => void;
   setPhotoLight: (l: PhotoLight) => void;
   wind: () => void;
   capture: () => void;
+  setCaptureError: (message: string | null) => void;
   reset: () => void;
 }
 
@@ -47,6 +49,7 @@ export const useAtelier = create<AtelierState>((set) => ({
   photoLight: "Museum",
   windPulse: 0,
   capturePulse: 0,
+  captureError: null,
 
   enter: () => set({ mode: "studio" }),
   set: (key, value) =>
@@ -55,12 +58,13 @@ export const useAtelier = create<AtelierState>((set) => ({
   toggleFlip: () => set((s) => ({ flipped: !s.flipped })),
   toggleMacro: () => set((s) => ({ macro: !s.macro })),
   setStoryOpen: (storyOpen) => set({ storyOpen }),
-  toggleSound: () => set((s) => ({ soundOn: !s.soundOn })),
+  setSoundOn: (soundOn) => set({ soundOn }),
   setMode: (mode) => set({ mode }),
   setPhotoBg: (photoBg) => set({ photoBg }),
   setPhotoLight: (photoLight) => set({ photoLight }),
   wind: () => set((s) => ({ windPulse: s.windPulse + 1 })),
-  capture: () => set((s) => ({ capturePulse: s.capturePulse + 1 })),
+  capture: () => set((s) => ({ capturePulse: s.capturePulse + 1, captureError: null })),
+  setCaptureError: (captureError) => set({ captureError }),
   reset: () =>
-    set({ mode: "studio", flipped: false, macro: false, storyOpen: false }),
+    set({ mode: "studio", flipped: false, macro: false, storyOpen: false, captureError: null }),
 }));

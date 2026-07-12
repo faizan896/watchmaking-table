@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtelier } from "../lib/store";
 import { buildStory, PHOTO_BGS, PHOTO_LIGHTS } from "../lib/config";
-import { sfx, setAudioEnabled } from "../lib/audio";
+import { initAudio, sfx, setAudioEnabled } from "../lib/audio";
 
 /* ---------- top chrome ---------- */
 export function Chrome() {
@@ -47,7 +47,12 @@ export function Chrome() {
         )}
         <button
           className={`btn-ghost ${st.soundOn ? "active" : ""}`}
-          onClick={() => { st.toggleSound(); setAudioEnabled(!st.soundOn); }}
+          onClick={async () => {
+            const nextSoundOn = !st.soundOn;
+            const audioReady = !nextSoundOn || await initAudio();
+            st.setSoundOn(nextSoundOn && audioReady);
+            setAudioEnabled(nextSoundOn && audioReady);
+          }}
           aria-label="Toggle sound"
         >
           {st.soundOn ? "Sound" : "Muted"}
@@ -160,6 +165,11 @@ export function PhotoPanel() {
       <button className="btn-ghost active !px-10" onClick={() => st.capture()}>
         Capture
       </button>
+      {st.captureError && (
+        <div role="alert" className="text-[11px] tracking-[0.12em] text-red-300">
+          {st.captureError}
+        </div>
+      )}
     </motion.div>
   );
 }

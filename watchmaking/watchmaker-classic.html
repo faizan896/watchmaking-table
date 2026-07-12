@@ -827,7 +827,10 @@ function auInit(){
     AU.amb.connect(lp); lp.connect(AU.ambGain); AU.ambGain.connect(AU.master);
     AU.amb.start();
     AU.ambGain.gain.linearRampToValueAtTime(state.soundOn?.05:0, AU.ctx.currentTime+3);
-  }catch(e){}
+  }catch(e){
+    console.warn('Audio initialization failed; continuing without sound.',e);
+    AU.ctx=AU.master=AU.amb=AU.ambGain=null;
+  }
 }
 function tone(freq,dur,vol,type,when,bend){
   if(!AU.ctx||!state.soundOn) return;
@@ -859,7 +862,7 @@ const SND={
   roll:  ()=>{noiseBurst(.5,.14,900,.6);},
   woosh: ()=>{noiseBurst(.24,.12,500,.5);}
 };
-function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){console.warn('Haptic feedback failed.',e);}}
 
 /* ---------------- build watch + tray ---------------- */
 const watchSVG=$('#watch'), backSVG=$('#watchBack');

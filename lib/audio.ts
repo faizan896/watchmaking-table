@@ -4,16 +4,22 @@ let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let enabled = true;
 
-export function initAudio() {
-  if (ctx) return;
+export async function initAudio(): Promise<boolean> {
   try {
-    ctx = new (window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    master = ctx.createGain();
-    master.gain.value = 0.85;
-    master.connect(ctx.destination);
-  } catch {
-    /* audio unavailable — the studio stays silent */
+    if (!ctx) {
+      ctx = new (window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = 0.85;
+      master.connect(ctx.destination);
+    }
+    if (ctx.state === "suspended") await ctx.resume();
+    return true;
+  } catch (error) {
+    console.warn("Audio initialization failed; continuing without sound.", error);
+    ctx = null;
+    master = null;
+    return false;
   }
 }
 export function setAudioEnabled(v: boolean) { enabled = v; }
