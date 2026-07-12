@@ -4,7 +4,7 @@
    Everything is drawn; nothing is downloaded.
    ──────────────────────────────────────────────── */
 import * as THREE from "three";
-import { WatchConfig, DialType, BezelType, StrapType, PhotoBg, CASE_MATERIALS } from "./config";
+import { WatchConfig, DialType, BezelType, StrapType, PhotoBg, CASE_MATERIALS, isGoldCase } from "./config";
 
 function canvas(size: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const c = document.createElement("canvas");
@@ -21,6 +21,17 @@ function tex(c: HTMLCanvasElement, srgb = true): THREE.CanvasTexture {
 function rand(seed: number) {
   let s = seed >>> 0 || 1;
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+}
+/* traces a gear/wheel toothed rim as the current path; caller fills/strokes.
+   `valley` is the tooth-root radius as a fraction of the tip radius `R`. */
+function toothedRimPath(g: CanvasRenderingContext2D, R: number, teeth: number, valley: number) {
+  g.beginPath();
+  for (let i = 0; i <= teeth * 2; i++) {
+    const a = (i / (teeth * 2)) * Math.PI * 2;
+    const rr = i % 2 ? R : R * valley;
+    g[i ? "lineTo" : "moveTo"](Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  g.closePath();
 }
 
 /* ============ DIAL ============ */
@@ -160,13 +171,7 @@ function dialBase(g: CanvasRenderingContext2D, dial: DialType) {
       const gear = (x: number, y: number, R: number, teeth: number) => {
         g.save(); g.translate(x, y);
         g.fillStyle = "rgba(190,150,66,.9)";
-        g.beginPath();
-        for (let i = 0; i <= teeth * 2; i++) {
-          const a = (i / (teeth * 2)) * Math.PI * 2;
-          const rr = i % 2 ? R : R * 0.88;
-          g[i ? "lineTo" : "moveTo"](Math.cos(a) * rr, Math.sin(a) * rr);
-        }
-        g.closePath(); g.fill();
+        toothedRimPath(g, R, teeth, 0.88); g.fill();
         g.fillStyle = "#171310";
         for (let s2 = 0; s2 < 4; s2++) {
           const a = (s2 / 4) * Math.PI * 2 + 0.6;
@@ -201,7 +206,7 @@ export function dialTexture(cfg: WatchConfig): THREE.CanvasTexture {
   dialBase(g, cfg.dial);
   const light = LIGHT_DIALS.includes(cfg.dial);
   const metal = CASE_MATERIALS[cfg.caseMat].color;
-  const goldCase = ["Yellow Gold", "Rose Gold", "Bronze"].includes(cfg.caseMat);
+  const goldCase = isGoldCase(cfg.caseMat);
   const idxA = goldCase ? "#f4dd94" : "#f4f5f7";
   const idxB = goldCase ? "#8a6d1f" : "#75787f";
   const ink = light ? "rgba(30,28,24,.9)" : "rgba(235,229,215,.92)";
@@ -324,13 +329,7 @@ export function movementTexture(): THREE.CanvasTexture {
     const gold = g.createRadialGradient(-R * 0.4, -R * 0.4, R * 0.2, 0, 0, R * 1.1);
     gold.addColorStop(0, "#f0d489"); gold.addColorStop(0.55, "#c9a445"); gold.addColorStop(1, "#7c6023");
     g.fillStyle = gold;
-    g.beginPath();
-    for (let i = 0; i <= teeth * 2; i++) {
-      const a = (i / (teeth * 2)) * Math.PI * 2;
-      const rr = i % 2 ? R : R * 0.92;
-      g[i ? "lineTo" : "moveTo"](Math.cos(a) * rr, Math.sin(a) * rr);
-    }
-    g.closePath(); g.fill();
+    toothedRimPath(g, R, teeth, 0.92); g.fill();
     g.strokeStyle = "rgba(70,50,12,.8)"; g.lineWidth = 2; g.stroke();
     // crossing spokes (four-arm wheel)
     g.fillStyle = "rgba(34,22,6,.78)";

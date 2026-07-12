@@ -9,6 +9,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { useAtelier } from "../lib/store";
 import { LIGHT_RIGS, BG_COLORS, buildStory } from "../lib/config";
 import { stageTexture, shadowTexture, backdropTexture } from "../lib/textures";
+import { usePulse } from "../lib/hooks";
 import { Watch } from "./Watch";
 import { sfx } from "../lib/audio";
 
@@ -305,11 +306,8 @@ function CameraRig() {
 function Capture() {
   const capturePulse = useAtelier((s) => s.capturePulse);
   const config = useAtelier((s) => s.config);
-  const seen = useRef(0);
   const { gl, scene, camera } = useThree();
-  useEffect(() => {
-    if (capturePulse === seen.current) return;
-    seen.current = capturePulse;
+  usePulse(capturePulse, () => {
     gl.render(scene, camera);
     const name = buildStory(config).model.replace(/\s+/g, "-").toLowerCase();
     const a = document.createElement("a");
@@ -317,7 +315,7 @@ function Capture() {
     a.download = `atelier-${name}.png`;
     a.click();
     sfx.shutter();
-  }, [capturePulse, gl, scene, camera, config]);
+  });
   return null;
 }
 

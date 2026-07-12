@@ -3,18 +3,19 @@
    case, bezel, crystal, dial, hands, crown, lugs,
    strap, caseback, movement, rotor.
    ──────────────────────────────────────────────── */
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { useAtelier } from "../lib/store";
-import { CASE_MATERIALS, FINISH_MOD, WatchConfig } from "../lib/config";
+import { CASE_MATERIALS, FINISH_MOD, WatchConfig, isGoldCase } from "../lib/config";
 import {
   dialTexture, movementTexture, rotorTexture, bezelInsertTexture,
   strapTexture, strapIsMetal, smudgeTexture,
 } from "../lib/textures";
+import { usePulse } from "../lib/hooks";
 import { sfx } from "../lib/audio";
 
-const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+const clamp = THREE.MathUtils.clamp;
 
 /* ---------- shared case material ---------- */
 function useCaseMaterial(cfg: WatchConfig) {
@@ -132,7 +133,7 @@ function Hands({ cfg, caseMat }: { cfg: WatchConfig; caseMat: THREE.Material }) 
   const hourRef = useRef<THREE.Group>(null);
   const minRef = useRef<THREE.Group>(null);
   const secRef = useRef<THREE.Group>(null);
-  const goldCase = ["Yellow Gold", "Rose Gold", "Bronze"].includes(cfg.caseMat);
+  const goldCase = isGoldCase(cfg.caseMat);
   const secMat = useMemo(
     () => new THREE.MeshPhysicalMaterial({
       color: goldCase ? "#d4af37" : "#24406e",
@@ -413,14 +414,10 @@ function Crown({ caseMat }: { caseMat: THREE.Material }) {
   const g = useRef<THREE.Group>(null);
   const spin = useRef(0);
   const windPulse = useAtelier((s) => s.windPulse);
-  const seen = useRef(0);
-  useEffect(() => {
-    if (windPulse !== seen.current) {
-      seen.current = windPulse;
-      spin.current += 14;
-      sfx.wind(7);
-    }
-  }, [windPulse]);
+  usePulse(windPulse, () => {
+    spin.current += 14;
+    sfx.wind(7);
+  });
   useFrame((_, dt) => {
     if (!g.current) return;
     const step = spin.current * Math.min(1, dt * 5);

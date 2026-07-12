@@ -56,6 +56,10 @@ export const FINISH_MOD: Record<Finish, { dr: number; dm: number }> = {
   Frosted:         { dr: +0.42, dm: -0.05 },
 };
 
+/* warm-toned cases that shift dial indices, hands, etc. toward gold */
+export const GOLD_CASES: CaseMat[] = ["Yellow Gold", "Rose Gold", "Bronze"];
+export const isGoldCase = (caseMat: CaseMat): boolean => GOLD_CASES.includes(caseMat);
+
 export const DIAL_SWATCH: Record<DialType, string> = {
   Black: "#101114", White: "#efece3", Blue: "#16324f", Green: "#123f2d",
   Burgundy: "#4a1420", Salmon: "#e8a87c", Meteorite: "#9aa0a8",
