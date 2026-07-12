@@ -189,11 +189,11 @@ export function buildStory(c: WatchConfig): Story {
     reference: `Ref. ${ref}`,
     collection: `${collection} Collection`,
     persona: pick(PERSONA, seed),
-    inspiration: pick(INSPIRATION, seed >> 3),
-    philosophy: pick(PHILOSOPHY, seed >> 6),
+    inspiration: pick(INSPIRATION, seed >>> 3),
+    philosophy: pick(PHILOSOPHY, seed >>> 6),
     movement,
     price: "$" + price.toLocaleString("en-US"),
     year: "Launch — Autumn 2026",
-    notes: pick(NOTES, seed >> 9),
+    notes: pick(NOTES, seed >>> 9),
   };
 }
