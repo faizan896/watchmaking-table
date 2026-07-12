@@ -134,7 +134,7 @@ function initCore(){
   // WebGL support
   try{
     renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
-  }catch(e){fail('This experience needs WebGL. Please open it in a modern desktop browser (Chrome, Safari, Edge, Firefox) with hardware acceleration enabled.');return false;}
+  }catch(e){console.error('WebGL initialization failed.',e);fail('This experience needs WebGL. Please open it in a modern desktop browser (Chrome, Safari, Edge, Firefox) with hardware acceleration enabled.');return false;}
   renderer.setPixelRatio(Math.min(devicePixelRatio,CFG.DPRmax));
   renderer.setSize(W,H);
   renderer.shadowMap.enabled=true;
@@ -640,7 +640,14 @@ function tweenCamera(pos,tgt,dur=1.6,ease=easeInOut,done){
    AUDIO — synthesized, subtle
    =================================================================== */
 let AC=null;
-function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function ac(){
+  if(!AC){
+    try{AC=new(window.AudioContext||window.webkitAudioContext)();}
+    catch(e){console.warn('Audio initialization failed; continuing without sound.',e);return null;}
+  }
+  if(AC.state==='suspended')AC.resume().catch(e=>console.warn('Audio resume failed; continuing without sound.',e));
+  return AC;
+}
 function blip(freq,dur,vol,type='triangle',q=6){const a=ac();if(!a)return;
   const o=a.createOscillator(),g=a.createGain(),f=a.createBiquadFilter();
   f.type='bandpass';f.frequency.value=freq;f.Q.value=q;o.type=type;o.frequency.value=freq;
@@ -810,12 +817,18 @@ function finishAssembly(){
 
 function downloadPhoto(){
   const wRatio=1600,hRatio=2000;const oldW=W,oldH=H;
-  renderer.setSize(wRatio,hRatio,false);camera.aspect=wRatio/hRatio;camera.updateProjectionMatrix();
-  renderer.render(scene,camera);
-  const url=renderer.domElement.toDataURL('image/png');
-  const a=document.createElement('a');a.href=url;a.download='watchmaking-table.png';a.click();
-  renderer.setSize(oldW,oldH,false);camera.aspect=oldW/oldH;camera.updateProjectionMatrix();
-  toastMsg('Photograph saved');
+  try{
+    renderer.setSize(wRatio,hRatio,false);camera.aspect=wRatio/hRatio;camera.updateProjectionMatrix();
+    renderer.render(scene,camera);
+    const url=renderer.domElement.toDataURL('image/png');
+    const a=document.createElement('a');a.href=url;a.download='watchmaking-table.png';a.click();
+    toastMsg('Photograph saved');
+  }catch(e){
+    console.error('Photograph export failed.',e);
+    toastMsg('Photograph could not be saved');
+  }finally{
+    renderer.setSize(oldW,oldH,false);camera.aspect=oldW/oldH;camera.updateProjectionMatrix();
+  }
 }
 
 /* ===================================================================

@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtelier } from "../lib/store";
-import { initAudio, sfx } from "../lib/audio";
+import { initAudio, setAudioEnabled, sfx } from "../lib/audio";
 
 export function Landing() {
   const mode = useAtelier((s) => s.mode);
   const enter = useAtelier((s) => s.enter);
+  const setSoundOn = useAtelier((s) => s.setSoundOn);
   return (
     <AnimatePresence>
       {mode === "landing" && (
@@ -12,10 +13,15 @@ export function Landing() {
           className="fixed inset-0 z-40 flex flex-col items-center justify-center cursor-pointer select-none"
           style={{ background: "radial-gradient(120% 120% at 50% 42%, rgba(11,10,9,.42) 30%, rgba(4,3,2,.96) 100%)" }}
           exit={{ opacity: 0, transition: { duration: 2.6, ease: "easeInOut" } }}
-          onClick={() => {
-            initAudio();
-            sfx.bigTick();
+          onClick={async () => {
             setTimeout(enter, 420);
+            const audioReady = await initAudio();
+            if (audioReady) {
+              sfx.bigTick();
+            } else {
+              setAudioEnabled(false);
+              setSoundOn(false);
+            }
           }}
         >
           <motion.div

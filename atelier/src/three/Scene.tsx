@@ -305,19 +305,25 @@ function CameraRig() {
 function Capture() {
   const capturePulse = useAtelier((s) => s.capturePulse);
   const config = useAtelier((s) => s.config);
+  const setCaptureError = useAtelier((s) => s.setCaptureError);
   const seen = useRef(0);
   const { gl, scene, camera } = useThree();
   useEffect(() => {
     if (capturePulse === seen.current) return;
     seen.current = capturePulse;
-    gl.render(scene, camera);
-    const name = buildStory(config).model.replace(/\s+/g, "-").toLowerCase();
-    const a = document.createElement("a");
-    a.href = gl.domElement.toDataURL("image/png");
-    a.download = `atelier-${name}.png`;
-    a.click();
-    sfx.shutter();
-  }, [capturePulse, gl, scene, camera, config]);
+    try {
+      gl.render(scene, camera);
+      const name = buildStory(config).model.replace(/\s+/g, "-").toLowerCase();
+      const a = document.createElement("a");
+      a.href = gl.domElement.toDataURL("image/png");
+      a.download = `atelier-${name}.png`;
+      a.click();
+      sfx.shutter();
+    } catch (error) {
+      console.error("Photo capture failed.", error);
+      setCaptureError("The image could not be saved. Please try again.");
+    }
+  }, [capturePulse, gl, scene, camera, config, setCaptureError]);
   return null;
 }
 

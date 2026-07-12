@@ -720,7 +720,14 @@ function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");
    AUDIO — soft mechanical tick + snap
    ===================================================================== */
 let AC=null;
-function audio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC;}
+function audio(){
+  if(!AC){
+    try{AC=new (window.AudioContext||window.webkitAudioContext)();}
+    catch(e){console.warn("Audio initialization failed; continuing without sound.",e);return null;}
+  }
+  if(AC.state==="suspended")AC.resume().catch(e=>console.warn("Audio resume failed; continuing without sound.",e));
+  return AC;
+}
 function click(freq,dur,vol,type="triangle"){const ac=audio();if(!ac)return;
   const o=ac.createOscillator(),g=ac.createGain(),f=ac.createBiquadFilter();
   f.type="bandpass";f.frequency.value=freq;f.Q.value=6;o.type=type;o.frequency.value=freq;
@@ -821,13 +828,30 @@ function downloadWallpaper(){
   const url=URL.createObjectURL(blob);
   const img=new Image();
   img.onload=()=>{
-    const c=document.createElement("canvas");c.width=W;c.height=H;
-    const x=c.getContext("2d");x.fillStyle="#040404";x.fillRect(0,0,W,H);
-    x.drawImage(img,0,0,W,H);URL.revokeObjectURL(url);
-    c.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);
-      a.download="latelier-timepiece.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("Wallpaper downloaded");},"image/png");
+    try{
+      const c=document.createElement("canvas");c.width=W;c.height=H;
+      const x=c.getContext("2d");
+      if(!x) throw new Error("Canvas 2D context is unavailable");
+      x.fillStyle="#040404";x.fillRect(0,0,W,H);
+      x.drawImage(img,0,0,W,H);
+      c.toBlob(b=>{
+        if(!b){console.error("Wallpaper encoding failed.");toast("Export failed — try again");return;}
+        try{
+          const a=document.createElement("a");a.href=URL.createObjectURL(b);
+          a.download="latelier-timepiece.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast("Wallpaper downloaded");
+        }catch(e){
+          console.error("Wallpaper download failed.",e);
+          toast("Export failed — try again");
+        }
+      },"image/png");
+    }catch(e){
+      console.error("Wallpaper export failed.",e);
+      toast("Export failed — try again");
+    }finally{
+      URL.revokeObjectURL(url);
+    }
   };
-  img.onerror=()=>toast("Export failed — try again");
+  img.onerror=e=>{console.error("Wallpaper image preparation failed.",e);URL.revokeObjectURL(url);toast("Export failed — try again");};
   img.src=url;
 }
 $("#downloadBtn").addEventListener("click",downloadWallpaper);
