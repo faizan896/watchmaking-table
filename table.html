@@ -11,7 +11,7 @@
    CALAME · L'ÉTABLI
    A bench, a calibre, and enough silence to hear it start.
    ———————————————————————————————————————— */
-html,body{margin:0;padding:0;height:100%;background:#181009;overflow:hidden}
+html,body{margin:0;padding:0;height:100%;background:#161311;overflow:hidden}
 svg{display:block;width:100vw;height:100vh;user-select:none;-webkit-user-select:none;touch-action:none}
 text{user-select:none;-webkit-user-select:none;pointer-events:none}
 
@@ -21,17 +21,8 @@ body.c-part{cursor:grab}
 body.c-hold{cursor:grabbing}
 body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cline x1='6' y1='22' x2='19' y2='9' stroke='%23b98a4a' stroke-width='4' stroke-linecap='round'/%3E%3Cline x1='19' y1='9' x2='24' y2='4' stroke='%23d8d5cc' stroke-width='2.6'/%3E%3Cline x1='22.2' y1='2.2' x2='25.8' y2='5.8' stroke='%23d8d5cc' stroke-width='2.2'/%3E%3C/svg%3E") 24 4, pointer}
 
-.dust{animation:drift 16s linear infinite;will-change:transform,opacity}
-@keyframes drift{
-  0%{transform:translate(0,0);opacity:0}
-  12%{opacity:.5}
-  88%{opacity:.35}
-  100%{transform:translate(-46px,34px);opacity:0}
-}
-@media (prefers-reduced-motion:reduce){.dust{animation:none;opacity:.18}}
-
 #small{
-  display:none;position:fixed;inset:0;z-index:99;background:#181009;color:#e9dfc8;
+  display:none;position:fixed;inset:0;z-index:99;background:#161311;color:#e9dfc8;
   font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;line-height:1.6;
   padding:3rem;text-align:center;align-items:center;justify-content:center;
 }
@@ -46,29 +37,34 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <defs>
   <!-- ————— matter ————— -->
   <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#523a26"/><stop offset=".45" stop-color="#46311f"/>
-    <stop offset="1" stop-color="#332214"/>
+    <stop offset="0" stop-color="#6b543c"/><stop offset=".5" stop-color="#5f4a34"/>
+    <stop offset="1" stop-color="#503e2b"/>
   </linearGradient>
-  <linearGradient id="woodPlank" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".06" stop-color="#fff" stop-opacity=".05"/>
-    <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/>
+  <linearGradient id="railWood" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#54412d"/><stop offset="1" stop-color="#453424"/>
   </linearGradient>
-  <radialGradient id="matGrad" cx=".42" cy=".38" r="1">
-    <stop offset="0" stop-color="#7c6247"/><stop offset=".7" stop-color="#6b523a"/><stop offset="1" stop-color="#59422e"/>
+  <linearGradient id="drawerWood" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#63503a"/><stop offset="1" stop-color="#523f2c"/>
+  </linearGradient>
+  <radialGradient id="matGrad" cx=".46" cy=".4" r="1">
+    <stop offset="0" stop-color="#57625a"/><stop offset=".65" stop-color="#4b564e"/><stop offset="1" stop-color="#3f4a42"/>
   </radialGradient>
   <radialGradient id="lampPool" cx=".5" cy=".5" r=".5">
-    <stop offset="0" stop-color="#ffdf9e" stop-opacity=".32"/>
-    <stop offset=".55" stop-color="#ffcf82" stop-opacity=".13"/>
-    <stop offset="1" stop-color="#ffcf82" stop-opacity="0"/>
+    <stop offset="0" stop-color="#ffeccb" stop-opacity=".12"/>
+    <stop offset=".6" stop-color="#ffe4b6" stop-opacity=".05"/>
+    <stop offset="1" stop-color="#ffe4b6" stop-opacity="0"/>
   </radialGradient>
-  <radialGradient id="vign" cx=".5" cy=".46" r=".75">
+  <radialGradient id="vign" cx=".5" cy=".47" r=".8">
     <stop offset="0" stop-color="#000" stop-opacity="0"/>
-    <stop offset=".62" stop-color="#0d0703" stop-opacity=".18"/>
-    <stop offset="1" stop-color="#0d0703" stop-opacity=".78"/>
+    <stop offset=".72" stop-color="#14100c" stop-opacity=".05"/>
+    <stop offset="1" stop-color="#14100c" stop-opacity=".38"/>
   </radialGradient>
   <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#e8c07a"/><stop offset=".5" stop-color="#b98a4a"/><stop offset="1" stop-color="#8a6330"/>
+    <stop offset="0" stop-color="#cfae74"/><stop offset=".5" stop-color="#a5824c"/><stop offset="1" stop-color="#7c6136"/>
   </linearGradient>
+  <radialGradient id="feltG" cx=".45" cy=".42" r="1">
+    <stop offset="0" stop-color="#3a423c"/><stop offset="1" stop-color="#2d342f"/>
+  </radialGradient>
   <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#f0efe9"/><stop offset=".45" stop-color="#c9c7bd"/><stop offset="1" stop-color="#8f8d84"/>
   </linearGradient>
@@ -94,7 +90,7 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <stop offset="0" stop-color="#f2ecdd"/><stop offset="1" stop-color="#e2d8bf"/>
   </linearGradient>
   <linearGradient id="bp" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#e9e2cd"/><stop offset="1" stop-color="#d8cfb2"/>
+    <stop offset="0" stop-color="#ebece3"/><stop offset="1" stop-color="#dddfd2"/>
   </linearGradient>
   <linearGradient id="leatherTan" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#a8784a"/><stop offset="1" stop-color="#7e5530"/>
@@ -116,8 +112,13 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <feColorMatrix in="n" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .06 0"/>
     <feComposite operator="over" in2="SourceGraphic"/></filter>
   <filter id="woodGrain" x="-5%" y="-5%" width="110%" height="110%">
-    <feTurbulence type="fractalNoise" baseFrequency=".012 .09" numOctaves="3" seed="7" result="n"/>
-    <feColorMatrix in="n" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 .3 0 .10 0" result="g"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".005 .075" numOctaves="4" seed="11" result="n"/>
+    <feColorMatrix in="n" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 .3 0 .13 0" result="g"/>
+    <feComposite in="g" in2="SourceGraphic" operator="over"/>
+  </filter>
+  <filter id="matTex" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="4" result="n"/>
+    <feColorMatrix in="n" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .035 0" result="g"/>
     <feComposite in="g" in2="SourceGraphic" operator="over"/>
   </filter>
   <filter id="softSh" x="-40%" y="-40%" width="180%" height="180%">
@@ -131,25 +132,53 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   </filter>
 </defs>
 
-<!-- ————— the desk ————— -->
+<!-- ————— the bench: one solid walnut slab ————— -->
 <g id="gDesk">
   <rect width="1440" height="900" fill="url(#wood)" filter="url(#woodGrain)"/>
-  <g opacity=".8">
-    <rect x="0" y="0" width="1440" height="180" fill="url(#woodPlank)"/>
-    <rect x="0" y="180" width="1440" height="200" fill="url(#woodPlank)"/>
-    <rect x="0" y="380" width="1440" height="190" fill="url(#woodPlank)"/>
-    <rect x="0" y="570" width="1440" height="180" fill="url(#woodPlank)"/>
-    <rect x="0" y="750" width="1440" height="150" fill="url(#woodPlank)"/>
+  <!-- even task light, barely there -->
+  <ellipse cx="740" cy="450" rx="700" ry="470" fill="url(#lampPool)"/>
+
+  <!-- back rail with precision drawers -->
+  <rect x="0" y="0" width="1440" height="72" fill="url(#railWood)" filter="url(#woodGrain)"/>
+  <rect x="0" y="70" width="1440" height="5" fill="#000" opacity=".28"/>
+  <rect x="0" y="75" width="1440" height="1.5" fill="#fff" opacity=".07"/>
+  <g>
+    <rect x="486" y="8" width="180" height="55" rx="2.5" fill="url(#drawerWood)" stroke="#2e2216" stroke-width="1"/>
+    <rect x="678" y="8" width="180" height="55" rx="2.5" fill="url(#drawerWood)" stroke="#2e2216" stroke-width="1"/>
+    <rect x="870" y="8" width="180" height="55" rx="2.5" fill="url(#drawerWood)" stroke="#2e2216" stroke-width="1"/>
+    <rect x="1062" y="8" width="180" height="55" rx="2.5" fill="url(#drawerWood)" stroke="#2e2216" stroke-width="1"/>
+    <rect x="1254" y="8" width="180" height="55" rx="2.5" fill="url(#drawerWood)" stroke="#2e2216" stroke-width="1"/>
+    <g fill="url(#brass)" stroke="#241a0c" stroke-width=".8">
+      <circle cx="576" cy="35" r="5.5"/><circle cx="768" cy="35" r="5.5"/><circle cx="960" cy="35" r="5.5"/>
+      <circle cx="1152" cy="35" r="5.5"/><circle cx="1344" cy="35" r="5.5"/>
+    </g>
+    <g fill="#4a3a22">
+      <circle cx="576" cy="35" r="1.8"/><circle cx="768" cy="35" r="1.8"/><circle cx="960" cy="35" r="1.8"/>
+      <circle cx="1152" cy="35" r="1.8"/><circle cx="1344" cy="35" r="1.8"/>
+    </g>
   </g>
-  <!-- lamp light pool on the wood -->
-  <ellipse cx="700" cy="470" rx="760" ry="520" fill="url(#lampPool)"/>
+
+  <!-- component catch groove, routed along the front edge -->
+  <rect x="36" y="834" width="1368" height="8" rx="4" fill="#3b2d1e"/>
+  <rect x="36" y="834" width="1368" height="3" fill="#241a0e" opacity=".8"/>
+  <rect x="36" y="841" width="1368" height="1.4" fill="#fff" opacity=".08"/>
+
+  <!-- leather armrests, worn where wrists rest -->
+  <g>
+    <rect x="292" y="854" width="330" height="80" rx="14" fill="url(#leatherTan)" stroke="#4a3018" stroke-width="1.4"/>
+    <rect x="303" y="864" width="308" height="60" rx="9" fill="none" stroke="#e9dfc8" stroke-width="1" stroke-dasharray="4 6" opacity=".22"/>
+    <ellipse cx="457" cy="884" rx="105" ry="20" fill="#fff" opacity=".05"/>
+    <rect x="818" y="854" width="330" height="80" rx="14" fill="url(#leatherTan)" stroke="#4a3018" stroke-width="1.4"/>
+    <rect x="829" y="864" width="308" height="60" rx="9" fill="none" stroke="#e9dfc8" stroke-width="1" stroke-dasharray="4 6" opacity=".22"/>
+    <ellipse cx="983" cy="884" rx="105" ry="20" fill="#fff" opacity=".05"/>
+  </g>
 </g>
 
-<!-- ————— leather mat ————— -->
-<g id="gMat" filter="url(#softSh)">
-  <rect x="380" y="170" width="700" height="610" rx="26" fill="url(#matGrad)"/>
-  <rect x="391" y="181" width="678" height="588" rx="19" fill="none" stroke="#c9b493" stroke-width="1.4" stroke-dasharray="5 6" opacity=".5"/>
-  <rect x="380" y="170" width="700" height="610" rx="26" fill="none" stroke="#3c2c1d" stroke-width="2" opacity=".6"/>
+<!-- ————— anti-static work mat ————— -->
+<g id="gMat">
+  <rect x="382" y="192" width="700" height="598" rx="10" fill="url(#matGrad)" filter="url(#matTex)"/>
+  <rect x="382" y="192" width="700" height="598" rx="10" fill="none" stroke="#2c342d" stroke-width="1.6"/>
+  <rect x="383.5" y="193.5" width="697" height="595" rx="9" fill="none" stroke="#fff" stroke-width="1" opacity=".04"/>
 </g>
 
 <!-- ————— props: filled by script (blueprint, notebook, tray, tools, lamp) ————— -->
@@ -164,10 +193,8 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <!-- ————— floating drag layer ————— -->
 <g id="gFloat"></g>
 
-<!-- ————— atmosphere ————— -->
-<g id="gDust" pointer-events="none"></g>
+<!-- ————— atmosphere: nothing but honest light ————— -->
 <rect width="1440" height="900" fill="url(#vign)" pointer-events="none"/>
-<g id="gLampGlass" pointer-events="none"></g>
 </svg>
 
 <script>
@@ -327,67 +354,62 @@ var SND={
    ============================================================ */
 var MOVX=690, MOVY=470;   /* centre of the holder */
 
-/* ————— lamp, top right, its switch is the only "setting" ————— */
+/* ————— task lamp, entering from above; its toggle is the only switch ————— */
 (function(){
   var g=S("g",null,$("gProps"));
-  S("path",{d:"M1438 60 L1210 96",stroke:"#20180f","stroke-width":9,"stroke-linecap":"round"},g);
-  S("path",{d:"M1438 60 L1210 96",stroke:"#4a3a26","stroke-width":5,"stroke-linecap":"round"},g);
-  var head=S("g",{transform:"translate(1210 96) rotate(24)"},g);
-  S("path",{d:"M-52 0 A52 26 0 0 1 52 0 L38 14 A38 18 0 0 0 -38 14 Z",fill:"#2b2013",stroke:"#0f0a05","stroke-width":1.5},head);
-  S("ellipse",{cx:0,cy:12,rx:36,ry:9,fill:"#ffe1a0",opacity:.9},head);
-  /* glow cone drawn in glass layer */
-  var cone=S("path",{d:"M1178 122 L1240 118 L1010 430 L820 470 Z",fill:"#ffdf9e",opacity:.05},$("gLampGlass"));
-  /* switch = sound */
-  var sw=S("g",{transform:"translate(1256 78)",cursor:"pointer"},g);
-  S("circle",{cx:0,cy:0,r:11,fill:"url(#brass)",stroke:"#20180f","stroke-width":1.5},sw);
-  var nub=S("line",{x1:0,y1:-6,x2:0,y2:6,stroke:"#20180f","stroke-width":3,"stroke-linecap":"round"},sw);
-  var st=T(g,1256,108,"SON",8.5,{fill:"#c9b493",anchor:"middle",ls:2});st.setAttribute("opacity",.55);
+  S("path",{d:"M870 0 L916 86",stroke:"#181715","stroke-width":11,"stroke-linecap":"round"},g);
+  S("path",{d:"M870 0 L916 86",stroke:"#34322e","stroke-width":6,"stroke-linecap":"round"},g);
+  var head=S("g",{transform:"translate(916 90) rotate(16)"},g);
+  S("path",{d:"M-48 0 A48 22 0 0 1 48 0 L36 12 A36 15 0 0 0 -36 12 Z",fill:"#232220",stroke:"#121110","stroke-width":1.4},head);
+  S("path",{d:"M-42 -3 A42 17 0 0 1 42 -3",fill:"none",stroke:"#fff","stroke-width":1,opacity:.10},head);
+  S("ellipse",{cx:0,cy:10,rx:30,ry:6.5,fill:"#f3e7cd",opacity:.85},head);
+  /* toggle = sound, unlabeled, as on the real thing */
+  var sw=S("g",{transform:"translate(962 58)",cursor:"pointer"},g);
+  S("circle",{cx:0,cy:0,r:9,fill:"#34322e",stroke:"#121110","stroke-width":1.2},sw);
+  var nub=S("line",{x1:0,y1:-5,x2:0,y2:5,stroke:"#c9c7bd","stroke-width":2.4,"stroke-linecap":"round"},sw);
   sw.addEventListener("pointerdown",function(e){
     e.stopPropagation();soundOn=!soundOn;
     nub.setAttribute("transform",soundOn?"":"rotate(90)");
     if(!soundOn&&tickNode){tickNode.stop();tickNode=null;}
     if(soundOn){audio();if(state.alive)SND.tickStart();}
-    cone.setAttribute("opacity",soundOn?.05:.05);
   });
 })();
 
-/* ————— oil cup, screwdrivers, loose screws, tweezers ————— */
+/* ————— tools: each one earns its place ————— */
 (function(){
   var g=$("gProps");
-  /* oil cup */
-  var oc=S("g",{transform:"translate(1235 705)",filter:"url(#tinySh)"},g);
-  S("circle",{cx:0,cy:0,r:26,fill:"url(#steel)",stroke:"#55524a"},oc);
-  S("circle",{cx:0,cy:0,r:17,fill:"#3a2c14"},oc);
-  S("circle",{cx:0,cy:0,r:12,fill:"#5d4720"},oc);
-  S("ellipse",{cx:-4,cy:-4,rx:5,ry:3,fill:"#c8a860",opacity:.5},oc);
-  T(g,1235,752,"HUILE 8000",8,{fill:"#c9b493",anchor:"middle",ls:2}).setAttribute("opacity",.5);
-  /* screwdriver stand */
-  var sd=S("g",{transform:"translate(1330 300)"},g);
-  S("rect",{x:-34,y:-14,width:68,height:150,rx:9,fill:"#2b2013",stroke:"#0f0a05",filter:"url(#tinySh)"},sd);
-  [["#c9391b",-20],["#b98a4a",0],["#7c8b6f",20]].forEach(function(c,i){
-    var d=S("g",{transform:"translate("+c[1]+" 0)"},sd);
-    S("circle",{cx:0,cy:0,r:8,fill:c[0],stroke:"#0f0a05"},d);
-    S("line",{x1:0,y1:8,x2:0,y2:118,stroke:"url(#steel)","stroke-width":3.4},d);
-    S("circle",{cx:0,cy:0,r:2.6,fill:"#f0efe9",opacity:.7},d);
+  /* brass tool holder — three screwdrivers lying in their tray, tips worn */
+  var tr=S("g",{transform:"translate(1268 400)"},g);
+  S("rect",{x:-84,y:-118,width:168,height:236,rx:10,fill:"url(#brass)",stroke:"#4a3a20","stroke-width":1.4,filter:"url(#tinySh)"},tr);
+  S("rect",{x:-84,y:-118,width:168,height:236,rx:10,fill:"#000",opacity:.12},tr);
+  S("rect",{x:-72,y:-106,width:144,height:212,rx:6,fill:"url(#feltG)"},tr);
+  [["#7c4438",-44],["#6e5f40",0],["#4f5c4b",44]].forEach(function(c){
+    var d=S("g",{transform:"translate("+c[1]+" -6)"},tr);
+    S("line",{x1:0,y1:-88,x2:0,y2:8,stroke:"url(#steel)","stroke-width":3.6},d);
+    S("line",{x1:0,y1:-88,x2:0,y2:-78,stroke:"#8f8d84","stroke-width":3.6},d);
+    S("rect",{x:-6.5,y:8,width:13,height:74,rx:6,fill:c[0],stroke:"#1d1a15","stroke-width":.8},d);
+    for(var k2=0;k2<5;k2++)S("line",{x1:-6.5,y1:20+k2*12,x2:6.5,y2:20+k2*12,stroke:"#000",opacity:.18},d);
+    S("circle",{cx:0,cy:90,r:7,fill:c[0],stroke:"#1d1a15","stroke-width":.8},d);
+    S("circle",{cx:0,cy:90,r:2.4,fill:"#d8d5cc",opacity:.6},d);
   });
-  T(g,1330,478,"0.8 · 1.2 · 1.6",8,{fill:"#c9b493",anchor:"middle",ls:2}).setAttribute("opacity",.5);
-  /* brass tweezers resting */
-  var tw=S("g",{transform:"translate(452 812) rotate(-9)",filter:"url(#tinySh)"},g);
-  S("path",{d:"M0 0 L124 -7 L128 -4 L8 6 Z",fill:"url(#brass)"},tw);
-  S("path",{d:"M0 6 L124 11 L128 8 L8 0 Z",fill:"url(#brass)",opacity:.85},tw);
-  S("circle",{cx:6,cy:3,r:4,fill:"#8a6330"},tw);
-  /* a few spilled screws */
-  [[520,205],[540,214],[531,196]].forEach(function(pt){
-    var sc=screwHead(3.2);sc.setAttribute("transform","translate("+pt[0]+" "+pt[1]+")");
-    sc.setAttribute("filter","url(#tinySh)");g.appendChild(sc);
-  });
-  /* loupe */
-  var lp=S("g",{transform:"translate(1150 806)",filter:"url(#softSh)",cursor:"pointer"},g);
-  S("circle",{cx:0,cy:0,r:34,fill:"#1d150c",stroke:"#0f0a05","stroke-width":2},lp);
-  S("circle",{cx:0,cy:0,r:27,fill:"#b9cdd4",opacity:.28},lp);
-  S("path",{d:"M-14 -12 A19 19 0 0 1 8 -17",stroke:"#fff","stroke-width":3,fill:"none",opacity:.5,"stroke-linecap":"round"},lp);
-  S("path",{d:"M23 24 L44 46",stroke:"#1d150c","stroke-width":11,"stroke-linecap":"round"},lp);
-  T(g,1150,862,"LOUPE ×3",8,{fill:"#c9b493",anchor:"middle",ls:2}).setAttribute("opacity",.5);
+  /* steel tweezers, resting where the right hand leaves them */
+  var tw=S("g",{transform:"translate(1010 748) rotate(-14)",filter:"url(#tinySh)"},g);
+  S("path",{d:"M0 0 L118 -6 L122 -3.4 L8 5 Z",fill:"url(#steel)"},tw);
+  S("path",{d:"M0 5 L118 9 L122 6.6 L8 0 Z",fill:"url(#steel)",opacity:.9},tw);
+  S("path",{d:"M112 -5.6 L122 -3.4 L122 6.6 L112 8.4 Z",fill:"#77756c"},tw);
+  S("circle",{cx:5,cy:2.5,r:3,fill:"#8f8d84"},tw);
+  /* oiler cup, lidded */
+  var oc=S("g",{transform:"translate(1268 640)",filter:"url(#tinySh)"},g);
+  S("circle",{cx:0,cy:0,r:20,fill:"url(#steel)",stroke:"#55524a"},oc);
+  S("circle",{cx:0,cy:0,r:13,fill:"#332614"},oc);
+  S("circle",{cx:0,cy:0,r:8.5,fill:"#52401e"},oc);
+  S("ellipse",{cx:-3,cy:-3,rx:3.4,ry:2,fill:"#c8a860",opacity:.4},oc);
+  /* eye loupe, black horn — click to work under it */
+  var lp=S("g",{transform:"translate(1178 806)",filter:"url(#tinySh)",cursor:"pointer"},g);
+  S("circle",{cx:0,cy:0,r:26,fill:"#1c1a17",stroke:"#0e0d0b","stroke-width":2},lp);
+  S("circle",{cx:0,cy:0,r:20,fill:"#9fb0ac",opacity:.22},lp);
+  S("circle",{cx:0,cy:0,r:13,fill:"#0e0d0b",opacity:.35},lp);
+  S("path",{d:"M-11 -9 A14 14 0 0 1 6 -13",stroke:"#fff","stroke-width":2,fill:"none",opacity:.35,"stroke-linecap":"round"},lp);
   var zoomed=false;
   lp.addEventListener("pointerdown",function(e){
     e.stopPropagation();zoomed=!zoomed;SND.pick();
@@ -398,21 +420,11 @@ var MOVX=690, MOVY=470;   /* centre of the holder */
   });
 })();
 
-/* ————— dust in the lamplight ————— */
-(function(){
-  for(var i=0;i<12;i++){
-    var c=S("circle",{cx:520+Math.random()*560,cy:180+Math.random()*420,r:.8+Math.random()*1.4,
-      fill:"#ffe9bd",class:"dust"},$("gDust"));
-    c.style.animationDelay=(-Math.random()*16)+"s";
-    c.style.animationDuration=(13+Math.random()*9)+"s";
-  }
-})();
-
 /* ————— notebook (bottom left): the quiet voice ————— */
 var NB={};
 (function(){
-  var g=S("g",{transform:"translate(76 596) rotate(-2)"},$("gNotebook"));
-  S("rect",{x:0,y:0,width:300,height:246,rx:6,fill:"#4a3527",filter:"url(#softSh)"},g);
+  var g=S("g",{transform:"translate(76 574) rotate(-1)"},$("gNotebook"));
+  S("rect",{x:0,y:0,width:300,height:246,rx:5,fill:"#3d3a33",filter:"url(#tinySh)"},g);
   S("rect",{x:8,y:6,width:284,height:234,rx:3,fill:"url(#paper)"},g);
   S("line",{x1:150,y1:8,x2:150,y2:238,stroke:"#b3a488","stroke-width":1,opacity:.6},g);
   for(var i=0;i<7;i++)S("line",{x1:166,y1:52+i*24,x2:282,y2:52+i*24,stroke:"#b3a488","stroke-width":.7,opacity:.5},g);
@@ -437,14 +449,14 @@ function note(step,title,lines,aside){
 /* ————— blueprint (top): the running record ————— */
 var BP={rows:[]};
 (function(){
-  var g=S("g",{transform:"translate(430 26) rotate(-.6)"},$("gBlueprint"));
-  S("rect",{x:0,y:0,width:620,height:128,rx:3,fill:"url(#bp)",filter:"url(#softSh)"},g);
-  S("rect",{x:6,y:6,width:608,height:116,rx:2,fill:"none",stroke:"#8a6f52","stroke-width":.8,opacity:.6},g);
-  /* rolled ends */
-  S("rect",{x:-8,y:-4,width:14,height:136,rx:6,fill:"#d8cfb2",stroke:"#8a6f52","stroke-width":.6},g);
-  S("rect",{x:614,y:-4,width:14,height:136,rx:6,fill:"#d8cfb2",stroke:"#8a6f52","stroke-width":.6},g);
-  BP.title=T(g,22,32,"CALIBRE O-46 — FEUILLE DE MONTAGE",11,{fill:"#3d3122",ls:2.6,w:600});
-  BP.ref=T(g,598,32,"",10,{fill:"#8a6f52",ls:2,anchor:"end"});
+  var g=S("g",{transform:"translate(66 96)"},$("gBlueprint"));
+  S("rect",{x:0,y:0,width:620,height:128,fill:"url(#bp)",filter:"url(#tinySh)"},g);
+  S("rect",{x:7,y:7,width:606,height:114,fill:"none",stroke:"#7d8577","stroke-width":.6,opacity:.55},g);
+  /* drafting tape, two corners */
+  S("rect",{x:-10,y:-6,width:34,height:14,rx:1,fill:"#ddd8c4",opacity:.85,transform:"rotate(-4 7 1)"},g);
+  S("rect",{x:596,y:-6,width:34,height:14,rx:1,fill:"#ddd8c4",opacity:.85,transform:"rotate(3 613 1)"},g);
+  BP.title=T(g,22,32,"CALIBRE O-46 — FEUILLE DE MONTAGE",11,{fill:"#3a4038",ls:2.6,w:600});
+  BP.ref=T(g,598,32,"",10,{fill:"#7d8577",ls:2,anchor:"end"});
   BP.g=g;
 })();
 function bpList(names){
@@ -472,30 +484,31 @@ function bpCurrent(i){
   });
 }
 
-/* ————— parts tray (left) ————— */
-var TRAY={x:210,y:330};
+/* ————— parts tray: turned aluminium, felt-lined ————— */
+var TRAY={x:210,y:390};
 (function(){
-  var g=S("g",{transform:"translate(90 200)"},$("gTray"));
-  S("rect",{x:0,y:0,width:240,height:262,rx:12,fill:"#2b2013",filter:"url(#softSh)"},g);
-  S("rect",{x:9,y:9,width:222,height:244,rx:8,fill:"#4a3a26"},g);
-  S("rect",{x:16,y:16,width:208,height:230,rx:6,fill:"#5d4c33"},g);
-  S("rect",{x:16,y:16,width:208,height:230,rx:6,fill:"#000",opacity:.14},g);
-  T(g,120,282,"",1,{});
-  T($("gTray"),210,492,"PIÈCES",8.5,{fill:"#c9b493",anchor:"middle",ls:3}).setAttribute("opacity",.5);
+  var g=S("g",{transform:"translate(210 390)"},$("gTray"));
+  S("circle",{cx:0,cy:0,r:112,fill:"url(#steel)",stroke:"#55524a","stroke-width":1.2,filter:"url(#tinySh)"},g);
+  S("circle",{cx:0,cy:0,r:106,fill:"none",stroke:"#000",opacity:.18},g);
+  S("circle",{cx:0,cy:0,r:100,fill:"url(#feltG)"},g);
+  S("circle",{cx:0,cy:0,r:99,fill:"none",stroke:"#000",opacity:.28,"stroke-width":2},g);
 })();
 
-/* ————— movement holder ————— */
+/* ————— movement holder: anodized, knurled clamps, no ceremony ————— */
 (function(){
-  var g=S("g",{transform:"translate("+MOVX+" "+MOVY+")",filter:"url(#softSh)"},$("gWork"));
-  S("circle",{cx:0,cy:0,r:196,fill:"#1d150c"},g);
-  S("circle",{cx:0,cy:0,r:186,fill:"#2b2013"},g);
-  S("circle",{cx:0,cy:0,r:168,fill:"#241b10"},g);
+  var g=S("g",{transform:"translate("+MOVX+" "+MOVY+")",filter:"url(#tinySh)"},$("gWork"));
+  S("circle",{cx:0,cy:0,r:194,fill:"#23201c"},g);
+  S("circle",{cx:0,cy:0,r:194,fill:"none",stroke:"#14120f","stroke-width":2},g);
+  S("circle",{cx:0,cy:0,r:184,fill:"#312d27"},g);
+  S("circle",{cx:0,cy:0,r:167,fill:"#282420"},g);
   for(var k=0;k<3;k++){
     var a=-TAU/4+k*TAU/3;
-    S("rect",{x:-9,y:-186,width:18,height:26,rx:4,fill:"url(#brass)",transform:"rotate("+(a*360/TAU+90)+")"},g);
+    var cl=S("g",{transform:"rotate("+(a*360/TAU+90)+")"},g);
+    S("rect",{x:-8,y:-186,width:16,height:24,rx:3,fill:"url(#steel)",stroke:"#3c3a34","stroke-width":.8},cl);
+    S("line",{x1:-4,y1:-180,x2:4,y2:-180,stroke:"#3c3a34","stroke-width":1},cl);
+    S("line",{x1:-4,y1:-172,x2:4,y2:-172,stroke:"#3c3a34","stroke-width":1},cl);
   }
-  S("circle",{cx:0,cy:0,r:152,fill:"none",stroke:"#0f0a05","stroke-width":3},g);
-  T($("gWork"),MOVX,MOVY+218,"PORTE-MOUVEMENT",8.5,{fill:"#c9b493",anchor:"middle",ls:3}).setAttribute("opacity",.45);
+  S("circle",{cx:0,cy:0,r:152,fill:"none",stroke:"#14120f","stroke-width":3},g);
 })();
 /* ============================================================
    THE CALIBRE O-46 — layout in movement-local coordinates
@@ -891,12 +904,12 @@ function ghostShow(step){
   ghostClear();
   var t=targetGlobal(step);
   var gx=MOVX+(step.gx!=null?step.gx:step.tx), gy=MOVY+(step.gy!=null?step.gy:step.ty);
-  var c=S("circle",{cx:gx,cy:gy,r:step.gr,fill:"none",stroke:"#e9dfc8","stroke-width":1.2,
-    "stroke-dasharray":"5 7",opacity:.34},gGhost);
+  var c=S("circle",{cx:gx,cy:gy,r:step.gr,fill:"none",stroke:"#dfe4da","stroke-width":1,
+    "stroke-dasharray":"2 6",opacity:.2},gGhost);
   gGhost._c=c;
 }
 function ghostClear(){while(gGhost.firstChild)gGhost.removeChild(gGhost.firstChild);gGhost._c=null;}
-function ghostNear(n){if(gGhost._c)gGhost._c.setAttribute("opacity",n?.9:.34);}
+function ghostNear(n){if(gGhost._c)gGhost._c.setAttribute("opacity",n?.55:.2);}
 
 function spawnPart(step){
   var node=S("g",{filter:"url(#tinySh)",cursor:"grab"},$("gFloat"));
@@ -1003,7 +1016,7 @@ function screwMode(step,side){
   var left=step.screws.length;
   step.screws.forEach(function(sp){
     var sg=S("g",{transform:"translate("+sp.x+" "+sp.y+")",cursor:"pointer",filter:"url(#tinySh)"},screwLayer);
-    var halo=S("circle",{cx:0,cy:0,r:9.5,fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.7},sg);
+    var halo=S("circle",{cx:0,cy:0,r:9.5,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},sg);
     var head=screwHead(4.6);sg.appendChild(head);
     var hit=S("circle",{cx:0,cy:0,r:15,fill:"transparent"},sg);
     var done=false;
@@ -1028,8 +1041,8 @@ function screwMode(step,side){
 function windMode(){
   state.mode="wind";
   var ratchet=gSideM.querySelector("#ratchetScrew");
-  var halo=S("circle",{cx:L.barrel.x,cy:L.barrel.y,r:22,fill:"none",stroke:"#e9dfc8",
-    "stroke-width":1.2,"stroke-dasharray":"4 6",opacity:.8},gSideM);
+  var halo=S("circle",{cx:L.barrel.x,cy:L.barrel.y,r:22,fill:"none",stroke:"#dfe4da",
+    "stroke-width":1,"stroke-dasharray":"2 6",opacity:.45},gSideM);
   var hit=S("circle",{cx:L.barrel.x,cy:L.barrel.y,r:34,fill:"transparent",cursor:"pointer"},gSideM);
   var wound=0,holding=false,last=0,lastClick=0,ang=0;
   function step(ts){
@@ -1073,7 +1086,7 @@ function magicMoment(){
 function flipMode(){
   state.mode="action";
   var hit=S("circle",{cx:MOVX,cy:MOVY,r:200,fill:"transparent",cursor:"pointer"},$("gWork"));
-  var hint=S("circle",{cx:MOVX,cy:MOVY,r:186,fill:"none",stroke:"#e9dfc8","stroke-width":1.2,"stroke-dasharray":"5 8",opacity:.5},$("gWork"));
+  var hint=S("circle",{cx:MOVX,cy:MOVY,r:186,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"2 7",opacity:.3},$("gWork"));
   hit.addEventListener("pointerdown",function(){
     hit.remove();hint.remove();state.mode="wait";
     SND.pick();
@@ -1105,7 +1118,7 @@ function setMode(){
   state.mode="action";
   var a=state.arch;
   var hit=S("circle",{cx:MOVX+a.caseOut+a.crownR-4,cy:MOVY,r:30,fill:"transparent",cursor:"pointer"},$("gWork"));
-  var hint=S("circle",{cx:MOVX+a.caseOut+a.crownR-4,cy:MOVY,r:a.crownR+8,fill:"none",stroke:"#e9dfc8","stroke-width":1.1,"stroke-dasharray":"3 5",opacity:.8},$("gWork"));
+  var hint=S("circle",{cx:MOVX+a.caseOut+a.crownR-4,cy:MOVY,r:a.crownR+8,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"2 5",opacity:.45},$("gWork"));
   hit.addEventListener("pointerdown",function(){
     hit.remove();hint.remove();state.mode="wait";
     SND.snap();SND.whirr();
@@ -1220,10 +1233,10 @@ function commission(){
     c.addEventListener("pointerdown",function(){
       if(state.mode!=="choose")return;
       state.mode="wait";audio();SND.paper();
-      tween(700,function(p){
-        cards.setAttribute("transform","translate(0 "+(p*560)+")");
+      tween(620,function(p){
+        cards.setAttribute("transform","translate(0 "+(p*36)+")");
         cards.setAttribute("opacity",1-p);
-      },function(){cards.remove();start(a);},easeIn);
+      },function(){cards.remove();start(a);});
     });
   });
 }
