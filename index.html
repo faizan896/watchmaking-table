@@ -140,9 +140,9 @@ key.shadow.mapSize.set(2048,2048);key.shadow.radius=6;
 key.shadow.camera.left=-3;key.shadow.camera.right=3;key.shadow.camera.top=3;key.shadow.camera.bottom=-3;
 scene.add(key);
 const rim=new THREE.DirectionalLight(0xdce8f2,.7);rim.position.set(-4,2,-3);scene.add(rim);
-/* soft fill from the camera so face-on metal never reads black */
-const fill=new THREE.PointLight(0xfff4e2,14,0,2);
-camera.add(fill);fill.position.set(.4,.6,.2);scene.add(camera);
+/* front light rides with the camera: face-on metal and dials stay alive */
+const front=new THREE.DirectionalLight(0xfff2e0,1.15);
+scene.add(front);scene.add(front.target);
 
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.ShadowMaterial({opacity:.42}));
 ground.rotation.x=-Math.PI/2;ground.position.y=-1.75;ground.receiveShadow=true;scene.add(ground);
@@ -154,8 +154,9 @@ addEventListener('resize',()=>{
 
 /* ————— materials ————— */
 function metalMat(c,rough,aniso){
-  const m=new THREE.MeshPhysicalMaterial({color:c,metalness:1,roughness:rough,envMapIntensity:1.25});
-  if(aniso){m.anisotropy=.9;m.roughness=Math.max(rough,.28);}
+  const m=new THREE.MeshPhysicalMaterial({color:c,metalness:1,
+    roughness:Math.max(rough,.13),envMapIntensity:1.25});
+  if(aniso){m.anisotropy=.9;m.roughness=Math.max(rough,.3);}
   return m;
 }
 const METALS={
@@ -528,8 +529,8 @@ function buildDial(dl,cs,mv){
   fixUV(geo);
   const tex=dialCanvas(dl,mv.k,shapeKind);
   const mat=new THREE.MeshPhysicalMaterial({map:tex,
-    metalness:dl.metalDial?.55:.08,roughness:dl.gloss?.1:(dl.metalDial?.32:.5),
-    clearcoat:dl.gloss?1:0,clearcoatRoughness:.06,envMapIntensity:1});
+    metalness:dl.metalDial?.3:.05,roughness:dl.gloss?.12:(dl.metalDial?.36:.55),
+    clearcoat:dl.gloss?1:0,clearcoatRoughness:.06,envMapIntensity:.9});
   const m=new THREE.Mesh(geo,mat);g.add(m);
   /* applied markers on sunray sheets */
   if(dl.applied&&!cs.rect){
@@ -904,6 +905,8 @@ function update(){
   if(CLOCK.sec)CLOCK.sec.rotation.z=-s*Math.PI/30;
   if(MOV&&MOV.bal)MOV.bal.rotation.z=.85*Math.sin(t*Math.PI*2*2.5);
   if(MOV&&MOV.rotor)MOV.rotor.rotation.z=.9*Math.sin(t*.6)+t*.12;
+  front.position.copy(camera.position).multiplyScalar(1.2);
+  front.position.y+=1.2;
   controls.update();
 }
 function frame(){update();renderer.render(scene,camera);}
