@@ -66,8 +66,25 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <stop offset="0" stop-color="#3a423c"/><stop offset="1" stop-color="#2d342f"/>
   </radialGradient>
   <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#f0efe9"/><stop offset=".45" stop-color="#c9c7bd"/><stop offset="1" stop-color="#8f8d84"/>
+    <stop offset="0" stop-color="#f6f5f0"/><stop offset=".35" stop-color="#d9d7cd"/>
+    <stop offset=".62" stop-color="#a9a79d"/><stop offset="1" stop-color="#83817a"/>
   </linearGradient>
+  <pattern id="brushP" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+    <line x1="0" y1="0" x2="3" y2="0" stroke="#fff" stroke-width=".5" opacity=".05"/>
+    <line x1="0" y1="1.5" x2="3" y2="1.5" stroke="#000" stroke-width=".5" opacity=".06"/>
+  </pattern>
+  <pattern id="tropic" width="12" height="12" patternUnits="userSpaceOnUse">
+    <rect width="12" height="12" fill="#2c3134"/>
+    <path d="M0 6 L6 0 L12 6 L6 12 Z" fill="none" stroke="#1d2124" stroke-width="1.6"/>
+    <circle cx="6" cy="6" r="1" fill="#3a4145"/>
+  </pattern>
+  <pattern id="weave" width="8" height="8" patternUnits="userSpaceOnUse">
+    <rect width="8" height="8" fill="#6a6248"/>
+    <rect x="0" y="0" width="4" height="4" fill="#756c50"/>
+    <rect x="4" y="4" width="4" height="4" fill="#756c50"/>
+    <rect x="4" y="0" width="4" height="4" fill="#5d5640"/>
+    <rect x="0" y="4" width="4" height="4" fill="#5d5640"/>
+  </pattern>
   <linearGradient id="maillechort" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#e7ddc7"/><stop offset=".5" stop-color="#d3c7ad"/><stop offset="1" stop-color="#b3a488"/>
   </linearGradient>
@@ -633,90 +650,295 @@ function pBalanceAssy(){
 }
 
 /* ============================================================
-   ARCHITECTURES — three watches, three characters
+   THE CATALOGUE — every stage offers real geometry, not colour
    ============================================================ */
-var ARCHS={
-  m:{ key:"m", name:"Méridienne", ref:"RÉF. 1859-M",
-      caseOut:158, opening:134, metal:"steel", lugs:"curved", crownR:11, crownKnurl:18,
-      dial:"argent", strap:"tan", numerals:[["12",0,-96],["3",96,4],["6",0,102],["9",-96,4]],
-      story:["A dress instrument. Thin bezel, curved","lugs drawn with one French curve.","Oxidized silver sheet, meridian at noon."]},
-  hv:{ key:"hv", name:"Heure Vraie", ref:"RÉF. 1874-HV",
-      caseOut:164, opening:134, metal:"steel", lugs:"strong", crownR:14, crownKnurl:24,
-      dial:"enamel", subdial:true, numerals:[["12",0,-96],["3",96,4],["9",-96,4]],
-      story:["The signature. Grand feu enamel, and a","register for solar time at your longitude.","A micrometer crown, sized for gloves."]},
-  t:{ key:"t", name:"Tantale", ref:"RÉF. 2019-T",
-      caseOut:168, opening:134, metal:"tantalum", lugs:"integrated", crownR:12, crownKnurl:20,
-      dial:"glacier", strap:"mesh", numerals:[["12",0,-96],["6",0,102]],
-      story:["Tantalum — the blue-grey of glacial water,","stubborn to machine. Integrated case,","milanese mesh, baton geometry."]}
+var SEL={movement:null,dial:null,hands:null,caze:null,bezel:null,crystal:null,strap:null};
+var CAT={
+  movement:{label:"CALIBRE",title:"Le calibre",
+    lines:["Two layouts of the same O-46.","Centre seconds sweeps the sheet;","petite seconde keeps its own register."],
+    items:[
+      {k:"centre",name:"Trotteuse centrale",d:"seconde au centre"},
+      {k:"petite",name:"Petite seconde",d:"registre à 6 heures"}]},
+  dial:{label:"CADRAN",title:"Le cadran",
+    lines:["Six sheets, six architectures.","Typography, track and balance differ —","not the colour. Never only the colour."],
+    items:[
+      {k:"sector",name:"Secteur",base:"#d9d5c8"},
+      {k:"california",name:"California",base:"#ece4cf"},
+      {k:"explorer",name:"Explorateur",base:"#cdd9d6"},
+      {k:"railroad",name:"Chemin de fer",base:"#e7e0cc"},
+      {k:"enamel",name:"Émail",base:"#f6f2e8"},
+      {k:"field",name:"Champ",base:"#26221b"}]},
+  hands:{label:"AIGUILLES",title:"Les aiguilles",
+    lines:["Each pattern balances differently","over the same cannon pinion.","Choose what your eye should find first."],
+    items:[
+      {k:"dauphine",name:"Dauphine"},
+      {k:"sword",name:"Glaive"},
+      {k:"breguet",name:"Breguet"},
+      {k:"leaf",name:"Feuille"},
+      {k:"cathedral",name:"Cathédrale"},
+      {k:"mercedes",name:"Mercedes"}]},
+  caze:{label:"BOÎTE",title:"La boîte",
+    lines:["Six architectures, six centres of","gravity. Lugs, guards and girth are","engineering, not decoration."],
+    items:[
+      {k:"dress",name:"Habillée",shape:"round",R:150,lug:"wire",crownR:9,crown:"fine",metal:"steel"},
+      {k:"diver",name:"Plongée",shape:"round",R:162,lug:"strong",crownR:11,crown:"guarded",metal:"steel"},
+      {k:"pilot",name:"Pilote",shape:"round",R:164,lug:"straight",crownR:15,crown:"onion",metal:"steel"},
+      {k:"cushion",name:"Coussin",shape:"cushion",R:158,lug:"none",crownR:10,crown:"fine",metal:"steel"},
+      {k:"tonneau",name:"Tonneau",shape:"tonneau",R:150,lug:"none",crownR:9,crown:"fine",metal:"steel"},
+      {k:"octo",name:"Octogonale",shape:"octo",R:160,lug:"none",crownR:10,crown:"flat",metal:"tantalum"}]},
+  bezel:{label:"LUNETTE",title:"La lunette",
+    lines:["The bezel is engineering you can","hold. A scale, a grip, or silence."],
+    items:[
+      {k:"smooth",name:"Lisse"},
+      {k:"coin",name:"Monnaie"},
+      {k:"fluted",name:"Cannelée"},
+      {k:"dive",name:"Plongée 60"},
+      {k:"tachy",name:"Tachymètre"}]},
+  crystal:{label:"GLACE",title:"La glace",
+    lines:["Flat reads the sheet honestly;","the dome bends the light; the box","stands the dial in a vitrine."],
+    items:[
+      {k:"flat",name:"Plate"},
+      {k:"domed",name:"Bombée"},
+      {k:"box",name:"Box"}]},
+  strap:{label:"BRACELET",title:"Le bracelet",
+    lines:["Construction, not colourway.","Links, weave, hide or mesh — each","hangs the same case differently."],
+    items:[
+      {k:"leather",name:"Veau naturel"},
+      {k:"rubber",name:"Tropic"},
+      {k:"canvas",name:"Toile"},
+      {k:"oyster",name:"Oyster"},
+      {k:"jubilee",name:"Jubilé"},
+      {k:"milanese",name:"Milanaise"}]}
 };
-ARCHS.m.strapName="Veau naturel, cousu à plat";
-ARCHS.hv.strapName="Veau brun, tannage végétal";
-ARCHS.t.strapName="Maille milanaise, acier";
-ARCHS.hv.strap="dark";
+function metalFill(c){return c.metal==="tantalum"?"url(#tantalum)":"url(#steel)";}
 
-function metalFill(a){return a.metal==="tantalum"?"url(#tantalum)":"url(#steel)";}
-
-/* ————— case, per architecture ————— */
-function pCase(a){
-  var g=S("g",null), R=a.caseOut, o=a.opening;
-  var lug="";
-  if(a.lugs==="curved"){
-    lug="M-34 -"+(R-10)+" C-40 -"+(R+26)+" -30 -"+(R+42)+" -22 -"+(R+44)+" L22 -"+(R+44)+" C30 -"+(R+42)+" 40 -"+(R+26)+" 34 -"+(R-10)+" Z";
-    lug+="M-34 "+(R-10)+" C-40 "+(R+26)+" -30 "+(R+42)+" -22 "+(R+44)+" L22 "+(R+44)+" C30 "+(R+42)+" 40 "+(R+26)+" 34 "+(R-10)+" Z";
-  }else if(a.lugs==="strong"){
-    lug="M-42 -"+(R-14)+" L-46 -"+(R+40)+" L-30 -"+(R+48)+" L30 -"+(R+48)+" L46 -"+(R+40)+" L42 -"+(R-14)+" Z";
-    lug+="M-42 "+(R-14)+" L-46 "+(R+40)+" L-30 "+(R+48)+" L30 "+(R+48)+" L46 "+(R+40)+" L42 "+(R-14)+" Z";
-  }else{ /* integrated */
-    lug="M-56 -"+(R-22)+" C-58 -"+(R+18)+" -44 -"+(R+34)+" 0 -"+(R+34)+" C44 -"+(R+34)+" 58 -"+(R+18)+" 56 -"+(R-22)+" Z";
-    lug+="M-56 "+(R-22)+" C-58 "+(R+18)+" -44 "+(R+34)+" 0 "+(R+34)+" C44 "+(R+34)+" 58 "+(R+18)+" 56 "+(R-22)+" Z";
+/* ————— cases: six architectures, six silhouettes ————— */
+function shapePath(c){
+  var R=c.R;
+  if(c.shape==="cushion"){
+    var k=R*.92;
+    return "M0 -"+R+" C"+k+" -"+R+" "+R+" -"+k+" "+R+" 0 C"+R+" "+k+" "+k+" "+R+" 0 "+R+
+      " C-"+k+" "+R+" -"+R+" "+k+" -"+R+" 0 C-"+R+" -"+k+" -"+k+" -"+R+" 0 -"+R+"Z";
   }
-  S("path",{d:lug,fill:metalFill(a),stroke:"#3c3a34","stroke-width":1.2},g);
-  S("path",{d:"M-"+R+" 0A"+R+" "+R+" 0 1 0 "+R+" 0A"+R+" "+R+" 0 1 0 -"+R+" 0Z"+circleSub(o),
-    fill:metalFill(a),"fill-rule":"evenodd",stroke:"#3c3a34","stroke-width":1.4},g);
-  S("circle",{cx:0,cy:0,r:(R+o)/2,fill:"none",stroke:"#fff","stroke-width":1.2,opacity:.28},g);
-  S("circle",{cx:0,cy:0,r:o+2,fill:"none",stroke:"#00000044","stroke-width":2},g);
-  S("path",{d:"M -"+(R-4)+" -30 A "+(R-4)+" "+(R-4)+" 0 0 1 -30 -"+(R-4),fill:"none",stroke:"#fff","stroke-width":2.4,opacity:.35,"stroke-linecap":"round"},g);
+  if(c.shape==="tonneau"){
+    var w=150,h=192;
+    return "M-"+w+" 0 C-"+w+" -"+(h*.64)+" -"+(w*.56)+" -"+h+" 0 -"+h+
+      " C"+(w*.56)+" -"+h+" "+w+" -"+(h*.64)+" "+w+" 0"+
+      " C"+w+" "+(h*.64)+" "+(w*.56)+" "+h+" 0 "+h+
+      " C-"+(w*.56)+" "+h+" -"+w+" "+(h*.64)+" -"+w+" 0Z";
+  }
+  if(c.shape==="octo"){
+    var d="",ro=R+4;
+    for(var i=0;i<8;i++){var an=-TAU/16+i*TAU/8;d+=(i?"L":"M")+px(0,ro,an).toFixed(1)+" "+py(0,ro,an).toFixed(1);}
+    return d+"Z";
+  }
+  return "M-"+R+" 0A"+R+" "+R+" 0 1 0 "+R+" 0A"+R+" "+R+" 0 1 0 -"+R+" 0Z";
+}
+function pCase(c){
+  var g=S("g",null), R=c.R, o=134, mf=metalFill(c);
+  /* lugs first, under the body */
+  function lugs(){
+    var d="";
+    if(c.lug==="wire"){
+      [[-27,-1],[27,1]].forEach(function(q){
+        [-1,1].forEach(function(dir){
+          S("rect",{x:q[0]-4.5,y:dir===-1?-(R+40):R-4,width:9,height:44,rx:4.5,
+            fill:mf,stroke:"#4a473f","stroke-width":.9,transform:"rotate("+(q[1]*6*dir)+" "+q[0]+" "+(dir*R)+")"},g);
+        });
+      });
+    }else if(c.lug==="strong"){
+      d="M-44 -"+(R-16)+" L-48 -"+(R+40)+" L-30 -"+(R+50)+" L30 -"+(R+50)+" L48 -"+(R+40)+" L44 -"+(R-16)+" Z";
+      d+="M-44 "+(R-16)+" L-48 "+(R+40)+" L-30 "+(R+50)+" L30 "+(R+50)+" L48 "+(R+40)+" L44 "+(R-16)+" Z";
+      S("path",{d:d,fill:mf,stroke:"#3c3a34","stroke-width":1.2},g);
+      S("path",{d:"M-40 -"+(R+2)+" L-42 -"+(R+38)+" M40 -"+(R+2)+" L42 -"+(R+38)+" M-40 "+(R+2)+" L-42 "+(R+38)+" M40 "+(R+2)+" L42 "+(R+38),
+        stroke:"#fff","stroke-width":1.4,opacity:.25},g);
+    }else if(c.lug==="straight"){
+      d="M-42 -"+(R-18)+" L-36 -"+(R+44)+" L-18 -"+(R+48)+" L-24 -"+(R-4)+" Z";
+      d+="M42 -"+(R-18)+" L36 -"+(R+44)+" L18 -"+(R+48)+" L24 -"+(R-4)+" Z";
+      d+="M-42 "+(R-18)+" L-36 "+(R+44)+" L-18 "+(R+48)+" L-24 "+(R-4)+" Z";
+      d+="M42 "+(R-18)+" L36 "+(R+44)+" L18 "+(R+48)+" L24 "+(R-4)+" Z";
+      S("path",{d:d,fill:mf,stroke:"#3c3a34","stroke-width":1.2},g);
+    }
+  }
+  lugs();
+  /* crown guards for the diver */
+  if(c.crown==="guarded"){
+    S("path",{d:"M"+(R-14)+" -26 C"+(R+16)+" -20 "+(R+16)+" 20 "+(R-14)+" 26 Z",fill:mf,stroke:"#3c3a34","stroke-width":1.1},g);
+  }
+  /* body with opening */
+  var body=shapePath(c)+circleSub(o);
+  S("path",{d:body,fill:mf,"fill-rule":"evenodd",stroke:"#2f2d28","stroke-width":1.5},g);
+  S("path",{d:body,fill:"url(#brushP)","fill-rule":"evenodd"},g);
+  /* chamfer + edge light */
+  S("path",{d:shapePath({shape:c.shape,R:R-5}),fill:"none",stroke:"#fff","stroke-width":1,opacity:.14},g);
+  S("circle",{cx:0,cy:0,r:o+2,fill:"none",stroke:"#000",opacity:.3,"stroke-width":2.4},g);
+  S("path",{d:"M -"+(R-3)+" -34 A "+(R-3)+" "+(R-3)+" 0 0 1 -34 -"+(R-3),fill:"none",stroke:"#fff","stroke-width":2.2,opacity:.3,"stroke-linecap":"round"},g);
+  S("path",{d:"M "+(R-3)+" 34 A "+(R-3)+" "+(R-3)+" 0 0 1 34 "+(R-3),fill:"none",stroke:"#fff","stroke-width":1.4,opacity:.14,"stroke-linecap":"round"},g);
   return g;
 }
-function pCrown(a){
-  var g=S("g",null),r=a.crownR;
+/* ————— bezels: engineering you can hold ————— */
+function ringPath(rOut,rIn){return "M-"+rOut+" 0A"+rOut+" "+rOut+" 0 1 0 "+rOut+" 0A"+rOut+" "+rOut+" 0 1 0 -"+rOut+" 0Z"+circleSub(rIn);}
+function pBezel(b,c){
+  var g=S("g",null), mf=metalFill(c), rIn=138, rOut=c.R-2, k;
+  if(c.shape==="octo"){
+    var oct=shapePath({shape:"octo",R:c.R-8})+circleSub(rIn);
+    S("path",{d:oct,fill:mf,"fill-rule":"evenodd",stroke:"#2f2d28","stroke-width":1.3},g);
+    for(k=0;k<8;k++){
+      var av=-TAU/16+k*TAU/8, sx=px(0,c.R-16,av), sy=py(0,c.R-16,av);
+      var sc=S("g",{transform:"translate("+sx+" "+sy+") rotate("+(k*45+20)+")"},g);
+      S("circle",{cx:0,cy:0,r:4.6,fill:"url(#steel)",stroke:"#44423c","stroke-width":.8},sc);
+      S("line",{x1:-2.8,y1:0,x2:2.8,y2:0,stroke:"#3c3a34","stroke-width":1.6},sc);
+    }
+    rOut=c.R-8;
+  }else{
+    S("path",{d:ringPath(rOut,rIn),fill:mf,"fill-rule":"evenodd",stroke:"#2f2d28","stroke-width":1.2},g);
+  }
+  if(b.k==="coin"){
+    for(k=0;k<130;k++){var a2=k*TAU/130;
+      S("line",{x1:px(0,rOut-4,a2),y1:py(0,rOut-4,a2),x2:px(0,rOut-.5,a2),y2:py(0,rOut-.5,a2),stroke:"#514e46","stroke-width":.8},g);}
+  }else if(b.k==="fluted"){
+    for(k=0;k<48;k++){
+      var f0=k*TAU/48,f1=f0+TAU/96;
+      S("path",{d:sectorCut(rIn+2,rOut-2,f0,f1),fill:k%2?"#f0efe8":"#a9a79d",opacity:.9},g);
+    }
+    S("path",{d:ringPath(rOut,rIn),fill:"none","fill-rule":"evenodd",stroke:"#2f2d28","stroke-width":1.2},g);
+  }else if(b.k==="dive"){
+    S("path",{d:ringPath(rOut-2,rIn+1),fill:"#191d21","fill-rule":"evenodd"},g);
+    for(k=0;k<60;k++){
+      var a3=k*TAU/60,maj=k%5===0,rm=(rOut+rIn)/2;
+      if(k===0)continue;
+      S("line",{x1:px(0,rOut-5,a3-TAU/4),y1:py(0,rOut-5,a3-TAU/4),
+        x2:px(0,rOut-(maj?13:9),a3-TAU/4),y2:py(0,rOut-(maj?13:9),a3-TAU/4),
+        stroke:"#dfe0d8","stroke-width":maj?2.2:1},g);
+    }
+    for(k=1;k<6;k++){
+      var an4=k*TAU/6-TAU/4, t4=S("text",{x:px(0,(rOut+rIn)/2,an4),y:py(0,(rOut+rIn)/2,an4)+5,
+        "text-anchor":"middle","font-family":"Archivo Narrow","font-size":14,"font-weight":600,fill:"#dfe0d8"},g);
+      t4.textContent=k*10;
+    }
+    S("path",{d:"M-7 -"+(rOut-4)+" L7 -"+(rOut-4)+" L0 -"+(rIn+4)+" Z",fill:"#dfe0d8"},g);
+    S("circle",{cx:0,cy:-(rOut+rIn)/2,r:2.6,fill:"#e9e3c8"},g);
+  }else if(b.k==="tachy"){
+    [[500,7.2],[400,9],[300,12],[250,14.4],[200,18],[180,20],[160,22.5],[140,25.7],[120,30],[110,32.7],[100,36],[90,40],[80,45],[70,51.4],[65,55.4],[60,60]].forEach(function(q){
+      var aa=q[1]*6*Math.PI/180-TAU/4;
+      var tt=S("text",{x:px(0,(rOut+rIn)/2,aa),y:py(0,(rOut+rIn)/2,aa)+3.4,
+        "text-anchor":"middle","font-family":"Archivo Narrow","font-size":9.5,"font-weight":600,fill:"#26221b"},g);
+      tt.textContent=q[0];
+      S("line",{x1:px(0,rOut-2,aa),y1:py(0,rOut-2,aa),x2:px(0,rOut-6,aa),y2:py(0,rOut-6,aa),stroke:"#26221b","stroke-width":1},g);
+    });
+    var tl=S("text",{x:0,y:(rOut+rIn)/2+4,"text-anchor":"middle","font-family":"Archivo Narrow","font-size":7.5,fill:"#7c6136","letter-spacing":"2"},g);
+    tl.textContent="TACHYMÈTRE";
+  }else{ /* smooth */
+    S("path",{d:"M -"+(rOut-2)+" -28 A "+(rOut-2)+" "+(rOut-2)+" 0 0 1 -28 -"+(rOut-2),fill:"none",stroke:"#fff","stroke-width":3,opacity:.35,"stroke-linecap":"round"},g);
+    S("path",{d:"M "+(rOut-2)+" 28 A "+(rOut-2)+" "+(rOut-2)+" 0 0 1 28 "+(rOut-2),fill:"none",stroke:"#fff","stroke-width":2,opacity:.16,"stroke-linecap":"round"},g);
+  }
+  return g;
+}
+/* ————— crowns ————— */
+function pCrown(c){
+  var g=S("g",null),r=c.crownR,mf=metalFill(c),k;
   S("rect",{x:-16,y:-3.2,width:16,height:6.4,fill:"url(#steel)"},g);
-  S("circle",{cx:0,cy:0,r:r,fill:metalFill(a),stroke:"#3c3a34","stroke-width":1},g);
-  for(var k=0;k<a.crownKnurl;k++){
-    var an=k*TAU/a.crownKnurl;
-    S("line",{x1:px(0,r-1.5,an),y1:py(0,r-1.5,an),x2:px(0,r+1.5,an),y2:py(0,r+1.5,an),stroke:"#2c2a24","stroke-width":1.4},g);
+  S("circle",{cx:0,cy:0,r:r,fill:mf,stroke:"#3c3a34","stroke-width":1},g);
+  var n=c.crown==="onion"?12:(c.crown==="fine"?30:20);
+  if(c.crown!=="flat"){
+    for(k=0;k<n;k++){var an=k*TAU/n;
+      S("line",{x1:px(0,r-1.6,an),y1:py(0,r-1.6,an),x2:px(0,r+1.4,an),y2:py(0,r+1.4,an),stroke:"#2c2a24","stroke-width":c.crown==="onion"?2.2:1.1},g);}
   }
-  S("circle",{cx:0,cy:0,r:r*.45,fill:"none",stroke:"#00000033","stroke-width":1},g);
+  if(c.crown==="onion"){
+    S("circle",{cx:0,cy:0,r:r*.62,fill:"none",stroke:"#00000030","stroke-width":2},g);
+    S("circle",{cx:0,cy:0,r:r*.3,fill:"url(#steel)",stroke:"#3c3a34","stroke-width":.8},g);
+  }else if(c.crown==="flat"){
+    S("line",{x1:-r*.55,y1:0,x2:r*.55,y2:0,stroke:"#3c3a34","stroke-width":2},g);
+  }else{
+    S("circle",{cx:0,cy:0,r:r*.45,fill:"none",stroke:"#00000033","stroke-width":1},g);
+  }
   return g;
 }
-function pCrystal(a){
-  var g=S("g",null);
-  S("circle",{cx:0,cy:0,r:a.opening+5,fill:"url(#crystalG)",stroke:"#ffffff55","stroke-width":1},g);
-  S("path",{d:"M-72 -86 A 112 112 0 0 1 30 -108",fill:"none",stroke:"#fff","stroke-width":5,opacity:.30,"stroke-linecap":"round"},g);
+/* ————— crystals: three ways to bend light ————— */
+function pCrystal(kk){
+  var g=S("g",null),r=139,k=kk.k;
+  if(k==="flat"){
+    S("circle",{cx:0,cy:0,r:r,fill:"#fff",opacity:.025},g);
+    S("circle",{cx:0,cy:0,r:r,fill:"none",stroke:"#fff","stroke-width":1,opacity:.3},g);
+    S("path",{d:"M-96 -52 L-30 -104",stroke:"#fff","stroke-width":10,opacity:.07,"stroke-linecap":"round"},g);
+    S("path",{d:"M-88 -34 L-14 -96",stroke:"#fff","stroke-width":3,opacity:.10,"stroke-linecap":"round"},g);
+  }else if(k==="domed"){
+    S("circle",{cx:0,cy:0,r:r,fill:"url(#crystalG)"},g);
+    S("circle",{cx:0,cy:0,r:r,fill:"none",stroke:"#fff","stroke-width":1.2,opacity:.35},g);
+    S("circle",{cx:0,cy:0,r:120,fill:"none",stroke:"#fff","stroke-width":7,opacity:.05},g);
+    S("path",{d:"M-84 -78 A 116 116 0 0 1 22 -112",fill:"none",stroke:"#fff","stroke-width":7,opacity:.3,"stroke-linecap":"round"},g);
+    S("path",{d:"M78 84 A 114 114 0 0 0 108 44",fill:"none",stroke:"#fff","stroke-width":4,opacity:.13,"stroke-linecap":"round"},g);
+  }else{ /* box */
+    S("circle",{cx:0,cy:0,r:r,fill:"#fff",opacity:.04},g);
+    S("circle",{cx:0,cy:0,r:r,fill:"none",stroke:"#fff","stroke-width":1.6,opacity:.4},g);
+    S("circle",{cx:0,cy:0,r:127,fill:"none",stroke:"#fff","stroke-width":6,opacity:.10},g);
+    S("circle",{cx:0,cy:0,r:120,fill:"none",stroke:"#fff","stroke-width":1.2,opacity:.2},g);
+    S("path",{d:"M-76 -70 A 104 104 0 0 1 18 -102",fill:"none",stroke:"#fff","stroke-width":5,opacity:.26,"stroke-linecap":"round"},g);
+    S("path",{d:"M-135 -22 A 136 136 0 0 1 -122 -60",fill:"none",stroke:"#fff","stroke-width":4,opacity:.3,"stroke-linecap":"round"},g);
+    S("path",{d:"M135 22 A 136 136 0 0 1 122 60",fill:"none",stroke:"#fff","stroke-width":4,opacity:.2,"stroke-linecap":"round"},g);
+  }
   return g;
 }
-function pStrap(a){
-  var g=S("g",null),R=a.caseOut,w=(a.lugs==="integrated")?100:62;
+/* ————— straps: constructions, not colourways ————— */
+function pStrap(sk,c){
+  var g=S("g",null),R=(c.shape==="round")?c.R:(c.shape==="tonneau"?192:c.R),k=sk.k;
+  var w=(c.shape==="octo")?96:(c.shape==="round"?(c.lug==="strong"?70:62):80);
+  var y0off=(c.shape==="round")?R+42:R+18, y1off=R+215;
   function piece(dir){
-    var y0=dir*(R+6),y1=dir*(R+190);
-    var p=S("g",null,g);
-    if(a.strap==="mesh"){
-      var d="M"+(-w/2)+" "+y0+" L"+(-w/2+6)+" "+y1+" L"+(w/2-6)+" "+y1+" L"+(w/2)+" "+y0+" Z";
-      S("path",{d:d,fill:"url(#mesh)",stroke:"#3c3a34","stroke-width":1.4},p);
-      S("path",{d:d,fill:"url(#steel)",opacity:.14},p);
-      if(dir>0)S("rect",{x:-w/2+8,y:y1-34,width:w-16,height:22,rx:4,fill:"url(#steel)",stroke:"#3c3a34"},p);
-    }else{
-      var grad=a.strap==="tan"?"url(#leatherTan)":"url(#leatherDark)";
-      var d2="M"+(-w/2)+" "+y0+" C"+(-w/2-3)+" "+(y0+dir*60)+" "+(-w/2+9)+" "+y1+" "+(-w/2+13)+" "+y1+
-        " L"+(w/2-13)+" "+y1+" C"+(w/2-9)+" "+y1+" "+(w/2+3)+" "+(y0+dir*60)+" "+(w/2)+" "+y0+" Z";
-      S("path",{d:d2,fill:grad,stroke:"#2c1d10","stroke-width":1.2},p);
-      S("path",{d:"M"+(-w/2+7)+" "+(y0+dir*10)+" L"+(-w/2+16)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.65},p);
-      S("path",{d:"M"+(w/2-7)+" "+(y0+dir*10)+" L"+(w/2-16)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.65},p);
+    var y0=dir*y0off, y1=dir*y1off, p=S("g",null,g), i, rows, t, rw, y;
+    var taper=function(t2){return w*(1-t2*.16);};
+    if(k==="oyster"||k==="jubilee"){
+      rows=Math.floor((y1off-y0off)/24);
+      for(i=0;i<rows;i++){
+        t=i/rows; rw=taper(t); y=dir*(y0off+i*24);
+        var h2=22;
+        if(k==="oyster"){
+          S("rect",{x:-rw/2,y:Math.min(y,y+dir*h2),width:rw*.31,height:h2,rx:5,fill:"url(#steel)",stroke:"#55524a","stroke-width":.7},p);
+          S("rect",{x:rw/2-rw*.31,y:Math.min(y,y+dir*h2),width:rw*.31,height:h2,rx:5,fill:"url(#steel)",stroke:"#55524a","stroke-width":.7},p);
+          S("rect",{x:-rw*.17,y:Math.min(y,y+dir*h2),width:rw*.34,height:h2,rx:5,fill:"#eceae2",stroke:"#8f8d84","stroke-width":.7},p);
+        }else{
+          var ws=[.20,.12,.32,.12,.20], x=-rw/2, j;
+          for(j=0;j<5;j++){
+            S("rect",{x:x,y:Math.min(y,y+dir*h2),width:rw*ws[j],height:h2,rx:4.5,
+              fill:(j%2)?"#eceae2":"url(#steel)",stroke:"#8f8d84","stroke-width":.6},p);
+            x+=rw*ws[j];
+          }
+        }
+      }
+      if(dir>0){
+        S("rect",{x:-w*.4,y:y1-40,width:w*.8,height:30,rx:6,fill:"url(#steel)",stroke:"#55524a","stroke-width":1},p);
+        S("line",{x1:-w*.24,y1:y1-25,x2:w*.24,y2:y1-25,stroke:"#8f8d84","stroke-width":1},p);
+      }
+      return;
+    }
+    var d2="M"+(-w/2)+" "+y0+" C"+(-w/2-3)+" "+(y0+dir*60)+" "+(-w/2+9)+" "+y1+" "+(-w/2+13)+" "+y1+
+      " L"+(w/2-13)+" "+y1+" C"+(w/2-9)+" "+y1+" "+(w/2+3)+" "+(y0+dir*60)+" "+(w/2)+" "+y0+" Z";
+    if(k==="milanese"){
+      S("path",{d:d2,fill:"url(#mesh)",stroke:"#3c3a34","stroke-width":1.3},p);
+      S("path",{d:d2,fill:"url(#steel)",opacity:.13},p);
+      if(dir>0)S("rect",{x:-w/2+6,y:y1-36,width:w-12,height:24,rx:4,fill:"url(#steel)",stroke:"#55524a"},p);
+    }else if(k==="rubber"){
+      S("path",{d:d2,fill:"url(#tropic)",stroke:"#17191b","stroke-width":1.5},p);
+      for(i=0;i<4;i++)S("circle",{cx:0,cy:dir*(y1off-34-i*17),r:2.6,fill:"#141618"},p);
+      if(dir>0)S("rect",{x:-w/2+5,y:y1-16,width:w-10,height:12,rx:6,fill:"none",stroke:"url(#steel)","stroke-width":4.5},p);
+    }else if(k==="canvas"){
+      S("path",{d:d2,fill:"url(#weave)",stroke:"#43402f","stroke-width":1.3},p);
+      S("path",{d:"M"+(-w/2+6)+" "+(y0+dir*8)+" L"+(-w/2+14)+" "+(y1-dir*6),stroke:"#3b382a","stroke-width":1,"stroke-dasharray":"4 4",opacity:.7},p);
+      S("path",{d:"M"+(w/2-6)+" "+(y0+dir*8)+" L"+(w/2-14)+" "+(y1-dir*6),stroke:"#3b382a","stroke-width":1,"stroke-dasharray":"4 4",opacity:.7},p);
+      S("rect",{x:-w/2+4,y:dir>0?y0+22:y0-34,width:w-8,height:12,rx:2,fill:"url(#leatherDark)",stroke:"#241708","stroke-width":.8},p);
+      if(dir>0)S("rect",{x:-w/2+5,y:y1-28,width:w-10,height:15,rx:7,fill:"none",stroke:"url(#brass)","stroke-width":4.5},p);
+      else for(i=0;i<4;i++)S("circle",{cx:0,cy:y1+dir*(-26-i*15),r:2.2,fill:"#2c281c"},p);
+    }else{ /* leather */
+      S("path",{d:d2,fill:"url(#leatherTan)",stroke:"#4a3018","stroke-width":1.2},p);
+      S("path",{d:"M"+(-w/2+7)+" "+(y0+dir*10)+" L"+(-w/2+15)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},p);
+      S("path",{d:"M"+(w/2-7)+" "+(y0+dir*10)+" L"+(w/2-15)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},p);
+      S("path",{d:"M"+(-w/2+10)+" "+(dir*(y0off+34))+" Q0 "+(dir*(y0off+30))+" "+(w/2-10)+" "+(dir*(y0off+34)),fill:"none",stroke:"#4a3018","stroke-width":.8,opacity:.4},p);
+      S("path",{d:"M"+(-w/2+10)+" "+(dir*(y0off+92))+" Q0 "+(dir*(y0off+88))+" "+(w/2-10)+" "+(dir*(y0off+92)),fill:"none",stroke:"#4a3018","stroke-width":.8,opacity:.35},p);
       if(dir>0){
         S("rect",{x:-w/2+4,y:y1-30,width:w-8,height:16,rx:8,fill:"none",stroke:"url(#brass)","stroke-width":5},p);
         S("line",{x1:0,y1:y1-30,x2:0,y2:y1-16,stroke:"url(#brass)","stroke-width":3.4},p);
       }else{
-        for(var h=0;h<4;h++)S("circle",{cx:0,cy:y1+26+h*16,r:2.4,fill:"#241708"},p);
+        for(i=0;i<4;i++)S("circle",{cx:0,cy:y1+26+i*16,r:2.4,fill:"#241708"},p);
       }
     }
   }
@@ -724,85 +946,213 @@ function pStrap(a){
   return g;
 }
 
-/* ————— dials — individually designed, not recoloured ————— */
-function pDial(a){
-  var g=S("g",null),R=138;
-  var fill=a.dial==="glacier"?"#cdd9d6":(a.dial==="enamel"?"#f6f1e4":"#ece4cf");
-  S("circle",{cx:0,cy:0,r:R,fill:fill,stroke:"#8a7a5c","stroke-width":1},g);
-  if(a.dial==="enamel")S("circle",{cx:-34,cy:-40,r:82,fill:"#fff",opacity:.35},g);
-  /* contour relief, faint */
-  for(var i=0;i<5;i++){
-    var d="";
-    for(var an=0;an<=360;an+=10){
-      var t=an*Math.PI/180,rr=26+i*22+Math.sin(an*3*Math.PI/180+2)*6;
-      d+=(an?"L":"M")+((-24)+rr*Math.cos(t)).toFixed(1)+" "+((18)+rr*Math.sin(t)).toFixed(1);
-    }
-    S("path",{d:d+"Z",fill:"none",stroke:"#8a6f52","stroke-width":.5,opacity:.13},g);
+/* ============================================================
+   DIALS — six architectures, six typographies
+   ============================================================ */
+function dialText(g,x,y,str,size,f){
+  f=f||{};
+  var t=S("text",{x:x,y:y,"text-anchor":"middle",
+    "font-family":f.serif?"Cormorant Garamond":"Archivo Narrow",
+    "font-size":size,"font-weight":f.w||600,fill:f.fill||"#26221b",
+    "letter-spacing":f.ls!=null?f.ls:0},g);
+  if(f.italic)t.setAttribute("font-style","italic");
+  t.textContent=str;return t;
+}
+function numeralRing(g,rr,size,f,skip){
+  for(var h2=1;h2<=12;h2++){
+    if(skip&&skip.indexOf(h2)>=0)continue;
+    var an=h2*TAU/12-TAU/4;
+    dialText(g,px(0,rr,an),py(0,rr,an)+size*.34,String(h2),size,f);
   }
-  /* the meridian */
-  S("line",{x1:0,y1:-R+8,x2:0,y2:R-8,stroke:"#8a6f52","stroke-width":.8,opacity:.5},g);
-  /* minute track */
+}
+function minuteTicks(g,R,col,majW,minW){
   for(var m=0;m<60;m++){
-    var am=m*6*Math.PI/180,maj=m%5===0;
-    var r1=maj?R-20:R-15,r2=R-9;
+    var am=m*6*Math.PI/180,maj=m%5===0,r1=maj?R-18:R-13,r2=R-8;
     S("line",{x1:Math.sin(am)*r1,y1:-Math.cos(am)*r1,x2:Math.sin(am)*r2,y2:-Math.cos(am)*r2,
-      stroke:"#211d16","stroke-width":maj?1.6:.7},g);
+      stroke:col,"stroke-width":maj?(majW||1.6):(minW||.7)},g);
   }
-  if(a.dial==="glacier"){ /* batons instead of most numerals */
-    for(var b=0;b<12;b++){
-      if(b===0||b===6)continue;
-      var ab=b*30*Math.PI/180;
-      S("rect",{x:-3,y:-(R-24),width:6,height:16,fill:"#211d16",
-        transform:"rotate("+(b*30)+")"},g);
+}
+function pDial(dk,mv){
+  var g=S("g",null),R=138,k=dk.k,base=dk.base,ink=k==="field"?"#e9e3c8":"#26221b",sub=k==="field"?"#9a927c":"#8a6f52";
+  S("circle",{cx:0,cy:0,r:R,fill:base,stroke:k==="field"?"#0e0c09":"#8a7a5c","stroke-width":1.2},g);
+  S("circle",{cx:0,cy:0,r:R-2,fill:"none",stroke:"#000",opacity:.10,"stroke-width":3},g);
+  /* the meridian — the house hairline, always */
+  S("line",{x1:0,y1:-R+7,x2:0,y2:R-7,stroke:sub,"stroke-width":.7,opacity:.45},g);
+
+  if(k==="sector"){
+    S("circle",{cx:0,cy:0,r:94,fill:"none",stroke:ink,"stroke-width":1.2},g);
+    S("circle",{cx:0,cy:0,r:62,fill:"none",stroke:ink,"stroke-width":.9},g);
+    S("circle",{cx:0,cy:0,r:30,fill:"none",stroke:ink,"stroke-width":.6,opacity:.7},g);
+    for(var s1=0;s1<12;s1++){
+      var as=s1*TAU/12;
+      S("line",{x1:px(0,62,as),y1:py(0,62,as),x2:px(0,94,as),y2:py(0,94,as),stroke:ink,"stroke-width":.9},g);
+    }
+    minuteTicks(g,R,ink,1.4,.6);
+    numeralRing(g,112,19,{serif:true,w:600});
+  }else if(k==="california"){
+    minuteTicks(g,R,ink);
+    S("path",{d:"M-9 -104 L9 -104 L0 -86 Z",fill:ink},g);
+    S("path",{d:"M-7 104 L7 104 L0 88 Z",fill:ink},g);
+    [[1,"I"],[2,"II"],[10,"X"],[11,"XI"]].forEach(function(q){
+      var an5=q[0]*TAU/12-TAU/4;
+      dialText(g,px(0,100,an5),py(0,100,an5)+8,q[1],23,{serif:true,w:600});
+    });
+    [4,5,7,8].forEach(function(h5){
+      var an6=h5*TAU/12-TAU/4;
+      dialText(g,px(0,100,an6),py(0,100,an6)+8,String(h5),23,{w:600});
+    });
+    [3,9].forEach(function(h6){
+      S("rect",{x:h6===3?86:-108,y:-4,width:22,height:8,fill:ink},g);
+    });
+  }else if(k==="explorer"){
+    minuteTicks(g,R,ink,1.8,.8);
+    S("path",{d:"M-11 -114 L11 -114 L0 -92 Z",fill:ink},g);
+    [3,6,9].forEach(function(h7){
+      var an7=h7*TAU/12-TAU/4;
+      dialText(g,px(0,101,an7),py(0,101,an7)+11,String(h7),32,{w:600});
+    });
+    [1,2,4,5,7,8,10,11].forEach(function(h8){
+      var an8=h8*TAU/12-TAU/4;
+      var bt=S("g",{transform:"rotate("+(h8*30)+")"},g);
+      S("rect",{x:-4,y:-116,width:8,height:24,fill:ink,stroke:k==="explorer"&&dk.base==="#cdd9d6"?"#26221b":"none","stroke-width":.6},bt);
+    });
+  }else if(k==="railroad"){
+    S("circle",{cx:0,cy:0,r:120,fill:"none",stroke:ink,"stroke-width":1},g);
+    S("circle",{cx:0,cy:0,r:107,fill:"none",stroke:ink,"stroke-width":1},g);
+    for(var m2=0;m2<60;m2++){
+      var am2=m2*6*Math.PI/180;
+      S("line",{x1:Math.sin(am2)*107,y1:-Math.cos(am2)*107,x2:Math.sin(am2)*120,y2:-Math.cos(am2)*120,
+        stroke:ink,"stroke-width":m2%5===0?1.8:.8},g);
+    }
+    numeralRing(g,88,22,{w:400,ls:.5});
+    S("line",{x1:-24,y1:0,x2:24,y2:0,stroke:ink,"stroke-width":.6,opacity:.5},g);
+  }else if(k==="enamel"){
+    S("circle",{cx:-30,cy:-36,r:88,fill:"#fff",opacity:.4},g);
+    S("circle",{cx:0,cy:0,r:119,fill:"none",stroke:ink,"stroke-width":.7},g);
+    S("circle",{cx:0,cy:0,r:116,fill:"none",stroke:ink,"stroke-width":.7},g);
+    for(var m3=0;m3<12;m3++){
+      var am3=m3*TAU/12;
+      S("circle",{cx:px(0,126,am3),cy:py(0,126,am3),r:1.7,fill:"#2c3a5c"},g);
+    }
+    numeralRing(g,98,29,{serif:true,w:500});
+  }else if(k==="field"){
+    minuteTicks(g,R,ink,1.8,.8);
+    S("path",{d:"M-10 -112 L10 -112 L0 -94 Z",fill:ink},g);
+    numeralRing(g,100,26,{w:600,fill:ink},[12]);
+    for(var h9=13;h9<=24;h9++){
+      var an9=(h9-12)*TAU/12-TAU/4;
+      dialText(g,px(0,64,an9),py(0,64,an9)+4,String(h9),11,{w:400,fill:sub});
     }
   }
-  a.numerals.forEach(function(n){
-    T(g,n[1],n[2]+8,n[0],a.dial==="glacier"?24:22,{anchor:"middle",fill:"#211d16",w:600,ls:0});
-  });
-  var wm=T(g,0,-48,"Calame",21,{serif:true,italic:true,w:600,anchor:"middle",fill:"#211d16",ls:0});
-  T(g,0,-33,"LE LOCLE",6.5,{anchor:"middle",fill:"#8a6f52",ls:2.4});
-  if(a.subdial){
-    var sd=S("g",{transform:"translate(0 62)"},g);
-    S("circle",{cx:0,cy:0,r:32,fill:"#eee7d4",stroke:"#8a6f52","stroke-width":.8},sd);
-    for(var k2=0;k2<12;k2++){
-      var a2=k2*TAU/12;
-      S("line",{x1:px(0,26,a2),y1:py(0,26,a2),x2:px(0,30,a2),y2:py(0,30,a2),stroke:"#8a6f52","stroke-width":.8},sd);
+  /* sheen — one window's worth of light */
+  S("ellipse",{cx:-42,cy:-48,rx:92,ry:62,fill:"#fff",opacity:k==="field"?.045:.07},g);
+  /* wordmark — printed, never applied */
+  dialText(g,0,-46,"Calame",20,{serif:true,italic:true,w:600,fill:ink});
+  dialText(g,0,-32,"LE LOCLE",6.5,{fill:sub,ls:2.4,w:400});
+  /* petite seconde register */
+  if(mv==="petite"){
+    var sd=S("g",{transform:"translate(0 58)"},g);
+    S("circle",{cx:0,cy:0,r:29,fill:k==="field"?"#1d1a14":"#00000012",stroke:sub,"stroke-width":.8},sd);
+    S("circle",{cx:0,cy:0,r:22,fill:"none",stroke:sub,"stroke-width":.5,opacity:.6},sd);
+    for(var k3=0;k3<12;k3++){
+      var a4=k3*TAU/12;
+      S("line",{x1:px(0,24,a4),y1:py(0,24,a4),x2:px(0,28,a4),y2:py(0,28,a4),stroke:k==="field"?ink:"#26221b","stroke-width":k3%3===0?1.2:.7},sd);
     }
-    T(sd,0,46,"HEURE VRAIE · 6°45´E",5.5,{anchor:"middle",fill:"#8a6f52",ls:1.4});
-  }else{
-    T(g,0,84,a.dial==="glacier"?"TANTALE":"MÉRIDIENNE",6,{anchor:"middle",fill:"#8a6f52",ls:2.6});
   }
-  S("circle",{cx:0,cy:0,r:4,fill:"#211d16"},g);
+  S("circle",{cx:0,cy:0,r:4,fill:k==="field"?"#e9e3c8":"#26221b"},g);
   return g;
 }
-/* divider-needle hands */
-function needle(len,w,cw,color){
-  var g=S("g",null);
-  S("path",{d:"M0 "+(-len)+" L"+w+" 0 L0 14 L"+(-w)+" 0 Z",fill:color||"#211d16"},g);
-  S("circle",{cx:0,cy:cw,r:4.4,fill:"none",stroke:color||"#211d16","stroke-width":1.8},g);
-  S("circle",{cx:0,cy:0,r:4.2,fill:color||"#211d16"},g);
+/* ============================================================
+   HANDS — six patterns over the same cannon pinion
+   ============================================================ */
+var LUME="#e9e3c8", BLUED="#31456e", INKH="#26221b";
+function secBase(g,len,color,lolli){
+  S("line",{x1:0,y1:30,x2:0,y2:-(len-22),stroke:color,"stroke-width":1.4},g);
+  if(lolli)S("circle",{cx:0,cy:-(len-40),r:6,fill:LUME,stroke:color,"stroke-width":1.6},g);
+  S("line",{x1:0,y1:-(len-22),x2:0,y2:-len,stroke:"#c9391b","stroke-width":2.2},g);
+  S("circle",{cx:0,cy:30,r:4,fill:color},g);
+  S("circle",{cx:0,cy:0,r:2.6,fill:color},g);
   return g;
 }
-function pHandH(){return needle(72,4.2,20);}
-function pHandM(){return needle(106,3.2,24);}
+var HSTY={
+  dauphine:{
+    h:function(){var g=S("g",null);
+      S("path",{d:"M0 -76 L7.5 0 L0 10 Z",fill:"#eceae2",stroke:"#55524a","stroke-width":.7},g);
+      S("path",{d:"M0 -76 L-7.5 0 L0 10 Z",fill:"#96948a",stroke:"#55524a","stroke-width":.7},g);
+      S("circle",{cx:0,cy:0,r:4.6,fill:"#b9b7ac",stroke:"#55524a"},g);return g;},
+    m:function(){var g=S("g",null);
+      S("path",{d:"M0 -110 L5.6 0 L0 10 Z",fill:"#eceae2",stroke:"#55524a","stroke-width":.7},g);
+      S("path",{d:"M0 -110 L-5.6 0 L0 10 Z",fill:"#96948a",stroke:"#55524a","stroke-width":.7},g);return g;},
+    s:function(){return secBase(S("g",null),116,"#44423c");}},
+  sword:{
+    h:function(){var g=S("g",null);
+      S("path",{d:"M0 -80 L9 -16 L7 10 L-7 10 L-9 -16 Z",fill:INKH},g);
+      S("path",{d:"M0 -70 L5 -18 L0 -8 L-5 -18 Z",fill:LUME},g);
+      S("circle",{cx:0,cy:0,r:5,fill:INKH},g);return g;},
+    m:function(){var g=S("g",null);
+      S("path",{d:"M0 -114 L6.6 -20 L5 10 L-5 10 L-6.6 -20 Z",fill:INKH},g);
+      S("path",{d:"M0 -104 L3.6 -24 L0 -12 L-3.6 -24 Z",fill:LUME},g);return g;},
+    s:function(){return secBase(S("g",null),118,INKH,true);}},
+  breguet:{
+    h:function(){var g=S("g",null);
+      S("line",{x1:0,y1:8,x2:0,y2:-48,stroke:BLUED,"stroke-width":3.4},g);
+      S("circle",{cx:0,cy:-56,r:7.5,fill:"none",stroke:BLUED,"stroke-width":3.2},g);
+      S("path",{d:"M0 -78 L3.4 -63 L-3.4 -63 Z",fill:BLUED},g);
+      S("circle",{cx:0,cy:0,r:4.6,fill:BLUED},g);return g;},
+    m:function(){var g=S("g",null);
+      S("line",{x1:0,y1:8,x2:0,y2:-84,stroke:BLUED,"stroke-width":2.6},g);
+      S("circle",{cx:0,cy:-91,r:6.4,fill:"none",stroke:BLUED,"stroke-width":2.6},g);
+      S("path",{d:"M0 -112 L3 -98 L-3 -98 Z",fill:BLUED},g);return g;},
+    s:function(){return secBase(S("g",null),114,BLUED);}},
+  leaf:{
+    h:function(){var g=S("g",null);
+      S("path",{d:"M0 -78 C8.5 -54 8.5 -22 3.4 8 L-3.4 8 C-8.5 -22 -8.5 -54 0 -78 Z",fill:BLUED},g);
+      S("circle",{cx:0,cy:0,r:4.6,fill:BLUED},g);return g;},
+    m:function(){var g=S("g",null);
+      S("path",{d:"M0 -112 C6.6 -80 6.6 -30 2.8 8 L-2.8 8 C-6.6 -30 -6.6 -80 0 -112 Z",fill:BLUED},g);return g;},
+    s:function(){return secBase(S("g",null),116,BLUED);}},
+  cathedral:{
+    h:function(){var g=S("g",null);
+      S("line",{x1:0,y1:10,x2:0,y2:-22,stroke:INKH,"stroke-width":4},g);
+      S("circle",{cx:0,cy:-33,r:10,fill:LUME,stroke:INKH,"stroke-width":3},g);
+      S("line",{x1:-9,y1:-33,x2:9,y2:-33,stroke:INKH,"stroke-width":1.6},g);
+      S("line",{x1:0,y1:-43,x2:0,y2:-58,stroke:INKH,"stroke-width":3.4},g);
+      S("path",{d:"M0 -74 L5 -58 L-5 -58 Z",fill:LUME,stroke:INKH,"stroke-width":1.6},g);
+      S("circle",{cx:0,cy:0,r:5,fill:INKH},g);return g;},
+    m:function(){var g=S("g",null);
+      S("line",{x1:0,y1:10,x2:0,y2:-44,stroke:INKH,"stroke-width":3.4},g);
+      S("circle",{cx:0,cy:-53,r:8,fill:LUME,stroke:INKH,"stroke-width":2.6},g);
+      S("line",{x1:0,y1:-61,x2:0,y2:-96,stroke:INKH,"stroke-width":2.8},g);
+      S("path",{d:"M0 -112 L4.4 -97 L-4.4 -97 Z",fill:LUME,stroke:INKH,"stroke-width":1.4},g);return g;},
+    s:function(){return secBase(S("g",null),114,INKH);}},
+  mercedes:{
+    h:function(){var g=S("g",null);
+      S("line",{x1:0,y1:10,x2:0,y2:-38,stroke:INKH,"stroke-width":5},g);
+      S("circle",{cx:0,cy:-50,r:11,fill:LUME,stroke:INKH,"stroke-width":2.6},g);
+      for(var k4=0;k4<3;k4++)S("line",{x1:0,y1:-50,x2:px(0,11,k4*TAU/3-TAU/4),y2:py(-50,11,k4*TAU/3-TAU/4)+0,stroke:INKH,"stroke-width":2.2},g);
+      S("path",{d:"M0 -70 L4.6 -60 L-4.6 -60 Z",fill:INKH},g);
+      S("circle",{cx:0,cy:0,r:5.2,fill:INKH},g);return g;},
+    m:function(){var g=S("g",null);
+      S("path",{d:"M0 -112 L6 -24 L4.6 10 L-4.6 10 L-6 -24 Z",fill:INKH},g);
+      S("path",{d:"M0 -102 L3.2 -28 L0 -16 L-3.2 -28 Z",fill:LUME},g);return g;},
+    s:function(){return secBase(S("g",null),118,INKH,true);}}
+};
+function pHandH(){return HSTY[SEL.hands.k].h();}
+function pHandM(){return HSTY[SEL.hands.k].m();}
 function pHandS(){
-  var g=S("g",null);
-  S("line",{x1:0,y1:26,x2:0,y2:-96,stroke:"#211d16","stroke-width":1.4},g);
-  S("line",{x1:0,y1:-96,x2:0,y2:-116,stroke:"#c9391b","stroke-width":2.2},g);
-  S("circle",{cx:0,cy:26,r:3.6,fill:"#211d16"},g);
-  S("circle",{cx:0,cy:0,r:2.6,fill:"#211d16"},g);
-  return g;
-}
-function pHandHV(){
-  var g=S("g",null);
-  S("path",{d:"M0 -26 L2.4 0 L0 6 L-2.4 0 Z",fill:"#3a4a7a"},g);
-  S("circle",{cx:0,cy:0,r:2.2,fill:"#3a4a7a"},g);
-  return g;
+  if(SEL.movement.k==="petite"){
+    var g=S("g",null);
+    S("line",{x1:0,y1:8,x2:0,y2:-16,stroke:"#44423c","stroke-width":1.2},g);
+    S("line",{x1:0,y1:-16,x2:0,y2:-24,stroke:"#c9391b","stroke-width":1.8},g);
+    S("circle",{cx:0,cy:0,r:2,fill:"#44423c"},g);
+    return g;
+  }
+  return HSTY[SEL.hands.k].s();
 }
 /* ============================================================
    STATE & SCENE GRAPH FOR THE BUILD
    ============================================================ */
-var state={arch:null,idx:0,steps:[],mode:"idle",alive:false,tAlive:0,timeSet:false,handBase:{h:305,m:54,s:0,hv:-30},tSecMount:0,setAnim:null};
+var state={idx:0,steps:[],mode:"idle",alive:false,tAlive:0,timeSet:false,handBase:{h:305,m:54,s:0},tSecMount:0,setAnim:null};
 var gMovWrap=S("g",{transform:"translate("+MOVX+" "+MOVY+")"},$("gWork"));
 var gFlip=S("g",null,gMovWrap);
 var gSideM=S("g",null,gFlip);   /* movement side */
@@ -826,11 +1176,12 @@ function svgPt(e){
 }
 
 /* ============================================================
-   STEPS — one calibre, assembled the way it is assembled
+   STEPS — decisions interleaved with the montage
    ============================================================ */
-function buildSteps(a){
+function buildSteps(){
   function W(spec){return function(){return pWheelTrain(spec)};}
-  var st=[
+  var petite=SEL.movement.k==="petite";
+  return [
     {k:"PLATINE",title:"La platine",make:pPlate,tx:0,ty:0,gr:140,gx:0,gy:0,snd:"seat",
       lines:["Seat the main plate in the holder.","Everything is measured from here."],
       aside:["Maillechort, untreated","Ø 30.4 mm — 13¼ lignes","Five recesses, five jewels"]},
@@ -842,7 +1193,8 @@ function buildSteps(a){
     {k:"ROUE MOYENNE",title:"La roue moyenne",make:W(L.third),tx:L.third.x,ty:L.third.y,gr:36,snd:"snap",
       lines:["The third wheel, passing the energy","onward. It only ever does this."],aside:["Laiton doré","1 tour / 7½ min"]},
     {k:"ROUE DES SECONDES",title:"La roue des secondes",make:W(L.fourth),tx:L.fourth.x,ty:L.fourth.y,gr:32,snd:"snap",
-      lines:["One turn per minute, exactly.","The trotteuse will ride on her."],aside:["Laiton doré","1 tour / minute"]},
+      lines:["One turn per minute, exactly.",petite?"Your register at six will read her.":"The trotteuse will ride on her."],
+      aside:["Laiton doré","1 tour / minute"]},
     {k:"ÉCHAPPEMENT",title:"La roue d'échappement",make:pEscapeW,tx:L.escape.x,ty:L.escape.y,gr:28,snd:"snap",
       lines:["Fifteen club teeth of hardened steel.","She counts what the others spend."],aside:["Acier trempé, 15 dents","2.5 alternances / s"]},
     {k:"PONT DE ROUAGE",title:"Le pont de rouage",make:pBridgeTrain,tx:0,ty:0,gr:78,gx:70,gy:8,snd:"seat",
@@ -867,43 +1219,53 @@ function buildSteps(a){
     {k:"RETOURNEMENT",type:"flip",title:"Retourner",
       lines:["It runs. Turn the holder over —","the other side belongs to the day."],
       aside:["Côté cadran"]},
-    {k:"CADRAN",title:"Le cadran",make:function(){return pDial(a)},tx:0,ty:0,gr:90,snd:"seat",
-      lines:a.story,aside:[a.ref]},
+    {type:"choose",cat:"dial"},
+    {k:"CADRAN",title:"Le cadran",make:function(){return pDial(SEL.dial,SEL.movement.k)},tx:0,ty:0,gr:90,snd:"seat",
+      lines:["Your sheet. It drops onto its feet","and the day has a face."],
+      aside:function(){return ["Cadran "+SEL.dial.name,petite?"Petite seconde à 6h":"Seconde au centre"]}},
+    {type:"choose",cat:"hands"},
     {k:"AIGUILLE DES HEURES",title:"L'aiguille des heures",make:pHandH,tx:0,ty:0,gr:26,snd:"snap",hand:"h",
-      lines:["The hour hand presses onto the","cannon pinion. A divider needle,","counterweighted like a compass."],aside:["Acier, contrepoids"]},
+      lines:["The hour hand presses onto the","cannon pinion, in the pattern","you chose."],aside:function(){return ["Motif "+SEL.hands.name]}},
     {k:"AIGUILLE DES MINUTES",title:"L'aiguille des minutes",make:pHandM,tx:0,ty:0,gr:26,snd:"snap",hand:"m",
-      lines:["The minute needle, longer and","lighter. Press until it seats."],aside:["Acier, contrepoids"]}
-  ];
-  if(a.subdial)st.push({k:"AIGUILLE SOLAIRE",title:"L'heure vraie",make:pHandHV,tx:0,ty:62,gr:20,snd:"snap",hand:"hv",
-      lines:["The solar hand — your longitude,","measured against civil time."],aside:["Acier bleui","6°45´ Est réglé"]});
-  st.push(
-    {k:"TROTTEUSE",title:"La trotteuse",make:pHandS,tx:0,ty:0,gr:22,snd:"snap",hand:"s",
-      lines:["The seconds needle. Its tip carries","the only vermilion on the watch."],aside:["Pointe: vermillon repère"]},
-    {k:"BOÎTE",title:"La boîte",make:function(){return pCase(a)},tx:0,ty:0,gr:120,snd:"seat",
+      lines:["The minute needle, longer and","lighter. Press until it seats."],aside:function(){return ["Motif "+SEL.hands.name]}},
+    {k:"TROTTEUSE",title:"La trotteuse",make:pHandS,tx:0,ty:petite?58:0,gr:petite?16:22,snd:"snap",hand:"s",
+      lines:petite?["The small seconds, in its own","register. Vermilion at the tip."]:["The seconds needle. Its tip carries","the only vermilion on the watch."],
+      aside:["Pointe: vermillon repère"]},
+    {type:"choose",cat:"caze"},
+    {k:"BOÎTE",title:"La boîte",make:function(){return pCase(SEL.caze)},tx:0,ty:0,gr:120,snd:"seat",
       lines:["The case comes down over the dial","and the movement finds its ring."],
-      aside:[a.metal==="tantalum"?"Tantale, fini main":"Acier, fini main","Fond: coordonnées gravées"]},
-    {k:"COURONNE",title:"La couronne",make:function(){return pCrown(a)},tx:a.caseOut+a.crownR-4,ty:0,gr:26,snd:"snap",
-      lines:["The crown slides home on its stem.","Knurled like a micrometer drum."],aside:["Prise gantée"]},
-    {k:"GLACE",title:"La glace",make:function(){return pCrystal(a)},tx:0,ty:0,gr:90,snd:"thock",
-      lines:["The crystal presses in with one","dull, honest sound."],aside:["Saphir, plat"]},
-    {k:"BRACELET",title:"Le bracelet",make:function(){return pStrap(a)},tx:0,ty:0,gr:130,snd:"springbar",strap:true,
-      lines:["Spring bars — two clicks. The strap","changes everything and hides nothing."],aside:[a.strapName]},
+      aside:function(){return [SEL.caze.name+(SEL.caze.metal==="tantalum"?" · tantale":" · acier"),"Fond: coordonnées gravées"]}},
+    {type:"choose",cat:"bezel"},
+    {k:"LUNETTE",title:"La lunette",make:function(){return pBezel(SEL.bezel,SEL.caze)},tx:0,ty:0,gr:104,snd:"snap",
+      lines:["The bezel presses on with a half","turn. Engineering, seated."],
+      aside:function(){return ["Lunette "+SEL.bezel.name]}},
+    {k:"COURONNE",title:"La couronne",make:function(){return pCrown(SEL.caze)},
+      dtx:function(){return SEL.caze.R+SEL.caze.crownR-4},ty:0,gr:26,snd:"snap",
+      lines:["The crown slides home on its stem.","Sized to its case, as it must be."],aside:["Prise gantée"]},
+    {type:"choose",cat:"crystal"},
+    {k:"GLACE",title:"La glace",make:function(){return pCrystal(SEL.crystal)},tx:0,ty:0,gr:90,snd:"thock",
+      lines:["The crystal presses in with one","dull, honest sound."],
+      aside:function(){return ["Saphir, "+SEL.crystal.name.toLowerCase()]}},
+    {type:"choose",cat:"strap"},
+    {k:"BRACELET",title:"Le bracelet",make:function(){return pStrap(SEL.strap,SEL.caze)},tx:0,ty:0,gr:150,snd:"springbar",strap:true,
+      lines:["Spring bars — two clicks. The","construction changes how the whole","watch hangs."],
+      aside:function(){return [SEL.strap.name]}},
     {k:"MISE À L'HEURE",type:"set",title:"La mise à l'heure",
       lines:["Pull the crown. Set the needles","to the observatory signal — now."],
       aside:["Signal de Neuchâtel"]}
-  );
-  return st;
+  ];
 }
 
 /* ============================================================
    DRAG ENGINE — parts have weight
    ============================================================ */
 var drag=null, gGhost=S("g",null,$("gFloat"));
-function targetGlobal(step){return {x:MOVX+step.tx,y:MOVY+step.ty};}
+function stepTx(step){return step.dtx?step.dtx():step.tx;}
+function targetGlobal(step){return {x:MOVX+stepTx(step),y:MOVY+step.ty};}
 function ghostShow(step){
   ghostClear();
   var t=targetGlobal(step);
-  var gx=MOVX+(step.gx!=null?step.gx:step.tx), gy=MOVY+(step.gy!=null?step.gy:step.ty);
+  var gx=MOVX+(step.gx!=null?step.gx:stepTx(step)), gy=MOVY+(step.gy!=null?step.gy:step.ty);
   var c=S("circle",{cx:gx,cy:gy,r:step.gr,fill:"none",stroke:"#dfe4da","stroke-width":1,
     "stroke-dasharray":"2 6",opacity:.2},gGhost);
   gGhost._c=c;
@@ -912,16 +1274,19 @@ function ghostClear(){while(gGhost.firstChild)gGhost.removeChild(gGhost.firstChi
 function ghostNear(n){if(gGhost._c)gGhost._c.setAttribute("opacity",n?.55:.2);}
 
 function spawnPart(step){
-  var node=S("g",{filter:"url(#tinySh)",cursor:"grab"},$("gFloat"));
+  /* no filters on moving nodes — the shadow is painted, cheap, 60fps */
+  var node=S("g",{cursor:"grab"},$("gFloat"));
+  var sh=S("ellipse",{cx:3,cy:14,rx:Math.min(step.gr*.95,150),ry:Math.max(9,step.gr*.24),fill:"#140b04",opacity:.24},node);
   node.appendChild(step.make());
-  var d={node:node,step:step,x:TRAY.x,y:TRAY.y,px:TRAY.x,py:TRAY.y,r:0,s:1,held:false,raf:0};
+  var d={node:node,sh:sh,step:step,x:TRAY.x,y:TRAY.y,px:TRAY.x,py:TRAY.y,r:0,s:1,held:false,raf:0};
   apply(d);
   node.addEventListener("pointerdown",function(e){
     if(state.mode!=="drag")return;
     e.preventDefault();audio();
     d.held=true;drag=d;
     var p=svgPt(e);d.px=p.x;d.py=p.y;
-    node.setAttribute("filter","url(#liftSh)");node.setAttribute("cursor","grabbing");
+    sh.setAttribute("cx",12);sh.setAttribute("cy",30);sh.setAttribute("opacity",.3);
+    node.setAttribute("cursor","grabbing");
     document.body.classList.add("c-hold");
     SND.pick();
     loop(d);
@@ -966,7 +1331,8 @@ addEventListener("pointerup",function(){
     },function(){install(d);});
   }else{
     var x1=d.x,y1=d.y,r1=d.r;
-    d.node.setAttribute("filter","url(#tinySh)");d.node.setAttribute("cursor","grab");
+    d.sh.setAttribute("cx",3);d.sh.setAttribute("cy",14);d.sh.setAttribute("opacity",.24);
+    d.node.setAttribute("cursor","grab");
     tween(520,function(p){
       d.x=lerp(x1,TRAY.x,p);d.y=lerp(y1,TRAY.y,p);d.r=r1*(1-p);d.s=lerp(1.07,1,p);apply(d);
     });
@@ -978,14 +1344,15 @@ function install(d){
   var step=d.step;
   d.node.remove();ghostClear();
   var side=(state.idx<=findIdx("BALANCIER"))?gSideM:gSideD;
-  var wrap=S("g",{transform:"translate("+step.tx+" "+step.ty+")"});
+  var wtx=stepTx(step);
+  var wrap=S("g",{transform:"translate("+wtx+" "+step.ty+")"});
   var inner=step.make();wrap.appendChild(inner);
   if(step.strap){gSideD.insertBefore(wrap,gSideD.firstChild);}
   else side.appendChild(wrap);
   SND[step.snd||"snap"]();
   /* press-fit feel for hands & crystal */
   if(step.hand||step.k==="GLACE"){
-    tween(180,function(p){wrap.setAttribute("transform","translate("+step.tx+" "+step.ty+") scale("+(1.14-p*.14)+")");});
+    tween(180,function(p){wrap.setAttribute("transform","translate("+wtx+" "+step.ty+") scale("+(1.14-p*.14)+")");});
   }
   /* remember what needs to move */
   if(step.k==="BARILLET")rotParts.barrel={el:inner,dir:1};
@@ -1015,7 +1382,7 @@ function screwMode(step,side){
   screwLayer=S("g",null,side);
   var left=step.screws.length;
   step.screws.forEach(function(sp){
-    var sg=S("g",{transform:"translate("+sp.x+" "+sp.y+")",cursor:"pointer",filter:"url(#tinySh)"},screwLayer);
+    var sg=S("g",{transform:"translate("+sp.x+" "+sp.y+")",cursor:"pointer"},screwLayer);
     var halo=S("circle",{cx:0,cy:0,r:9.5,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},sg);
     var head=screwHead(4.6);sg.appendChild(head);
     var hit=S("circle",{cx:0,cy:0,r:15,fill:"transparent"},sg);
@@ -1026,7 +1393,6 @@ function screwMode(step,side){
       tween(430,function(p){
         head.setAttribute("transform","rotate("+p*540+") scale("+(1-p*.1)+")");
       },function(){
-        sg.setAttribute("filter","");
         left--;
         if(left===0){
           document.body.classList.remove("c-driver");
@@ -1116,9 +1482,9 @@ function buildDialSideBase(){
 /* ————— setting the time ————— */
 function setMode(){
   state.mode="action";
-  var a=state.arch;
-  var hit=S("circle",{cx:MOVX+a.caseOut+a.crownR-4,cy:MOVY,r:30,fill:"transparent",cursor:"pointer"},$("gWork"));
-  var hint=S("circle",{cx:MOVX+a.caseOut+a.crownR-4,cy:MOVY,r:a.crownR+8,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"2 5",opacity:.45},$("gWork"));
+  var cxx=MOVX+SEL.caze.R+SEL.caze.crownR-4;
+  var hit=S("circle",{cx:cxx,cy:MOVY,r:30,fill:"transparent",cursor:"pointer"},$("gWork"));
+  var hint=S("circle",{cx:cxx,cy:MOVY,r:SEL.caze.crownR+8,fill:"none",stroke:"#dfe4da","stroke-width":1,"stroke-dasharray":"2 5",opacity:.45},$("gWork"));
   hit.addEventListener("pointerdown",function(){
     hit.remove();hint.remove();state.mode="wait";
     SND.snap();SND.whirr();
@@ -1130,21 +1496,24 @@ function setMode(){
     state.setAnim={fH:fH,fM:fM,dH:dH,dM:dM,p:0};
     tween(2100,function(p){state.setAnim.p=p;},function(){
       state.setAnim=null;state.timeSet=true;
-      if(HANDS.hv)HANDS.hv.inner.setAttribute("transform","rotate(-198)");
       setTimeout(finale,700);
     });
   });
 }
 
-/* ————— finale ————— */
+/* ————— finale: the certificate lists your decisions ————— */
 function finale(){
   state.mode="done";
   var serial=380+Math.floor(Math.random()*260);
   var rate=(Math.random()*1.5+.2).toFixed(1);
-  bpMark(state.steps.length-1);
+  bpMark(state.steps[state.steps.length-1].bpi);
   note("FIN DE FEUILLE","Instrument n° 0"+serial,
     ["Observed rate: +"+rate+" s/d — printed","as measured, lived with as found.","Wear it until it is used up."],
-    [state.arch.ref,state.arch.strapName||"","","47°03´23˝N · 6°44´57˝E","Le Locle, 946 m"]);
+    ["Boîte "+SEL.caze.name+" · lunette "+SEL.bezel.name,
+     "Cadran "+SEL.dial.name+" · aiguilles "+SEL.hands.name,
+     "Glace "+SEL.crystal.name.toLowerCase()+" · "+SEL.strap.name,
+     SEL.movement.k==="petite"?"O-46 PS, petite seconde":"O-46 TC, trotteuse centrale",
+     "47°03´23˝N · 6°44´57˝E · 946 m"]);
   var w=$("gWorkWrap");
   w.style.transition="transform 2.6s cubic-bezier(.22,.8,.24,1)";
   w.style.transformOrigin=MOVX+"px "+MOVY+"px";
@@ -1152,19 +1521,89 @@ function finale(){
 }
 
 /* ============================================================
+   CHOICE — options are laid on the mat, picked by hand
+   ============================================================ */
+function thumbFor(cat,it){
+  var g=S("g",null);
+  if(cat==="dial"){g.appendChild(pDial(it,SEL.movement?SEL.movement.k:"centre"));}
+  else if(cat==="caze"){S("circle",{cx:0,cy:0,r:130,fill:"#2e2a25"},g);g.appendChild(pCase(it));}
+  else if(cat==="hands"){
+    S("circle",{cx:0,cy:0,r:118,fill:"#dcd8ca",stroke:"#8a7a5c","stroke-width":2},g);
+    var hh=HSTY[it.k].h();hh.setAttribute("transform","rotate(-55)");g.appendChild(hh);
+    var mm=HSTY[it.k].m();mm.setAttribute("transform","rotate(45)");g.appendChild(mm);
+    var ss=HSTY[it.k].s();ss.setAttribute("transform","rotate(160)");g.appendChild(ss);
+  }else if(cat==="bezel"){
+    S("circle",{cx:0,cy:0,r:150,fill:"#2e2a25"},g);
+    g.appendChild(pBezel(it,SEL.caze&&SEL.caze.shape==="round"?SEL.caze:CAT.caze.items[1]));
+  }else if(cat==="crystal"){
+    S("circle",{cx:0,cy:0,r:112,fill:"#3b3630"},g);
+    var cc=pCrystal(it);cc.setAttribute("transform","scale(.8)");g.appendChild(cc);
+    var prof=it.k==="flat"?"M-92 148 L92 148":(it.k==="domed"?"M-92 148 Q0 104 92 148":"M-92 148 L-92 126 Q0 96 92 126 L92 148");
+    S("path",{d:prof,fill:"none",stroke:"#dfe4da","stroke-width":5,opacity:.8,"stroke-linecap":"round"},g);
+  }else if(cat==="strap"){
+    g.appendChild(pStrap(it,{shape:"round",R:8,lug:"plain"}));
+  }else if(cat==="movement"){
+    S("rect",{x:-88,y:-116,width:176,height:232,rx:3,fill:"url(#paper)",stroke:"#b3a488","stroke-width":1},g);
+    S("circle",{cx:0,cy:-24,r:62,fill:"none",stroke:"#3d3122","stroke-width":2.4},g);
+    S("circle",{cx:0,cy:-24,r:3.4,fill:"#3d3122"},g);
+    if(it.k==="centre"){S("line",{x1:0,y1:-24,x2:0,y2:-78,stroke:"#c9391b","stroke-width":2.6},g);}
+    else{S("circle",{cx:0,cy:8,r:17,fill:"none",stroke:"#3d3122","stroke-width":2},g);
+      S("line",{x1:0,y1:8,x2:0,y2:-7,stroke:"#c9391b","stroke-width":2},g);}
+    var dt=S("text",{x:0,y:78,"text-anchor":"middle","font-family":"Archivo Narrow","font-size":13,fill:"#8a6f52","letter-spacing":"1.5"},g);
+    dt.textContent=it.d||"";
+  }
+  return g;
+}
+function choiceMode(step,onPick){
+  state.mode="choose";
+  var cat=step.cat, items=CAT[cat].items, n=items.length;
+  var sp=n>5?118:(n>4?132:(n>2?176:230));
+  var x0=720-(n-1)*sp/2, lay=S("g",null,$("gFloat"));
+  items.forEach(function(it,i){
+    var bx=x0+i*sp, by=248;
+    var c=S("g",{transform:"translate("+bx+" "+by+")",cursor:"pointer"},lay);
+    S("ellipse",{cx:2,cy:58,rx:48,ry:9,fill:"#140b04",opacity:.22},c);
+    var th=S("g",{transform:"scale("+(cat==="movement"?.52:.38)+")"},c);
+    th.appendChild(thumbFor(cat,it));
+    var tag=S("g",{transform:"translate(0 74)"},c);
+    S("rect",{x:-52,y:-12,width:104,height:24,fill:"url(#paper)",stroke:"#b3a488","stroke-width":.6},tag);
+    T(tag,0,5,it.name,12.5,{serif:true,italic:true,anchor:"middle",w:600});
+    c.addEventListener("pointerenter",function(){c.setAttribute("transform","translate("+bx+" "+(by-8)+")");});
+    c.addEventListener("pointerleave",function(){c.setAttribute("transform","translate("+bx+" "+by+")");});
+    c.addEventListener("pointerdown",function(e){
+      e.stopPropagation();
+      if(state.mode!=="choose")return;
+      state.mode="wait";audio();SEL[cat]=it;SND.paper();
+      tween(380,function(p){lay.setAttribute("opacity",1-p);},function(){
+        lay.remove();
+        if(onPick)onPick();else advance();
+      });
+    });
+  });
+}
+
+/* ============================================================
    THE CONDUCTOR
    ============================================================ */
-function roman(n){return ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"][n]||n;}
+function roman(n){return ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII"][n]||n;}
 function advance(){
-  if(state.idx>=0)bpMark(state.idx);
+  var cur=state.steps[state.idx];
+  if(cur&&cur.bpi!=null)bpMark(cur.bpi);
   state.idx++;
   if(state.idx>=state.steps.length)return;
   showStep();
 }
 function showStep(){
   var step=state.steps[state.idx];
-  bpCurrent(state.idx);
-  note("ÉTAPE "+roman(state.idx)+" · "+step.k,step.title,step.lines,step.aside);
+  if(step.type==="choose"){
+    var c=CAT[step.cat];
+    note("DÉCISION · "+c.label,c.title,c.lines,["À vous.","Posé sur le tapis."]);
+    choiceMode(step);
+    return;
+  }
+  if(step.bpi!=null)bpCurrent(step.bpi);
+  var aside=typeof step.aside==="function"?step.aside():step.aside;
+  note("ÉTAPE "+roman(step.bpi)+" · "+step.k,step.title,step.lines,aside);
   if(step.type==="wind"){windMode();return;}
   if(step.type==="flip"){flipMode();return;}
   if(step.type==="set"){setMode();return;}
@@ -1174,76 +1613,63 @@ function showStep(){
 }
 
 /* ============================================================
-   LIVING MOVEMENT — one loop drives everything
+   LIVING MOVEMENT — one loop, cached writes, no wasted paint
    ============================================================ */
+var _rc={};
+function rset(el,key,ang){
+  var q=Math.round(ang*10);
+  if(_rc[key]===q)return;
+  _rc[key]=q;el.setAttribute("transform","rotate("+(q/10)+")");
+}
 (function live(){
   var t=performance.now()/1000;
   if(state.alive){
     var e=t-state.tAlive;
     if(balanceRef){
-      balanceRef._osc.setAttribute("transform","rotate("+(34*Math.sin(e*TAU*1.25))+")");
-      if(balanceRef._spring)balanceRef._spring.setAttribute("transform","scale("+(1+.05*Math.sin(e*TAU*1.25))+")");
+      rset(balanceRef._osc,"osc",34*Math.sin(e*TAU*1.25));
+      if(balanceRef._spring){
+        var sq=Math.round((1+.05*Math.sin(e*TAU*1.25))*500);
+        if(_rc.spr!==sq){_rc.spr=sq;balanceRef._spring.setAttribute("transform","scale("+(sq/500)+")");}
+      }
     }
-    if(rotParts.escape)rotParts.escape.el.setAttribute("transform","rotate("+(-Math.floor(e*2.5)*12)+")");
-    if(rotParts.fourth)rotParts.fourth.el.setAttribute("transform","rotate("+(e*6)+")");
-    if(rotParts.third)rotParts.third.el.setAttribute("transform","rotate("+(-e*.8)+")");
-    if(rotParts.center)rotParts.center.el.setAttribute("transform","rotate("+(e*.1)+")");
+    if(rotParts.escape)rset(rotParts.escape.el,"esc",-Math.floor(e*2.5)*12);
+    if(rotParts.fourth)rset(rotParts.fourth.el,"fw",e*6);
+    if(rotParts.third)rset(rotParts.third.el,"tw",-e*.8);
+    if(rotParts.center)rset(rotParts.center.el,"cw",e*.1);
   }
   /* hands */
   var n=new Date(),sec=n.getSeconds()+n.getMilliseconds()/1000;
   if(HANDS.s){
-    var sa=state.timeSet?sec*6:( (t-state.tSecMount)*6 );
-    HANDS.s.inner.setAttribute("transform","rotate("+sa+")");
+    rset(HANDS.s.inner,"sh",state.timeSet?sec*6:((t-state.tSecMount)*6));
   }
   if(state.setAnim){
     var sa2=state.setAnim;
-    if(HANDS.h)HANDS.h.inner.setAttribute("transform","rotate("+(sa2.fH+sa2.dH*sa2.p)+")");
-    if(HANDS.m)HANDS.m.inner.setAttribute("transform","rotate("+(sa2.fM+sa2.dM*sa2.p)+")");
+    if(HANDS.h)rset(HANDS.h.inner,"hh",sa2.fH+sa2.dH*sa2.p);
+    if(HANDS.m)rset(HANDS.m.inner,"mh",sa2.fM+sa2.dM*sa2.p);
   }else if(state.timeSet){
-    if(HANDS.h)HANDS.h.inner.setAttribute("transform","rotate("+(((n.getHours()%12)+n.getMinutes()/60)*30)+")");
-    if(HANDS.m)HANDS.m.inner.setAttribute("transform","rotate("+((n.getMinutes()+sec/60)*6)+")");
+    if(HANDS.h)rset(HANDS.h.inner,"hh",((n.getHours()%12)+n.getMinutes()/60)*30);
+    if(HANDS.m)rset(HANDS.m.inner,"mh",(n.getMinutes()+sec/60)*6);
   }
   requestAnimationFrame(live);
 })();
 
 /* ============================================================
-   THE COMMISSION — three orders lie open on the mat
+   THE COMMISSION — nothing is predetermined today
    ============================================================ */
 function commission(){
-  state.mode="choose";
-  note("L'ÉTABLI","Choose the commission.",
-    ["Three orders lie open on the mat.","Three architectures — one calibre.","Take the one that suits your wrist."],
-    ["Méridienne — habillée","Heure Vraie — signature","Tantale — intégrée"]);
-  var cards=S("g",null,$("gFloat"));
-  [["m",520],["hv",712],["t",904]].forEach(function(q,i){
-    var a=ARCHS[q[0]];
-    var c=S("g",{transform:"translate("+q[1]+" 452) rotate("+(i*2-2)+")",cursor:"pointer",filter:"url(#softSh)"},cards);
-    S("rect",{x:-78,y:-104,width:156,height:208,rx:4,fill:"url(#paper)"},c);
-    S("rect",{x:-70,y:-96,width:140,height:192,rx:2,fill:"none",stroke:"#8a6f52","stroke-width":.7,opacity:.5},c);
-    /* little line drawing of the architecture */
-    var mini=S("g",{transform:"translate(0 -26) scale(.34)"},c);
-    var cs=pCase(a);cs.querySelectorAll("path,circle").forEach(function(p){
-      p.setAttribute("fill","none");p.setAttribute("stroke","#3d3122");p.setAttribute("stroke-width",3);
-    });
-    mini.appendChild(cs);
-    T(c,0,64,a.name,19,{serif:true,italic:true,w:600,anchor:"middle",fill:"#211d16",ls:0});
-    T(c,0,82,a.ref,8,{anchor:"middle",fill:"#8a6f52",ls:2});
-    c.addEventListener("pointerenter",function(){c.setAttribute("filter","url(#liftSh)");});
-    c.addEventListener("pointerleave",function(){c.setAttribute("filter","url(#softSh)");});
-    c.addEventListener("pointerdown",function(){
-      if(state.mode!=="choose")return;
-      state.mode="wait";audio();SND.paper();
-      tween(620,function(p){
-        cards.setAttribute("transform","translate(0 "+(p*36)+")");
-        cards.setAttribute("opacity",1-p);
-      },function(){cards.remove();start(a);});
-    });
-  });
+  note("L'ÉTABLI","The commission.",
+    ["Nothing is predetermined today.","Seven decisions will pass through","your hands. First: the calibre."],
+    ["O-46 · deux architectures","Choisissez sur le tapis."]);
+  choiceMode({cat:"movement"},start);
 }
-function start(a){
-  state.arch=a;state.steps=buildSteps(a);state.idx=-1;
-  BP.ref.textContent=a.ref+" · "+a.name.toUpperCase();
-  bpList(state.steps.map(function(s){return s.k;}));
+function start(){
+  state.steps=buildSteps();state.idx=-1;
+  BP.ref.textContent="COMMANDE SPÉCIALE · O-46 "+(SEL.movement.k==="petite"?"PS":"TC");
+  var names=[];
+  state.steps.forEach(function(s2){
+    if(s2.type!=="choose"){s2.bpi=names.length;names.push(s2.k);}
+  });
+  bpList(names);
   SND.paper();
   setTimeout(advance,300);
 }
