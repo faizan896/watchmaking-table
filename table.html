@@ -115,6 +115,42 @@ body.c-driver{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <linearGradient id="leatherDark" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#5d4630"/><stop offset="1" stop-color="#3e2c1c"/>
   </linearGradient>
+  <linearGradient id="leatherBlack" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#33302c"/><stop offset="1" stop-color="#1f1d1a"/>
+  </linearGradient>
+  <linearGradient id="leatherGreen" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#48543f"/><stop offset="1" stop-color="#32402c"/>
+  </linearGradient>
+  <linearGradient id="leatherBurg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#5e2c2a"/><stop offset="1" stop-color="#421c1c"/>
+  </linearGradient>
+  <pattern id="cotesP" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(24)">
+    <rect width="22" height="22" fill="none"/>
+    <rect x="0" width="11" height="22" fill="#fff" opacity=".10"/>
+    <rect x="11" width="11" height="22" fill="#000" opacity=".05"/>
+    <line x1="11" y1="0" x2="11" y2="22" stroke="#000" stroke-width=".6" opacity=".12"/>
+  </pattern>
+  <pattern id="perlP" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="8" cy="8" r="7" fill="none" stroke="#fff" stroke-width="1.6" opacity=".09"/>
+    <circle cx="0" cy="0" r="7" fill="none" stroke="#fff" stroke-width="1.6" opacity=".09"/>
+    <circle cx="16" cy="0" r="7" fill="none" stroke="#fff" stroke-width="1.6" opacity=".09"/>
+    <circle cx="0" cy="16" r="7" fill="none" stroke="#fff" stroke-width="1.6" opacity=".09"/>
+    <circle cx="16" cy="16" r="7" fill="none" stroke="#fff" stroke-width="1.6" opacity=".09"/>
+  </pattern>
+  <pattern id="sableP" width="4" height="4" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r=".5" fill="#000" opacity=".10"/>
+    <circle cx="3" cy="3" r=".5" fill="#fff" opacity=".10"/>
+  </pattern>
+  <pattern id="guillP" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="7" y2="0" stroke="#8a6f52" stroke-width=".7" opacity=".30"/>
+    <line x1="0" y1="0" x2="0" y2="7" stroke="#8a6f52" stroke-width=".7" opacity=".30"/>
+  </pattern>
+  <pattern id="natoP" width="18" height="10" patternUnits="userSpaceOnUse">
+    <rect width="18" height="10" fill="#3c4a38"/>
+    <rect x="0" width="4" height="10" fill="#8a6f52"/>
+    <rect x="9" width="4" height="10" fill="#8a6f52"/>
+    <line x1="0" y1="5" x2="18" y2="5" stroke="#000" stroke-width=".5" opacity=".25"/>
+  </pattern>
   <linearGradient id="rubberG" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#3a4246"/><stop offset="1" stop-color="#232a2d"/>
   </linearGradient>
@@ -513,7 +549,7 @@ var TRAY={x:210,y:478};
 
 /* ————— movement holder: anodized, knurled clamps, no ceremony ————— */
 (function(){
-  var g=S("g",{transform:"translate("+MOVX+" "+MOVY+")",filter:"url(#tinySh)"},$("gWork"));
+  var g=S("g",{id:"holderG",transform:"translate("+MOVX+" "+MOVY+")",filter:"url(#tinySh)"},$("gWork"));
   S("circle",{cx:0,cy:0,r:194,fill:"#23201c"},g);
   S("circle",{cx:0,cy:0,r:194,fill:"none",stroke:"#14120f","stroke-width":2},g);
   S("circle",{cx:0,cy:0,r:184,fill:"#312d27"},g);
@@ -590,11 +626,15 @@ function pLever(){
   S("circle",{cx:0,cy:0,r:3.4,fill:"url(#gilt)",stroke:"#8a6330"},g);
   return g;
 }
+function finPat(){
+  return SEL.finish?({cotes:"url(#cotesP)",perlage:"url(#perlP)",sable:"url(#sableP)"})[SEL.finish.k]:null;
+}
 function pBridgeBarrel(){
   var g=S("g",null);
   var d="M-124 -8 C-130 -52 -104 -96 -58 -106 C-20 -114 6 -88 10 -58 C13 -34 14 -6 6 6 C-2 18 -34 24 -66 20 C-98 16 -120 12 -124 -8 Z";
   d+=circleSubAt(L.barrel.x,L.barrel.y,17)+circleSubAt(L.center.x-4,L.center.y-52,5);
   S("path",{d:d,fill:"url(#maillechort)","fill-rule":"evenodd",stroke:"#8a7a5c","stroke-width":1.6},g);
+  var fp=finPat();if(fp)S("path",{d:d,fill:fp,"fill-rule":"evenodd"},g);
   S("path",{d:"M-118 -12 C-123 -50 -100 -90 -58 -100",fill:"none",stroke:"#fff","stroke-width":1,opacity:.3},g);
   var j=jewel(3.4);j.setAttribute("transform","translate("+(L.center.x-4)+" "+(L.center.y-52)+")");g.appendChild(j);
   T(g,-64,-44,"PONT DE BARILLET",6,{fill:"#8a7a5c",anchor:"middle",ls:1.6});
@@ -605,6 +645,7 @@ function pBridgeTrain(){
   var d="M18 74 C58 82 102 70 116 42 C130 12 124 -34 102 -58 C86 -74 54 -72 40 -60 C26 -50 22 -20 20 4 C18 30 8 62 18 74 Z";
   d+=circleSubAt(L.third.x,L.third.y,5)+circleSubAt(L.fourth.x,L.fourth.y,5)+circleSubAt(L.escape.x,L.escape.y,4.4);
   S("path",{d:d,fill:"url(#maillechort)","fill-rule":"evenodd",stroke:"#8a7a5c","stroke-width":1.6},g);
+  var fp=finPat();if(fp)S("path",{d:d,fill:fp,"fill-rule":"evenodd"},g);
   S("path",{d:"M24 68 C60 76 98 64 110 40",fill:"none",stroke:"#fff","stroke-width":1,opacity:.3},g);
   [L.third,L.fourth,L.escape].forEach(function(q){
     var j=jewel(3.2);j.setAttribute("transform","translate("+q.x+" "+q.y+")");g.appendChild(j);
@@ -623,8 +664,9 @@ function pBalanceAssy(){
   var g=S("g",null);
   /* cock — reaches SW to its screw boss */
   var cock=S("g",null,g);
-  S("path",{d:"M-78 44 C-84 58 -74 68 -60 64 C-40 58 -22 34 -10 16 C-2 4 6 -8 2 -14 C-4 -22 -18 -18 -28 -8 C-44 8 -70 30 -78 44 Z"+circleSubAt(0,0,5.4),
-    fill:"url(#maillechort)","fill-rule":"evenodd",stroke:"#8a7a5c","stroke-width":1.4},cock);
+  var cd="M-78 44 C-84 58 -74 68 -60 64 C-40 58 -22 34 -10 16 C-2 4 6 -8 2 -14 C-4 -22 -18 -18 -28 -8 C-44 8 -70 30 -78 44 Z"+circleSubAt(0,0,5.4);
+  S("path",{d:cd,fill:"url(#maillechort)","fill-rule":"evenodd",stroke:"#8a7a5c","stroke-width":1.4},cock);
+  var fp=finPat();if(fp)S("path",{d:cd,fill:fp,"fill-rule":"evenodd"},cock);
   /* regulator */
   S("path",{d:"M-14 6 L-26 20",stroke:"#4a5a76","stroke-width":2.4,"stroke-linecap":"round"},cock);
   T(cock,-46,52,"AVANCE · RETARD",4.6,{fill:"#8a7a5c",anchor:"middle",ls:1});
@@ -652,22 +694,37 @@ function pBalanceAssy(){
 /* ============================================================
    THE CATALOGUE — every stage offers real geometry, not colour
    ============================================================ */
-var SEL={movement:null,dial:null,hands:null,caze:null,bezel:null,crystal:null,strap:null};
+var SEL={movement:null,finish:null,dial:null,hands:null,caze:null,bezel:null,crystal:null,crown:null,strap:null};
 var CAT={
   movement:{label:"CALIBRE",title:"Le calibre",
-    lines:["Two layouts of the same O-46.","Centre seconds sweeps the sheet;","petite seconde keeps its own register."],
+    lines:["Five architectures of the O-46.","Each asks different work of your","hands — and shows different organs."],
     items:[
-      {k:"centre",name:"Trotteuse centrale",d:"seconde au centre"},
-      {k:"petite",name:"Petite seconde",d:"registre à 6 heures"}]},
+      {k:"centre",name:"Manuel",d:"trotteuse centrale"},
+      {k:"petite",name:"Petite seconde",d:"registre à 6 heures"},
+      {k:"auto",name:"Automatique",d:"rotor, remontage libre"},
+      {k:"gmt",name:"GMT",d:"second fuseau, 24 h"},
+      {k:"moon",name:"Phase de lune",d:"disque à 6 heures"}]},
+  finish:{label:"FINISSAGE",title:"Le finissage",
+    lines:["How the bridges catch the lamp.","Geneva stripes, pearls, or sand —","the hand shows in each differently."],
+    items:[
+      {k:"cotes",name:"Côtes de Genève"},
+      {k:"perlage",name:"Perlage"},
+      {k:"sable",name:"Sablé"}]},
   dial:{label:"CADRAN",title:"Le cadran",
-    lines:["Six sheets, six architectures.","Typography, track and balance differ —","not the colour. Never only the colour."],
+    lines:["Twelve sheets, twelve architectures.","Typography, track and balance differ —","not the colour. Never only the colour."],
     items:[
       {k:"sector",name:"Secteur",base:"#d9d5c8"},
       {k:"california",name:"California",base:"#ece4cf"},
       {k:"explorer",name:"Explorateur",base:"#cdd9d6"},
       {k:"railroad",name:"Chemin de fer",base:"#e7e0cc"},
       {k:"enamel",name:"Émail",base:"#f6f2e8"},
-      {k:"field",name:"Champ",base:"#26221b"}]},
+      {k:"field",name:"Champ",base:"#26221b"},
+      {k:"skeleton",name:"Squelette",base:"#d9d5c8"},
+      {k:"regulator",name:"Régulateur",base:"#e7e0cc"},
+      {k:"minimal",name:"Minimal",base:"#ece7d8"},
+      {k:"breguet",name:"Breguet",base:"#dedacb"},
+      {k:"military",name:"Militaire",base:"#2b261e"},
+      {k:"deco",name:"Art déco",base:"#e2ddca"}]},
   hands:{label:"AIGUILLES",title:"Les aiguilles",
     lines:["Each pattern balances differently","over the same cannon pinion.","Choose what your eye should find first."],
     items:[
@@ -676,16 +733,20 @@ var CAT={
       {k:"breguet",name:"Breguet"},
       {k:"leaf",name:"Feuille"},
       {k:"cathedral",name:"Cathédrale"},
-      {k:"mercedes",name:"Mercedes"}]},
+      {k:"mercedes",name:"Mercedes"},
+      {k:"pencil",name:"Crayon"},
+      {k:"syringe",name:"Seringue"}]},
   caze:{label:"BOÎTE",title:"La boîte",
-    lines:["Six architectures, six centres of","gravity. Lugs, guards and girth are","engineering, not decoration."],
+    lines:["Eight architectures, eight centres of","gravity. Lugs, guards and girth are","engineering, not decoration."],
     items:[
-      {k:"dress",name:"Habillée",shape:"round",R:150,lug:"wire",crownR:9,crown:"fine",metal:"steel"},
-      {k:"diver",name:"Plongée",shape:"round",R:162,lug:"strong",crownR:11,crown:"guarded",metal:"steel"},
-      {k:"pilot",name:"Pilote",shape:"round",R:164,lug:"straight",crownR:15,crown:"onion",metal:"steel"},
-      {k:"cushion",name:"Coussin",shape:"cushion",R:158,lug:"none",crownR:10,crown:"fine",metal:"steel"},
-      {k:"tonneau",name:"Tonneau",shape:"tonneau",R:150,lug:"none",crownR:9,crown:"fine",metal:"steel"},
-      {k:"octo",name:"Octogonale",shape:"octo",R:160,lug:"none",crownR:10,crown:"flat",metal:"tantalum"}]},
+      {k:"dress",name:"Habillée",shape:"round",R:150,lug:"wire",metal:"steel"},
+      {k:"diver",name:"Plongée",shape:"round",R:162,lug:"strong",crownG:true,metal:"steel"},
+      {k:"pilot",name:"Pilote",shape:"round",R:164,lug:"straight",metal:"steel"},
+      {k:"cushion",name:"Coussin",shape:"cushion",R:158,lug:"none",metal:"steel"},
+      {k:"tonneau",name:"Tonneau",shape:"tonneau",R:150,lug:"none",metal:"steel"},
+      {k:"square",name:"Carrée",shape:"square",R:152,lug:"none",metal:"steel"},
+      {k:"integrated",name:"Intégrée",shape:"integrated",R:156,lug:"none",metal:"steel"},
+      {k:"octo",name:"Octogonale",shape:"octo",R:160,lug:"none",metal:"tantalum"}]},
   bezel:{label:"LUNETTE",title:"La lunette",
     lines:["The bezel is engineering you can","hold. A scale, a grip, or silence."],
     items:[
@@ -693,21 +754,34 @@ var CAT={
       {k:"coin",name:"Monnaie"},
       {k:"fluted",name:"Cannelée"},
       {k:"dive",name:"Plongée 60"},
+      {k:"gmt",name:"GMT 24"},
       {k:"tachy",name:"Tachymètre"}]},
   crystal:{label:"GLACE",title:"La glace",
-    lines:["Flat reads the sheet honestly;","the dome bends the light; the box","stands the dial in a vitrine."],
+    lines:["Flat reads the sheet honestly;","domes bend the light; the box","stands the dial in a vitrine."],
     items:[
       {k:"flat",name:"Plate"},
       {k:"domed",name:"Bombée"},
+      {k:"ddomed",name:"Double bombée"},
       {k:"box",name:"Box"}]},
-  strap:{label:"BRACELET",title:"Le bracelet",
-    lines:["Construction, not colourway.","Links, weave, hide or mesh — each","hangs the same case differently."],
+  crown:{label:"COURONNE",title:"La couronne",
+    lines:["The one part you will touch every","day. Size and knurl are grip;","grip is respect for gloves."],
     items:[
-      {k:"leather",name:"Veau naturel"},
+      {k:"fine",name:"Moletée fine",r:9},
+      {k:"onion",name:"Oignon",r:15},
+      {k:"screw",name:"Vissée",r:11},
+      {k:"coinc",name:"Monnaie large",r:13}]},
+  strap:{label:"BRACELET",title:"Le bracelet",
+    lines:["Ten constructions. Hide, fabric,","links or mesh — each hangs the","same case a different way."],
+    items:[
+      {k:"leather",name:"Veau naturel",lg:"leatherTan"},
+      {k:"leather",name:"Veau brun",lg:"leatherDark"},
+      {k:"leather",name:"Veau noir",lg:"leatherBlack"},
+      {k:"leather",name:"Veau bordeaux",lg:"leatherBurg"},
+      {k:"nato",name:"NATO"},
       {k:"rubber",name:"Tropic"},
       {k:"canvas",name:"Toile"},
       {k:"oyster",name:"Oyster"},
-      {k:"jubilee",name:"Jubilé"},
+      {k:"president",name:"Président"},
       {k:"milanese",name:"Milanaise"}]}
 };
 function metalFill(c){return c.metal==="tantalum"?"url(#tantalum)":"url(#steel)";}
@@ -731,6 +805,20 @@ function shapePath(c){
     var d="",ro=R+4;
     for(var i=0;i<8;i++){var an=-TAU/16+i*TAU/8;d+=(i?"L":"M")+px(0,ro,an).toFixed(1)+" "+py(0,ro,an).toFixed(1);}
     return d+"Z";
+  }
+  if(c.shape==="square"){
+    var q=R-4,rc=34;
+    return "M"+(-q+rc)+" -"+q+" L"+(q-rc)+" -"+q+" Q"+q+" -"+q+" "+q+" "+(-q+rc)+
+      " L"+q+" "+(q-rc)+" Q"+q+" "+q+" "+(q-rc)+" "+q+
+      " L"+(-q+rc)+" "+q+" Q-"+q+" "+q+" -"+q+" "+(q-rc)+
+      " L-"+q+" "+(-q+rc)+" Q-"+q+" -"+q+" "+(-q+rc)+" -"+q+"Z";
+  }
+  if(c.shape==="integrated"){
+    /* round centre flowing into flat shoulders */
+    return "M-"+R+" 0 C-"+R+" -"+(R*.7)+" -"+(R*.7)+" -"+R+" 0 -"+R+
+      " C"+(R*.7)+" -"+R+" "+R+" -"+(R*.7)+" "+R+" 0"+
+      " C"+R+" "+(R*.7)+" "+(R*.7)+" "+R+" 0 "+R+
+      " C-"+(R*.7)+" "+R+" -"+R+" "+(R*.7)+" -"+R+" 0Z";
   }
   return "M-"+R+" 0A"+R+" "+R+" 0 1 0 "+R+" 0A"+R+" "+R+" 0 1 0 -"+R+" 0Z";
 }
@@ -762,8 +850,13 @@ function pCase(c){
   }
   lugs();
   /* crown guards for the diver */
-  if(c.crown==="guarded"){
+  if(c.crownG){
     S("path",{d:"M"+(R-14)+" -26 C"+(R+16)+" -20 "+(R+16)+" 20 "+(R-14)+" 26 Z",fill:mf,stroke:"#3c3a34","stroke-width":1.1},g);
+  }
+  /* integrated shoulders reach for the bracelet */
+  if(c.shape==="integrated"){
+    S("path",{d:"M-52 -"+(R-14)+" L-58 -"+(R+26)+" L58 -"+(R+26)+" L52 -"+(R-14)+" Z",fill:mf,stroke:"#3c3a34","stroke-width":1.1},g);
+    S("path",{d:"M-52 "+(R-14)+" L-58 "+(R+26)+" L58 "+(R+26)+" L52 "+(R-14)+" Z",fill:mf,stroke:"#3c3a34","stroke-width":1.1},g);
   }
   /* body with opening */
   var body=shapePath(c)+circleSub(o);
@@ -780,6 +873,8 @@ function pCase(c){
 function ringPath(rOut,rIn){return "M-"+rOut+" 0A"+rOut+" "+rOut+" 0 1 0 "+rOut+" 0A"+rOut+" "+rOut+" 0 1 0 -"+rOut+" 0Z"+circleSub(rIn);}
 function pBezel(b,c){
   var g=S("g",null), mf=metalFill(c), rIn=138, rOut=c.R-2, k;
+  if(c.shape==="square")rOut=c.R-8;
+  if(c.shape==="integrated")rOut=c.R-4;
   if(c.shape==="octo"){
     var oct=shapePath({shape:"octo",R:c.R-8})+circleSub(rIn);
     S("path",{d:oct,fill:mf,"fill-rule":"evenodd",stroke:"#2f2d28","stroke-width":1.3},g);
@@ -818,6 +913,23 @@ function pBezel(b,c){
     }
     S("path",{d:"M-7 -"+(rOut-4)+" L7 -"+(rOut-4)+" L0 -"+(rIn+4)+" Z",fill:"#dfe0d8"},g);
     S("circle",{cx:0,cy:-(rOut+rIn)/2,r:2.6,fill:"#e9e3c8"},g);
+  }else if(b.k==="gmt"){
+    /* two-tone 24h insert: day cream, night sepia-black */
+    S("path",{d:sectorCut(rIn+1,rOut-2,Math.PI,TAU),fill:"#ded6c0"},g);
+    S("path",{d:sectorCut(rIn+1,rOut-2,0,Math.PI),fill:"#221d15"},g);
+    for(k=0;k<24;k++){
+      var ag=k*TAU/24-TAU/4, dark=(k>=6&&k<18)?false:true;
+      if(k%2===0){
+        var tg=S("text",{x:px(0,(rOut+rIn)/2,ag),y:py(0,(rOut+rIn)/2,ag)+4.4,
+          "text-anchor":"middle","font-family":"Archivo Narrow","font-size":12,"font-weight":600,
+          fill:(py(0,1,ag)>0)?"#ded6c0":"#221d15"},g);
+        tg.textContent=k===0?24:k;
+      }else{
+        S("line",{x1:px(0,rOut-4,ag),y1:py(0,rOut-4,ag),x2:px(0,rOut-9,ag),y2:py(0,rOut-9,ag),
+          stroke:(py(0,1,ag)>0)?"#ded6c0":"#221d15","stroke-width":1.4},g);
+      }
+    }
+    S("path",{d:"M-6 -"+(rOut-3)+" L6 -"+(rOut-3)+" L0 -"+(rIn+3)+" Z",fill:"#ded6c0",stroke:"#221d15","stroke-width":1},g);
   }else if(b.k==="tachy"){
     [[500,7.2],[400,9],[300,12],[250,14.4],[200,18],[180,20],[160,22.5],[140,25.7],[120,30],[110,32.7],[100,36],[90,40],[80,45],[70,51.4],[65,55.4],[60,60]].forEach(function(q){
       var aa=q[1]*6*Math.PI/180-TAU/4;
@@ -834,23 +946,30 @@ function pBezel(b,c){
   }
   return g;
 }
-/* ————— crowns ————— */
-function pCrown(c){
-  var g=S("g",null),r=c.crownR,mf=metalFill(c),k;
+/* ————— crowns: the part you touch every day ————— */
+function pCrown(cr,c){
+  var g=S("g",null),r=cr.r,mf=metalFill(c),k;
   S("rect",{x:-16,y:-3.2,width:16,height:6.4,fill:"url(#steel)"},g);
   S("circle",{cx:0,cy:0,r:r,fill:mf,stroke:"#3c3a34","stroke-width":1},g);
-  var n=c.crown==="onion"?12:(c.crown==="fine"?30:20);
-  if(c.crown!=="flat"){
-    for(k=0;k<n;k++){var an=k*TAU/n;
-      S("line",{x1:px(0,r-1.6,an),y1:py(0,r-1.6,an),x2:px(0,r+1.4,an),y2:py(0,r+1.4,an),stroke:"#2c2a24","stroke-width":c.crown==="onion"?2.2:1.1},g);}
-  }
-  if(c.crown==="onion"){
+  if(cr.k==="fine"){
+    for(k=0;k<30;k++){var a1=k*TAU/30;
+      S("line",{x1:px(0,r-1.6,a1),y1:py(0,r-1.6,a1),x2:px(0,r+1.3,a1),y2:py(0,r+1.3,a1),stroke:"#2c2a24","stroke-width":1},g);}
+    S("circle",{cx:0,cy:0,r:r*.45,fill:"none",stroke:"#00000033","stroke-width":1},g);
+  }else if(cr.k==="onion"){
+    for(k=0;k<12;k++){var a2=k*TAU/12;
+      S("line",{x1:px(0,r-2,a2),y1:py(0,r-2,a2),x2:px(0,r+1.6,a2),y2:py(0,r+1.6,a2),stroke:"#2c2a24","stroke-width":2.4},g);}
     S("circle",{cx:0,cy:0,r:r*.62,fill:"none",stroke:"#00000030","stroke-width":2},g);
     S("circle",{cx:0,cy:0,r:r*.3,fill:"url(#steel)",stroke:"#3c3a34","stroke-width":.8},g);
-  }else if(c.crown==="flat"){
-    S("line",{x1:-r*.55,y1:0,x2:r*.55,y2:0,stroke:"#3c3a34","stroke-width":2},g);
-  }else{
-    S("circle",{cx:0,cy:0,r:r*.45,fill:"none",stroke:"#00000033","stroke-width":1},g);
+  }else if(cr.k==="screw"){
+    for(k=0;k<18;k++){var a3=k*TAU/18;
+      S("line",{x1:px(0,r-1.8,a3),y1:py(0,r-1.8,a3),x2:px(0,r+1.4,a3),y2:py(0,r+1.4,a3),stroke:"#2c2a24","stroke-width":1.6},g);}
+    S("circle",{cx:0,cy:0,r:r*.55,fill:"none",stroke:"#00000038","stroke-width":1.6},g);
+    S("line",{x1:-r*.4,y1:0,x2:r*.4,y2:0,stroke:"#3c3a34","stroke-width":1.8},g);
+  }else{ /* coin edge, large */
+    for(k=0;k<44;k++){var a4=k*TAU/44;
+      S("line",{x1:px(0,r-1.2,a4),y1:py(0,r-1.2,a4),x2:px(0,r+1.2,a4),y2:py(0,r+1.2,a4),stroke:"#2c2a24","stroke-width":.8},g);}
+    S("circle",{cx:0,cy:0,r:r*.6,fill:"none",stroke:"#00000030","stroke-width":1.2},g);
+    S("circle",{cx:0,cy:0,r:2,fill:"#3c3a34"},g);
   }
   return g;
 }
@@ -868,6 +987,13 @@ function pCrystal(kk){
     S("circle",{cx:0,cy:0,r:120,fill:"none",stroke:"#fff","stroke-width":7,opacity:.05},g);
     S("path",{d:"M-84 -78 A 116 116 0 0 1 22 -112",fill:"none",stroke:"#fff","stroke-width":7,opacity:.3,"stroke-linecap":"round"},g);
     S("path",{d:"M78 84 A 114 114 0 0 0 108 44",fill:"none",stroke:"#fff","stroke-width":4,opacity:.13,"stroke-linecap":"round"},g);
+  }else if(k==="ddomed"){
+    S("circle",{cx:0,cy:0,r:r,fill:"url(#crystalG)"},g);
+    S("circle",{cx:0,cy:0,r:r,fill:"none",stroke:"#fff","stroke-width":1.2,opacity:.35},g);
+    S("path",{d:"M-84 -78 A 116 116 0 0 1 22 -112",fill:"none",stroke:"#fff","stroke-width":7,opacity:.28,"stroke-linecap":"round"},g);
+    S("path",{d:"M-56 -50 A 76 76 0 0 1 14 -74",fill:"none",stroke:"#fff","stroke-width":4,opacity:.20,"stroke-linecap":"round"},g);
+    S("path",{d:"M74 80 A 110 110 0 0 0 104 42",fill:"none",stroke:"#fff","stroke-width":4,opacity:.12,"stroke-linecap":"round"},g);
+    S("circle",{cx:0,cy:0,r:96,fill:"none",stroke:"#fff","stroke-width":8,opacity:.04},g);
   }else{ /* box */
     S("circle",{cx:0,cy:0,r:r,fill:"#fff",opacity:.04},g);
     S("circle",{cx:0,cy:0,r:r,fill:"none",stroke:"#fff","stroke-width":1.6,opacity:.4},g);
@@ -879,11 +1005,36 @@ function pCrystal(kk){
   }
   return g;
 }
-/* ————— straps: constructions, not colourways ————— */
+/* ————— straps: ten constructions ————— */
 function pStrap(sk,c){
   var g=S("g",null),R=(c.shape==="round")?c.R:(c.shape==="tonneau"?192:c.R),k=sk.k;
-  var w=(c.shape==="octo")?96:(c.shape==="round"?(c.lug==="strong"?70:62):80);
-  var y0off=(c.shape==="round")?R+42:R+18, y1off=R+215;
+  var w=(c.shape==="octo"||c.shape==="integrated")?96:(c.shape==="round"?(c.lug==="strong"?70:62):80);
+  var y0off=(c.shape==="round")?R+42:(c.shape==="integrated"?R+24:R+18), y1off=R+215;
+  if(k==="nato"){
+    /* one band passing under the case, keepers and rings */
+    var d3="M"+(-w/2+4)+" -"+(y1off)+" L"+(w/2-4)+" -"+(y1off)+" L"+(w/2-4)+" "+(y1off)+" L"+(-w/2+4)+" "+(y1off)+" Z";
+    S("path",{d:d3,fill:"url(#natoP)",stroke:"#252a22","stroke-width":1.3},g);
+    [-1,1].forEach(function(dir){
+      S("rect",{x:-w/2,y:dir*(y0off-8)-6,width:w,height:12,rx:3,fill:"url(#steel)",stroke:"#55524a","stroke-width":.8},g);
+      S("rect",{x:-w/2+1,y:dir*(y0off+38)-5,width:w-2,height:10,rx:3,fill:"url(#natoP)",stroke:"#252a22","stroke-width":1},g);
+    });
+    S("rect",{x:-w/2+1,y:y1off-34,width:w-2,height:11,rx:3,fill:"url(#steel)",stroke:"#55524a","stroke-width":.8},g);
+    return g;
+  }
+  if(k==="president"){
+    var rows=Math.floor((y1off-y0off)/22);
+    [-1,1].forEach(function(dir){
+      for(var i=0;i<rows;i++){
+        var t=i/rows, rw=w*(1-t*.14), y=dir*(y0off+i*22), h2=20;
+        var ys=Math.min(y,y+dir*h2);
+        S("rect",{x:-rw/2,y:ys,width:rw*.27,height:h2,rx:9,fill:"url(#steel)",stroke:"#55524a","stroke-width":.7},g);
+        S("rect",{x:-rw*.135,y:ys,width:rw*.27,height:h2,rx:9,fill:"#eceae2",stroke:"#8f8d84","stroke-width":.7},g);
+        S("rect",{x:rw/2-rw*.27,y:ys,width:rw*.27,height:h2,rx:9,fill:"url(#steel)",stroke:"#55524a","stroke-width":.7},g);
+      }
+    });
+    S("rect",{x:-w*.36,y:y1off-38,width:w*.72,height:26,rx:7,fill:"url(#steel)",stroke:"#55524a","stroke-width":1},g);
+    return g;
+  }
   function piece(dir){
     var y0=dir*y0off, y1=dir*y1off, p=S("g",null,g), i, rows, t, rw, y;
     var taper=function(t2){return w*(1-t2*.16);};
@@ -928,8 +1079,8 @@ function pStrap(sk,c){
       S("rect",{x:-w/2+4,y:dir>0?y0+22:y0-34,width:w-8,height:12,rx:2,fill:"url(#leatherDark)",stroke:"#241708","stroke-width":.8},p);
       if(dir>0)S("rect",{x:-w/2+5,y:y1-28,width:w-10,height:15,rx:7,fill:"none",stroke:"url(#brass)","stroke-width":4.5},p);
       else for(i=0;i<4;i++)S("circle",{cx:0,cy:y1+dir*(-26-i*15),r:2.2,fill:"#2c281c"},p);
-    }else{ /* leather */
-      S("path",{d:d2,fill:"url(#leatherTan)",stroke:"#4a3018","stroke-width":1.2},p);
+    }else{ /* leather, in its colour */
+      S("path",{d:d2,fill:"url(#"+(sk.lg||"leatherTan")+")",stroke:"#2c1d10","stroke-width":1.2},p);
       S("path",{d:"M"+(-w/2+7)+" "+(y0+dir*10)+" L"+(-w/2+15)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},p);
       S("path",{d:"M"+(w/2-7)+" "+(y0+dir*10)+" L"+(w/2-15)+" "+(y1-dir*8),fill:"none",stroke:"#e9dfc8","stroke-width":1,"stroke-dasharray":"3 4",opacity:.5},p);
       S("path",{d:"M"+(-w/2+10)+" "+(dir*(y0off+34))+" Q0 "+(dir*(y0off+30))+" "+(w/2-10)+" "+(dir*(y0off+34)),fill:"none",stroke:"#4a3018","stroke-width":.8,opacity:.4},p);
@@ -973,11 +1124,24 @@ function minuteTicks(g,R,col,majW,minW){
   }
 }
 function pDial(dk,mv){
-  var g=S("g",null),R=138,k=dk.k,base=dk.base,ink=k==="field"?"#e9e3c8":"#26221b",sub=k==="field"?"#9a927c":"#8a6f52";
-  S("circle",{cx:0,cy:0,r:R,fill:base,stroke:k==="field"?"#0e0c09":"#8a7a5c","stroke-width":1.2},g);
-  S("circle",{cx:0,cy:0,r:R-2,fill:"none",stroke:"#000",opacity:.10,"stroke-width":3},g);
+  var g=S("g",null),R=138,k=dk.k,base=dk.base,dark=(k==="field"||k==="military"),
+      ink=dark?"#e9e3c8":"#26221b",sub=dark?"#9a927c":"#8a6f52";
+  if(k==="skeleton"){
+    /* openworked: a chapter ring, the movement showing through */
+    S("path",{d:ringPath(R,102),fill:base,"fill-rule":"evenodd",stroke:"#8a7a5c","stroke-width":1.2},g);
+  }else if(mv==="moon"){
+    /* aperture at six for the moon disc beneath */
+    S("path",{d:"M-"+R+" 0A"+R+" "+R+" 0 1 0 "+R+" 0A"+R+" "+R+" 0 1 0 -"+R+" 0Z"+
+      "M-30 72 A34 30 0 0 1 30 72 L-30 72Z",
+      fill:base,"fill-rule":"evenodd",stroke:dark?"#0e0c09":"#8a7a5c","stroke-width":1.2},g);
+    S("path",{d:"M-30 72 A34 30 0 0 1 30 72",fill:"none",stroke:"url(#gilt)","stroke-width":2.4},g);
+    S("line",{x1:-30,y1:72,x2:30,y2:72,stroke:"url(#gilt)","stroke-width":2.4},g);
+  }else{
+    S("circle",{cx:0,cy:0,r:R,fill:base,stroke:dark?"#0e0c09":"#8a7a5c","stroke-width":1.2},g);
+    S("circle",{cx:0,cy:0,r:R-2,fill:"none",stroke:"#000",opacity:.10,"stroke-width":3},g);
+  }
   /* the meridian — the house hairline, always */
-  S("line",{x1:0,y1:-R+7,x2:0,y2:R-7,stroke:sub,"stroke-width":.7,opacity:.45},g);
+  if(k!=="skeleton")S("line",{x1:0,y1:-R+7,x2:0,y2:R-7,stroke:sub,"stroke-width":.7,opacity:.45},g);
 
   if(k==="sector"){
     S("circle",{cx:0,cy:0,r:94,fill:"none",stroke:ink,"stroke-width":1.2},g);
@@ -1043,6 +1207,79 @@ function pDial(dk,mv){
       var an9=(h9-12)*TAU/12-TAU/4;
       dialText(g,px(0,64,an9),py(0,64,an9)+4,String(h9),11,{w:400,fill:sub});
     }
+  }else if(k==="skeleton"){
+    minuteTicks(g,R,ink,1.6,.7);
+    for(var b2=0;b2<12;b2++){
+      if(b2%3!==0)continue;
+      S("rect",{x:-3.4,y:-(R-22),width:6.8,height:14,fill:ink,transform:"rotate("+(b2*30)+")"},g);
+    }
+    /* four openwork bars carry the centre */
+    for(var b3=0;b3<4;b3++){
+      S("path",{d:"M-8 -104 C-4 -60 -4 -30 -7 -12 L7 -12 C4 -30 4 -60 8 -104 Z",
+        fill:base,stroke:"#8a7a5c","stroke-width":1,transform:"rotate("+(45+b3*90)+")"},g);
+    }
+    S("circle",{cx:0,cy:0,r:16,fill:"none",stroke:base,"stroke-width":7},g);
+    S("circle",{cx:0,cy:0,r:16,fill:"none",stroke:"#8a7a5c","stroke-width":1},g);
+  }else if(k==="regulator"){
+    minuteTicks(g,R,ink,1.6,.7);
+    numeralRing(g,116,15,{w:400,ls:.5});
+    var rh=S("g",{transform:"translate(0 -52)"},g);
+    S("circle",{cx:0,cy:0,r:37,fill:"#00000010",stroke:sub,"stroke-width":.9},rh);
+    S("circle",{cx:0,cy:0,r:30,fill:"none",stroke:sub,"stroke-width":.5,opacity:.7},rh);
+    [["12",0,-20],["3",22,3],["6",0,26],["9",-22,3]].forEach(function(q){
+      dialText(rh,q[1],q[2]+4,q[0],13,{serif:true,w:600});
+    });
+    dialText(g,0,20,"RÉGULATEUR",7,{fill:sub,ls:2.6,w:400});
+  }else if(k==="minimal"){
+    S("rect",{x:-2.5,y:-124,width:5,height:20,fill:ink},g);
+    S("circle",{cx:0,cy:118,r:2.4,fill:ink},g);
+    S("circle",{cx:-118,cy:0,r:2.4,fill:ink},g);
+    S("circle",{cx:118,cy:0,r:2.4,fill:ink},g);
+  }else if(k==="breguet"){
+    /* engine-turned centre, coined chapter */
+    S("circle",{cx:0,cy:0,r:78,fill:"url(#guillP)",stroke:sub,"stroke-width":.8},g);
+    S("circle",{cx:0,cy:0,r:122,fill:"none",stroke:ink,"stroke-width":.8},g);
+    S("circle",{cx:0,cy:0,r:98,fill:"none",stroke:ink,"stroke-width":.8},g);
+    for(var m5=0;m5<60;m5++){
+      var am5=m5*TAU/60;
+      if(m5%5===0)S("path",{d:"M0 -128 L2.6 -124 L0 -120 L-2.6 -124 Z",fill:ink,transform:"rotate("+(m5*6)+")"},g);
+      else S("circle",{cx:px(0,126,am5),cy:py(0,126,am5),r:.9,fill:ink},g);
+    }
+    numeralRing(g,110,21,{serif:true,italic:true,w:500});
+  }else if(k==="military"){
+    /* two-tone bullseye */
+    S("path",{d:ringPath(R-2,86),fill:"#1d1912","fill-rule":"evenodd"},g);
+    S("circle",{cx:0,cy:0,r:86,fill:"#ded6c0"},g);
+    minuteTicks(g,R,"#e9e3c8",1.8,.8);
+    numeralRing(g,110,22,{w:600,fill:"#e9e3c8"});
+    for(var h0=13;h0<=24;h0++){
+      var an0=(h0-12)*TAU/12-TAU/4;
+      dialText(g,px(0,66,an0),py(0,66,an0)+4,String(h0),11,{w:600,fill:"#4a4234"});
+    }
+    S("line",{x1:-30,y1:0,x2:30,y2:0,stroke:"#4a4234","stroke-width":.8,opacity:.7},g);
+    S("line",{x1:0,y1:-30,x2:0,y2:30,stroke:"#4a4234","stroke-width":.8,opacity:.7},g);
+  }else if(k==="deco"){
+    /* stepped geometry, a diamond frame */
+    S("path",{d:"M0 -122 L122 0 L0 122 L-122 0 Z",fill:"none",stroke:sub,"stroke-width":1.2},g);
+    S("path",{d:"M0 -112 L112 0 L0 112 L-112 0 Z",fill:"none",stroke:sub,"stroke-width":.6},g);
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(function(q){
+      var gx2=q[0]*104,gy2=q[1]*104;
+      S("rect",{x:gx2-11,y:gy2-11,width:22,height:22,fill:"none",stroke:"#26221b","stroke-width":2.4},g);
+      S("rect",{x:gx2-5,y:gy2-5,width:10,height:10,fill:"#26221b"},g);
+    });
+    [1,2,4,5,7,8,10,11].forEach(function(hd){
+      var and=hd*TAU/12-TAU/4;
+      S("circle",{cx:px(0,116,and),cy:py(0,116,and),r:2.6,fill:"#26221b"},g);
+    });
+    dialText(g,0,26,"ART DÉCO",7,{fill:sub,ls:4,w:400});
+  }
+  /* GMT: an inner 24-hour reading */
+  if(mv==="gmt"){
+    S("circle",{cx:0,cy:0,r:56,fill:"none",stroke:sub,"stroke-width":.6,opacity:.8},g);
+    [6,12,18,24].forEach(function(hq){
+      var anq=(hq%24)*TAU/24-TAU/4;
+      dialText(g,px(0,46,anq),py(0,46,anq)+4,String(hq),10,{w:600,fill:sub});
+    });
   }
   /* sheen — one window's worth of light */
   S("ellipse",{cx:-42,cy:-48,rx:92,ry:62,fill:"#fff",opacity:k==="field"?.045:.07},g);
@@ -1125,6 +1362,26 @@ var HSTY={
       S("line",{x1:0,y1:-61,x2:0,y2:-96,stroke:INKH,"stroke-width":2.8},g);
       S("path",{d:"M0 -112 L4.4 -97 L-4.4 -97 Z",fill:LUME,stroke:INKH,"stroke-width":1.4},g);return g;},
     s:function(){return secBase(S("g",null),114,INKH);}},
+  pencil:{
+    h:function(){var g=S("g",null);
+      S("path",{d:"M-5 -62 L0 -76 L5 -62 L5 6 L-5 6 Z",fill:INKH},g);
+      S("rect",{x:-2.2,y:-58,width:4.4,height:48,fill:LUME},g);
+      S("circle",{cx:0,cy:0,r:4.8,fill:INKH},g);return g;},
+    m:function(){var g=S("g",null);
+      S("path",{d:"M-4 -96 L0 -110 L4 -96 L4 6 L-4 6 Z",fill:INKH},g);
+      S("rect",{x:-1.8,y:-92,width:3.6,height:76,fill:LUME},g);return g;},
+    s:function(){return secBase(S("g",null),116,INKH);}},
+  syringe:{
+    h:function(){var g=S("g",null);
+      S("line",{x1:0,y1:8,x2:0,y2:-40,stroke:INKH,"stroke-width":2.6},g);
+      S("rect",{x:-4.5,y:-62,width:9,height:24,fill:"none",stroke:INKH,"stroke-width":2.2},g);
+      S("line",{x1:0,y1:-62,x2:0,y2:-78,stroke:INKH,"stroke-width":1.4},g);
+      S("circle",{cx:0,cy:0,r:4.4,fill:INKH},g);return g;},
+    m:function(){var g=S("g",null);
+      S("line",{x1:0,y1:8,x2:0,y2:-70,stroke:INKH,"stroke-width":2.2},g);
+      S("rect",{x:-3.8,y:-94,width:7.6,height:26,fill:"none",stroke:INKH,"stroke-width":2},g);
+      S("line",{x1:0,y1:-94,x2:0,y2:-112,stroke:INKH,"stroke-width":1.2},g);return g;},
+    s:function(){return secBase(S("g",null),118,INKH);}},
   mercedes:{
     h:function(){var g=S("g",null);
       S("line",{x1:0,y1:10,x2:0,y2:-38,stroke:INKH,"stroke-width":5},g);
@@ -1137,8 +1394,41 @@ var HSTY={
       S("path",{d:"M0 -102 L3.2 -28 L0 -16 L-3.2 -28 Z",fill:LUME},g);return g;},
     s:function(){return secBase(S("g",null),118,INKH,true);}}
 };
-function pHandH(){return HSTY[SEL.hands.k].h();}
+function pHandH(){
+  var g=HSTY[SEL.hands.k].h();
+  if(SEL.dial&&SEL.dial.k==="regulator"){var w2=S("g",null);g.setAttribute("transform","scale(.42)");w2.appendChild(g);return w2;}
+  return g;
+}
 function pHandM(){return HSTY[SEL.hands.k].m();}
+function pHandGMT(){
+  var g=S("g",null);
+  S("line",{x1:0,y1:10,x2:0,y2:-78,stroke:"#7c6136","stroke-width":2.6},g);
+  S("path",{d:"M0 -100 L8 -78 L-8 -78 Z",fill:"none",stroke:"#7c6136","stroke-width":2.2},g);
+  S("circle",{cx:0,cy:0,r:3.2,fill:"#7c6136"},g);
+  return g;
+}
+function pRotor(){
+  var g=S("g",null);
+  S("path",{d:"M-92 0 A92 92 0 0 1 92 0 L58 0 A58 58 0 0 0 -58 0 Z",fill:"url(#tantalum)",stroke:"#3c4247","stroke-width":1.4},g);
+  S("path",{d:"M-92 0 A92 92 0 0 1 92 0 L58 0 A58 58 0 0 0 -58 0 Z",fill:"url(#brushP)"},g);
+  S("path",{d:"M-58 0 L-24 0 L-16 -34 L16 -34 L24 0 L58 0 A58 58 0 0 0 -58 0Z",fill:"url(#maillechort)",stroke:"#8a7a5c","stroke-width":1},g);
+  var tr2=S("text",{x:0,y:-66,"text-anchor":"middle","font-family":"Archivo Narrow","font-size":9,"letter-spacing":"2.6",fill:"#d5d9db"},g);
+  tr2.textContent="CALAME · REMONTAGE LIBRE";
+  var j2=jewel(4.4);g.appendChild(j2);
+  S("circle",{cx:0,cy:0,r:10,fill:"none",stroke:"#66635a","stroke-width":2},g);
+  return g;
+}
+function pMoonDisc(){
+  var g=S("g",null);
+  S("circle",{cx:0,cy:0,r:36,fill:"#22304e",stroke:"#1a2338","stroke-width":1.4},g);
+  [[-20,-8,.9],[14,-22,.7],[26,6,.8],[-6,14,.6],[6,-6,.5],[-28,10,.6]].forEach(function(st2){
+    S("circle",{cx:st2[0],cy:st2[1],r:st2[2],fill:"#e9e3c8"},g);
+  });
+  S("circle",{cx:0,cy:-20,r:11,fill:"url(#gilt)",stroke:"#8a6330","stroke-width":.8},g);
+  S("circle",{cx:-3.4,cy:-23,r:2,fill:"#8a6330",opacity:.4},g);
+  S("circle",{cx:3,cy:-17,r:1.4,fill:"#8a6330",opacity:.35},g);
+  return g;
+}
 function pHandS(){
   if(SEL.movement.k==="petite"){
     var g=S("g",null);
@@ -1152,7 +1442,7 @@ function pHandS(){
 /* ============================================================
    STATE & SCENE GRAPH FOR THE BUILD
    ============================================================ */
-var state={idx:0,steps:[],mode:"idle",alive:false,tAlive:0,timeSet:false,handBase:{h:305,m:54,s:0},tSecMount:0,setAnim:null};
+var state={idx:0,steps:[],mode:"idle",alive:false,tAlive:0,timeSet:false,handBase:{h:305,m:54,s:0,g4:90},tSecMount:0,setAnim:null};
 var gMovWrap=S("g",{transform:"translate("+MOVX+" "+MOVY+")"},$("gWork"));
 var gFlip=S("g",null,gMovWrap);
 var gSideM=S("g",null,gFlip);   /* movement side */
@@ -1180,11 +1470,12 @@ function svgPt(e){
    ============================================================ */
 function buildSteps(){
   function W(spec){return function(){return pWheelTrain(spec)};}
-  var petite=SEL.movement.k==="petite";
-  return [
+  var petite=SEL.movement.k==="petite", mvk=SEL.movement.k;
+  var st=[
     {k:"PLATINE",title:"La platine",make:pPlate,tx:0,ty:0,gr:140,gx:0,gy:0,snd:"seat",
       lines:["Seat the main plate in the holder.","Everything is measured from here."],
       aside:["Maillechort, untreated","Ø 30.4 mm — 13¼ lignes","Five recesses, five jewels"]},
+    {type:"choose",cat:"finish"},
     {k:"BARILLET",title:"Le barillet",make:pBarrel,tx:L.barrel.x,ty:L.barrel.y,gr:56,snd:"seat",
       lines:["Three days of spring, coiled and","waiting. Lower it into its recess."],
       aside:["Laiton doré, 76 dents","Réserve: 72 heures"]},
@@ -1210,7 +1501,7 @@ function buildSteps(){
       lines:["The lever — two ruby pallets that","will speak to the escape wheel","five times every two seconds."],
       aside:["Acier, 2 palettes rubis","Sous son petit pont"]},
     {k:"REMONTAGE",type:"wind",title:"Le remontage",
-      lines:["Hold the ratchet screw and let it","turn. Three turns. The train strains","against the lever — and holds."],
+      lines:mvk==="auto"?["Even a rotor deserves a first meal.","Hold the ratchet; give the spring","three turns by hand."]:["Hold the ratchet screw and let it","turn. Three turns. The train strains","against the lever — and holds."],
       aside:["Énergie stockée","Rien ne bouge. Pas encore."]},
     {k:"BALANCIER",title:"Le balancier",make:pBalanceAssy,tx:L.balance.x,ty:L.balance.y,gr:58,snd:"seat",
       screws:[{x:-102,y:-40}],magic:true,
@@ -1224,7 +1515,8 @@ function buildSteps(){
       lines:["Your sheet. It drops onto its feet","and the day has a face."],
       aside:function(){return ["Cadran "+SEL.dial.name,petite?"Petite seconde à 6h":"Seconde au centre"]}},
     {type:"choose",cat:"hands"},
-    {k:"AIGUILLE DES HEURES",title:"L'aiguille des heures",make:pHandH,tx:0,ty:0,gr:26,snd:"snap",hand:"h",
+    {k:"AIGUILLE DES HEURES",title:"L'aiguille des heures",make:pHandH,tx:0,
+      dty:function(){return (SEL.dial&&SEL.dial.k==="regulator")?-52:0},ty:0,gr:26,snd:"snap",hand:"h",
       lines:["The hour hand presses onto the","cannon pinion, in the pattern","you chose."],aside:function(){return ["Motif "+SEL.hands.name]}},
     {k:"AIGUILLE DES MINUTES",title:"L'aiguille des minutes",make:pHandM,tx:0,ty:0,gr:26,snd:"snap",hand:"m",
       lines:["The minute needle, longer and","lighter. Press until it seats."],aside:function(){return ["Motif "+SEL.hands.name]}},
@@ -1239,9 +1531,11 @@ function buildSteps(){
     {k:"LUNETTE",title:"La lunette",make:function(){return pBezel(SEL.bezel,SEL.caze)},tx:0,ty:0,gr:104,snd:"snap",
       lines:["The bezel presses on with a half","turn. Engineering, seated."],
       aside:function(){return ["Lunette "+SEL.bezel.name]}},
-    {k:"COURONNE",title:"La couronne",make:function(){return pCrown(SEL.caze)},
-      dtx:function(){return SEL.caze.R+SEL.caze.crownR-4},ty:0,gr:26,snd:"snap",
-      lines:["The crown slides home on its stem.","Sized to its case, as it must be."],aside:["Prise gantée"]},
+    {type:"choose",cat:"crown"},
+    {k:"COURONNE",title:"La couronne",make:function(){return pCrown(SEL.crown,SEL.caze)},
+      dtx:function(){return SEL.caze.R+SEL.crown.r-4},ty:0,gr:26,snd:"snap",
+      lines:["The crown slides home on its stem.","The knurl you chose, under the","thumb every morning."],
+      aside:function(){return ["Couronne "+SEL.crown.name.toLowerCase()]}},
     {type:"choose",cat:"crystal"},
     {k:"GLACE",title:"La glace",make:function(){return pCrystal(SEL.crystal)},tx:0,ty:0,gr:90,snd:"thock",
       lines:["The crystal presses in with one","dull, honest sound."],
@@ -1254,6 +1548,23 @@ function buildSteps(){
       lines:["Pull the crown. Set the needles","to the observatory signal — now."],
       aside:["Signal de Neuchâtel"]}
   ];
+  /* movement architecture inserts its own organs */
+  function after(key,obj){
+    for(var i2=0;i2<st.length;i2++)if(st[i2].k===key){st.splice(i2+1,0,obj);return;}
+  }
+  if(mvk==="auto")after("BALANCIER",
+    {k:"ROTOR",title:"Le rotor",make:pRotor,tx:0,ty:0,gr:96,snd:"seat",
+      lines:["The winding mass, in tantalum.","From now on the wrist does","what the ratchet did."],
+      aside:["Remontage libre","Masse: tantale"]});
+  if(mvk==="moon")after("RETOURNEMENT",
+    {k:"DISQUE DE LUNE",title:"Le disque de lune",make:pMoonDisc,tx:0,ty:58,gr:40,snd:"snap",
+      lines:["The night sky, on a disc the size","of a thumbnail. It will show through","the window of your dial."],
+      aside:["Or sur émail bleui","59 dents, 29½ jours"]});
+  if(mvk==="gmt")after("AIGUILLE DES MINUTES",
+    {k:"AIGUILLE GMT",title:"L'aiguille des fuseaux",make:pHandGMT,tx:0,ty:0,gr:26,snd:"snap",hand:"g4",
+      lines:["The second time zone — one turn","a day, read on the inner ring."],
+      aside:["24 heures / tour"]});
+  return st;
 }
 
 /* ============================================================
@@ -1261,11 +1572,12 @@ function buildSteps(){
    ============================================================ */
 var drag=null, gGhost=S("g",null,$("gFloat"));
 function stepTx(step){return step.dtx?step.dtx():step.tx;}
-function targetGlobal(step){return {x:MOVX+stepTx(step),y:MOVY+step.ty};}
+function stepTy(step){return step.dty?step.dty():step.ty;}
+function targetGlobal(step){return {x:MOVX+stepTx(step),y:MOVY+stepTy(step)};}
 function ghostShow(step){
   ghostClear();
   var t=targetGlobal(step);
-  var gx=MOVX+(step.gx!=null?step.gx:stepTx(step)), gy=MOVY+(step.gy!=null?step.gy:step.ty);
+  var gx=MOVX+(step.gx!=null?step.gx:stepTx(step)), gy=MOVY+(step.gy!=null?step.gy:stepTy(step));
   var c=S("circle",{cx:gx,cy:gy,r:step.gr,fill:"none",stroke:"#dfe4da","stroke-width":1,
     "stroke-dasharray":"2 6",opacity:.2},gGhost);
   gGhost._c=c;
@@ -1343,16 +1655,16 @@ addEventListener("pointerup",function(){
 function install(d){
   var step=d.step;
   d.node.remove();ghostClear();
-  var side=(state.idx<=findIdx("BALANCIER"))?gSideM:gSideD;
-  var wtx=stepTx(step);
-  var wrap=S("g",{transform:"translate("+wtx+" "+step.ty+")"});
+  var side=(state.idx<findIdx("RETOURNEMENT"))?gSideM:gSideD;
+  var wtx=stepTx(step),wty=stepTy(step);
+  var wrap=S("g",{transform:"translate("+wtx+" "+wty+")"});
   var inner=step.make();wrap.appendChild(inner);
   if(step.strap){gSideD.insertBefore(wrap,gSideD.firstChild);}
   else side.appendChild(wrap);
   SND[step.snd||"snap"]();
   /* press-fit feel for hands & crystal */
   if(step.hand||step.k==="GLACE"){
-    tween(180,function(p){wrap.setAttribute("transform","translate("+wtx+" "+step.ty+") scale("+(1.14-p*.14)+")");});
+    tween(180,function(p){wrap.setAttribute("transform","translate("+wtx+" "+wty+") scale("+(1.14-p*.14)+")");});
   }
   /* remember what needs to move */
   if(step.k==="BARILLET")rotParts.barrel={el:inner,dir:1};
@@ -1360,6 +1672,7 @@ function install(d){
   if(step.k==="ROUE MOYENNE")rotParts.third={el:inner,dir:-1};
   if(step.k==="ROUE DES SECONDES")rotParts.fourth={el:inner,dir:1};
   if(step.k==="ÉCHAPPEMENT")rotParts.escape={el:inner,dir:-1};
+  if(step.k==="ROTOR")rotParts.rotor={el:inner};
   if(step.magic)balanceRef=inner;
   if(step.hand){HANDS[step.hand]={wrap:wrap,inner:inner};
     if(step.hand==="s")state.tSecMount=performance.now()/1000;
@@ -1504,20 +1817,108 @@ function setMode(){
 /* ————— finale: the certificate lists your decisions ————— */
 function finale(){
   state.mode="done";
-  var serial=380+Math.floor(Math.random()*260);
+  state.serial="0"+(380+Math.floor(Math.random()*260));
   var rate=(Math.random()*1.5+.2).toFixed(1);
   bpMark(state.steps[state.steps.length-1].bpi);
-  note("FIN DE FEUILLE","Instrument n° 0"+serial,
-    ["Observed rate: +"+rate+" s/d — printed","as measured, lived with as found.","Wear it until it is used up."],
+  note("FIN DE FEUILLE","Instrument n° "+state.serial,
+    ["Observed rate: +"+rate+" s/d — printed","as measured, lived with as found.","The studio is ready when you are."],
     ["Boîte "+SEL.caze.name+" · lunette "+SEL.bezel.name,
      "Cadran "+SEL.dial.name+" · aiguilles "+SEL.hands.name,
      "Glace "+SEL.crystal.name.toLowerCase()+" · "+SEL.strap.name,
-     SEL.movement.k==="petite"?"O-46 PS, petite seconde":"O-46 TC, trotteuse centrale",
+     "Calibre "+SEL.movement.name+" · "+SEL.finish.name,
      "47°03´23˝N · 6°44´57˝E · 946 m"]);
   var w=$("gWorkWrap");
   w.style.transition="transform 2.6s cubic-bezier(.22,.8,.24,1)";
   w.style.transformOrigin=MOVX+"px "+MOVY+"px";
   w.style.transform="scale(1.12)";
+  /* a paper tab appears at the bench edge */
+  var tab=S("g",{transform:"translate(1268 232) rotate(-2)",cursor:"pointer"},$("gProps"));
+  S("ellipse",{cx:3,cy:26,rx:58,ry:7,fill:"#140b04",opacity:.3},tab);
+  S("rect",{x:-60,y:-20,width:120,height:42,fill:"url(#paper)",stroke:"#b3a488","stroke-width":.8},tab);
+  T(tab,0,-1,"Studio",17,{serif:true,italic:true,anchor:"middle",w:600});
+  T(tab,0,15,"PHOTOGRAPHIE",7,{anchor:"middle",fill:"#8a6f52",ls:2.4});
+  tab.addEventListener("pointerdown",function(){studio();});
+}
+
+/* ============================================================
+   STUDIO — luxury photography of what you built
+   ============================================================ */
+var STU={rot:0,mac:false,bg:null,light:null};
+function studio(){
+  state.mode="studio";SND.paper();
+  ["gProps","gMat","gBlueprint","gNotebook","gTray"].forEach(function(id){$(id).setAttribute("display","none");});
+  $("holderG").setAttribute("display","none");
+  ghostClear();
+  /* backdrop under the watch */
+  STU.bg=S("rect",{width:1440,height:900,fill:"#0e0d0c"});
+  scene.insertBefore(STU.bg,$("gWorkWrap"));
+  STU.light=S("ellipse",{cx:720,cy:430,rx:680,ry:460,fill:"url(#lampPool)",opacity:1});
+  scene.insertBefore(STU.light,$("gWorkWrap"));
+  var w=$("gWorkWrap");
+  w.style.transition="transform 1.6s cubic-bezier(.22,.8,.24,1)";
+  w.style.transform="translate(30px,-16px) scale(1.62)";
+  /* rotate by dragging anywhere on the piece */
+  var dragging=false,lx=0;
+  scene.addEventListener("pointerdown",function(e){if(state.mode==="studio"){dragging=true;lx=e.clientX;}});
+  addEventListener("pointermove",function(e){
+    if(!dragging||state.mode!=="studio")return;
+    STU.rot+=(e.clientX-lx)*.35;lx=e.clientX;
+    gFlip.setAttribute("transform","rotate("+STU.rot+")");
+  });
+  addEventListener("pointerup",function(){dragging=false;});
+  /* quiet controls, bottom rail */
+  var ui=S("g",{id:"gStudioUI"},scene);
+  function label(x,txt,cb){
+    var b=S("g",{transform:"translate("+x+" 856)",cursor:"pointer"},ui);
+    var t2=T(b,0,0,txt,10,{fill:"#c9b493",anchor:"middle",ls:2.6});
+    S("rect",{x:-t2.textContent.length*4.4-8,y:-14,width:t2.textContent.length*8.8+16,height:22,fill:"transparent"},b);
+    b.addEventListener("pointerdown",function(e){e.stopPropagation();cb(b);});
+    return b;
+  }
+  /* backdrops */
+  [["#0e0d0c",250],["url(#leatherDark)",286],["#8b8a86",322],["url(#wood)",358],["#e6e0d1",394]].forEach(function(q){
+    var sw=S("circle",{cx:q[1],cy:856,r:11,fill:q[0],stroke:"#c9b493","stroke-width":1,cursor:"pointer"},ui);
+    sw.addEventListener("pointerdown",function(e){e.stopPropagation();STU.bg.setAttribute("fill",q[0]);SND.pick();});
+  });
+  T(ui,322,830,"FOND",8,{fill:"#8a6f52",anchor:"middle",ls:3});
+  /* light */
+  label(520,"CHAUD",function(){STU.light.setAttribute("fill","url(#lampPool)");STU.light.setAttribute("opacity",1);SND.pick();});
+  label(610,"FROID",function(){STU.light.setAttribute("fill","#cfe0e6");STU.light.setAttribute("opacity",.06);SND.pick();});
+  label(700,"NUIT",function(){STU.light.setAttribute("opacity",0);SND.pick();});
+  T(ui,610,830,"LUMIÈRE",8,{fill:"#8a6f52",anchor:"middle",ls:3});
+  /* macro */
+  label(820,"MACRO",function(b){
+    STU.mac=!STU.mac;
+    $("gWorkWrap").style.transform=STU.mac?"translate(30px,-16px) scale(2.5)":"translate(30px,-16px) scale(1.62)";
+    SND.pick();
+  });
+  /* wallpaper */
+  label(960,"PAPIER PEINT ↓",wallpaper);
+  /* again */
+  label(1140,"NOUVELLE COMMANDE",function(){location.reload();});
+  T(ui,720,884,"INSTRUMENT N° "+state.serial+" · CALAME, LE LOCLE",8.5,{fill:"#8a6f52",anchor:"middle",ls:2.4});
+}
+function wallpaper(){
+  try{
+    var xs=new XMLSerializer();
+    var defsStr=xs.serializeToString(scene.querySelector("defs"));
+    var watchStr=xs.serializeToString($("gWork"));
+    var bg=STU.bg?STU.bg.getAttribute("fill"):"#0e0d0c";
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1200">'+
+      '<style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&amp;family=Archivo+Narrow:wght@400;500;600&amp;display=swap");</style>'+
+      defsStr+
+      '<rect width="1920" height="1200" fill="'+bg+'"/>'+
+      '<ellipse cx="960" cy="560" rx="880" ry="600" fill="url(#lampPool)"/>'+
+      '<g transform="translate(960 560) scale(2.1) rotate('+STU.rot+') translate(-690 -470)">'+watchStr+'</g>'+
+      '<text x="960" y="1120" text-anchor="middle" font-family="Archivo Narrow" font-size="17" letter-spacing="6" fill="#8a6f52">INSTRUMENT N° '+state.serial+' · CALAME · LE LOCLE · 946 M</text>'+
+      '</svg>';
+    var blob=new Blob([svg],{type:"image/svg+xml"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="calame-"+state.serial+".svg";
+    document.body.appendChild(a);a.click();a.remove();
+    SND.paper();
+  }catch(err){}
 }
 
 /* ============================================================
@@ -1525,7 +1926,14 @@ function finale(){
    ============================================================ */
 function thumbFor(cat,it){
   var g=S("g",null);
-  if(cat==="dial"){g.appendChild(pDial(it,SEL.movement?SEL.movement.k:"centre"));}
+  if(cat==="dial"){
+    if(it.k==="skeleton"){
+      S("circle",{cx:0,cy:0,r:120,fill:"#c9bda1"},g);
+      S("circle",{cx:-30,cy:24,r:34,fill:"none",stroke:"#a8946a","stroke-width":5},g);
+      S("circle",{cx:34,cy:-18,r:24,fill:"none",stroke:"#a8946a","stroke-width":4},g);
+    }
+    g.appendChild(pDial(it,SEL.movement?SEL.movement.k:"centre"));
+  }
   else if(cat==="caze"){S("circle",{cx:0,cy:0,r:130,fill:"#2e2a25"},g);g.appendChild(pCase(it));}
   else if(cat==="hands"){
     S("circle",{cx:0,cy:0,r:118,fill:"#dcd8ca",stroke:"#8a7a5c","stroke-width":2},g);
@@ -1542,13 +1950,29 @@ function thumbFor(cat,it){
     S("path",{d:prof,fill:"none",stroke:"#dfe4da","stroke-width":5,opacity:.8,"stroke-linecap":"round"},g);
   }else if(cat==="strap"){
     g.appendChild(pStrap(it,{shape:"round",R:8,lug:"plain"}));
+  }else if(cat==="finish"){
+    S("rect",{x:-84,y:-56,width:168,height:112,rx:20,fill:"url(#maillechort)",stroke:"#8a7a5c","stroke-width":2},g);
+    var fpk={cotes:"url(#cotesP)",perlage:"url(#perlP)",sable:"url(#sableP)"}[it.k];
+    S("rect",{x:-84,y:-56,width:168,height:112,rx:20,fill:fpk},g);
+    var sc2=screwHead(9);sc2.setAttribute("transform","translate(-52 28)");g.appendChild(sc2);
+    var j3=jewel(8);j3.setAttribute("transform","translate(44 -18)");g.appendChild(j3);
+  }else if(cat==="crown"){
+    S("circle",{cx:0,cy:0,r:96,fill:"#2e2a25"},g);
+    var cr2=pCrown(it,{metal:"steel"});cr2.setAttribute("transform","scale(4.6)");g.appendChild(cr2);
   }else if(cat==="movement"){
     S("rect",{x:-88,y:-116,width:176,height:232,rx:3,fill:"url(#paper)",stroke:"#b3a488","stroke-width":1},g);
     S("circle",{cx:0,cy:-24,r:62,fill:"none",stroke:"#3d3122","stroke-width":2.4},g);
     S("circle",{cx:0,cy:-24,r:3.4,fill:"#3d3122"},g);
     if(it.k==="centre"){S("line",{x1:0,y1:-24,x2:0,y2:-78,stroke:"#c9391b","stroke-width":2.6},g);}
-    else{S("circle",{cx:0,cy:8,r:17,fill:"none",stroke:"#3d3122","stroke-width":2},g);
+    else if(it.k==="petite"){S("circle",{cx:0,cy:8,r:17,fill:"none",stroke:"#3d3122","stroke-width":2},g);
       S("line",{x1:0,y1:8,x2:0,y2:-7,stroke:"#c9391b","stroke-width":2},g);}
+    else if(it.k==="auto"){S("path",{d:"M-44 -24 A44 44 0 0 1 44 -24",fill:"none",stroke:"#3d3122","stroke-width":10,opacity:.8},g);
+      S("line",{x1:0,y1:-24,x2:0,y2:-64,stroke:"#c9391b","stroke-width":2.2},g);}
+    else if(it.k==="gmt"){S("line",{x1:0,y1:-24,x2:0,y2:-72,stroke:"#3d3122","stroke-width":2.4},g);
+      S("path",{d:"M0 -80 L6 -66 L-6 -66 Z",fill:"none",stroke:"#c9391b","stroke-width":2},g);
+      S("circle",{cx:0,cy:-24,r:26,fill:"none",stroke:"#3d3122","stroke-width":.8,"stroke-dasharray":"2 5"},g);}
+    else{S("path",{d:"M-16 16 A22 22 0 0 1 16 16 L-16 16Z",fill:"none",stroke:"#3d3122","stroke-width":2},g);
+      S("circle",{cx:4,cy:6,r:6,fill:"none",stroke:"#c9391b","stroke-width":1.8},g);}
     var dt=S("text",{x:0,y:78,"text-anchor":"middle","font-family":"Archivo Narrow","font-size":13,fill:"#8a6f52","letter-spacing":"1.5"},g);
     dt.textContent=it.d||"";
   }
@@ -1557,17 +1981,25 @@ function thumbFor(cat,it){
 function choiceMode(step,onPick){
   state.mode="choose";
   var cat=step.cat, items=CAT[cat].items, n=items.length;
-  var sp=n>5?118:(n>4?132:(n>2?176:230));
-  var x0=720-(n-1)*sp/2, lay=S("g",null,$("gFloat"));
+  var lay=S("g",null,$("gFloat"));
+  /* the lamp dims everything but the decision */
+  S("rect",{x:0,y:0,width:1440,height:900,fill:"#161311",opacity:.30},lay);
+  var perRow=n>8?Math.ceil(n/2):n;
+  var rows=Math.ceil(n/perRow);
+  var sp=perRow>5?118:(perRow>4?134:(perRow>2?178:232));
+  var scale=(rows>1?.32:(cat==="movement"?.52:.38));
   items.forEach(function(it,i){
-    var bx=x0+i*sp, by=248;
+    var row=Math.floor(i/perRow), inRow=i-row*perRow;
+    var rowCount=Math.min(perRow,n-row*perRow);
+    var bx=720-(rowCount-1)*sp/2+inRow*sp;
+    var by=rows>1?(row===0?196:366):248;
     var c=S("g",{transform:"translate("+bx+" "+by+")",cursor:"pointer"},lay);
-    S("ellipse",{cx:2,cy:58,rx:48,ry:9,fill:"#140b04",opacity:.22},c);
-    var th=S("g",{transform:"scale("+(cat==="movement"?.52:.38)+")"},c);
+    S("ellipse",{cx:2,cy:rows>1?50:58,rx:46,ry:8,fill:"#140b04",opacity:.28},c);
+    var th=S("g",{transform:"scale("+scale+")"},c);
     th.appendChild(thumbFor(cat,it));
-    var tag=S("g",{transform:"translate(0 74)"},c);
+    var tag=S("g",{transform:"translate(0 "+(rows>1?62:74)+")"},c);
     S("rect",{x:-52,y:-12,width:104,height:24,fill:"url(#paper)",stroke:"#b3a488","stroke-width":.6},tag);
-    T(tag,0,5,it.name,12.5,{serif:true,italic:true,anchor:"middle",w:600});
+    T(tag,0,5,it.name,12,{serif:true,italic:true,anchor:"middle",w:600});
     c.addEventListener("pointerenter",function(){c.setAttribute("transform","translate("+bx+" "+(by-8)+")");});
     c.addEventListener("pointerleave",function(){c.setAttribute("transform","translate("+bx+" "+by+")");});
     c.addEventListener("pointerdown",function(e){
@@ -1636,6 +2068,7 @@ function rset(el,key,ang){
     if(rotParts.fourth)rset(rotParts.fourth.el,"fw",e*6);
     if(rotParts.third)rset(rotParts.third.el,"tw",-e*.8);
     if(rotParts.center)rset(rotParts.center.el,"cw",e*.1);
+    if(rotParts.rotor)rset(rotParts.rotor.el,"ro",52*Math.sin(e*.55)+e*3);
   }
   /* hands */
   var n=new Date(),sec=n.getSeconds()+n.getMilliseconds()/1000;
@@ -1649,6 +2082,7 @@ function rset(el,key,ang){
   }else if(state.timeSet){
     if(HANDS.h)rset(HANDS.h.inner,"hh",((n.getHours()%12)+n.getMinutes()/60)*30);
     if(HANDS.m)rset(HANDS.m.inner,"mh",(n.getMinutes()+sec/60)*6);
+    if(HANDS.g4)rset(HANDS.g4.inner,"gh",(n.getHours()+n.getMinutes()/60)*15);
   }
   requestAnimationFrame(live);
 })();
@@ -1658,13 +2092,13 @@ function rset(el,key,ang){
    ============================================================ */
 function commission(){
   note("L'ÉTABLI","The commission.",
-    ["Nothing is predetermined today.","Seven decisions will pass through","your hands. First: the calibre."],
-    ["O-46 · deux architectures","Choisissez sur le tapis."]);
+    ["Nothing is predetermined today.","Nine decisions will pass through","your hands. First: the calibre."],
+    ["O-46 · cinq architectures","Choisissez sur le tapis."]);
   choiceMode({cat:"movement"},start);
 }
 function start(){
   state.steps=buildSteps();state.idx=-1;
-  BP.ref.textContent="COMMANDE SPÉCIALE · O-46 "+(SEL.movement.k==="petite"?"PS":"TC");
+  BP.ref.textContent="COMMANDE SPÉCIALE · O-46 "+({centre:"TC",petite:"PS",auto:"AU",gmt:"GMT",moon:"PL"}[SEL.movement.k]||"");
   var names=[];
   state.steps.forEach(function(s2){
     if(s2.type!=="choose"){s2.bpi=names.length;names.push(s2.k);}
