@@ -140,6 +140,9 @@ key.shadow.mapSize.set(2048,2048);key.shadow.radius=6;
 key.shadow.camera.left=-3;key.shadow.camera.right=3;key.shadow.camera.top=3;key.shadow.camera.bottom=-3;
 scene.add(key);
 const rim=new THREE.DirectionalLight(0xdce8f2,.7);rim.position.set(-4,2,-3);scene.add(rim);
+/* soft fill from the camera so face-on metal never reads black */
+const fill=new THREE.PointLight(0xfff4e2,14,0,2);
+camera.add(fill);fill.position.set(.4,.6,.2);scene.add(camera);
 
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.ShadowMaterial({opacity:.42}));
 ground.rotation.x=-Math.PI/2;ground.position.y=-1.75;ground.receiveShadow=true;scene.add(ground);
@@ -166,9 +169,9 @@ const inkMat=()=>new THREE.MeshPhysicalMaterial({color:0x17140f,metalness:.4,rou
 const lumeMat=()=>new THREE.MeshPhysicalMaterial({color:0xe9e3c8,metalness:0,roughness:.6,emissive:0x2a2718});
 const vermMat=()=>new THREE.MeshPhysicalMaterial({color:0xc9391b,metalness:.2,roughness:.35});
 function glassMat(){
-  return new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.02,
-    transmission:1,thickness:.12,ior:1.52,transparent:true,envMapIntensity:1.4,
-    clearcoat:1,clearcoatRoughness:.02});
+  return new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.03,
+    transmission:.96,thickness:.04,ior:1.5,transparent:true,envMapIntensity:.5,
+    specularIntensity:.6});
 }
 /* ————— canvas dial textures: crisp print, real typography ————— */
 function dialCanvas(fam,mv,shape){
@@ -477,15 +480,15 @@ function buildBezel(bz,cs,met){
       kn.material.flatShading=true;kn.rotation.x=Math.PI/2;kn.position.z=.03;g.add(kn);
     }
   }else if(bz.k==='fluted'){
-    const base=new THREE.Mesh(new THREE.CylinderGeometry(ro,ro,.06,96),met.bru());
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(ro,ro,.06,96),met.pol());
     base.rotation.x=Math.PI/2;base.position.z=.03;g.add(base);
-    const n=52,fg=new THREE.BoxGeometry(2*Math.PI*rm/n*.62,ro-ri,.1);
+    const n=56,fg=new THREE.BoxGeometry(2*Math.PI*rm/n*.58,(ro-ri)*.9,.035);
     const inst=new THREE.InstancedMesh(fg,met.pol(),n);
     const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler();
     for(let i=0;i<n;i++){
       const a=i*2*Math.PI/n;
-      E.set(i%2?.5:-.5,0,a+Math.PI/2);Q.setFromEuler(E);
-      M.compose(new THREE.Vector3(Math.cos(a)*rm,Math.sin(a)*rm,.055),Q,new THREE.Vector3(1,1,1));
+      E.set(i%2?.16:-.16,0,a+Math.PI/2);Q.setFromEuler(E);
+      M.compose(new THREE.Vector3(Math.cos(a)*rm,Math.sin(a)*rm,.062),Q,new THREE.Vector3(1,1,1));
       inst.setMatrixAt(i,M);
     }
     g.add(inst);
@@ -603,11 +606,12 @@ function buildCrystal(cr,cs,topZ){
     const m=new THREE.Mesh(new THREE.CylinderGeometry(R+.03,R+.03,.05,64),glassMat());
     m.rotation.x=Math.PI/2;m.position.z=topZ+.03;g.add(m);
   }else if(cr.k==='domed'){
-    const sph=new THREE.SphereGeometry(R*1.9,64,32,0,Math.PI*2,0,.56);
+    const sph=new THREE.SphereGeometry(R*1.45,64,32,0,Math.PI*2,0,.76);
+    sph.scale(1,.42,1);sph.computeVertexNormals();
     const m=new THREE.Mesh(sph,glassMat());
     m.rotation.x=Math.PI/2;
-    m.position.z=topZ-R*1.9*Math.cos(.56)+.03;
-    m.scale.z=.6;g.add(m);
+    m.position.z=topZ-R*1.45*Math.cos(.76)*.42+.04;
+    g.add(m);
   }else{ /* box */
     const wall=new THREE.Mesh(new THREE.CylinderGeometry(R+.02,R+.02,.16,64,1,true),glassMat());
     wall.rotation.x=Math.PI/2;wall.position.z=topZ+.08;g.add(wall);
@@ -636,7 +640,7 @@ function buildStrap(st,cs,met,backZ){
   const g=new THREE.Group();
   const wristR=1.5,zc=backZ-wristR+.12,w=cs.lugW;
   if(st.k==='leather'||st.k==='rubber'){
-    const geo=new THREE.CylinderGeometry(wristR+.04,wristR+.04,w,120,1,true,Math.PI*.14,Math.PI*1.72);
+    const geo=new THREE.CylinderGeometry(wristR+.04,wristR+.04,w,120,1,true,Math.PI*1.14,Math.PI*1.72);
     const mat=st.k==='leather'
       ?new THREE.MeshPhysicalMaterial({map:leatherCanvas(st.col),roughness:.72,metalness:0,side:THREE.DoubleSide})
       :new THREE.MeshPhysicalMaterial({color:st.col,roughness:.85,metalness:0,side:THREE.DoubleSide});
