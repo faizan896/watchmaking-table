@@ -933,7 +933,12 @@ window.CAL={
   stage:()=>stageIdx,
   frame,
   snap:()=>{frame();return renderer.domElement.toDataURL('image/png').length;},
-  sel:SEL
+  sel:SEL,
+  dialTest:k=>{try{const t=dialCanvas(DIALS.find(d=>d.k===k),'manual','round');
+    return 'len:'+t.image.toDataURL().length;}catch(e){return 'ERR:'+e.message;}},
+  parts:()=>Object.keys(PARTS).join(',')+' | dialKids:'+(PARTS.dial?PARTS.dial.children.length:-1)
+    +' | map:'+(PARTS.dial&&PARTS.dial.children[0]&&PARTS.dial.children[0].material&&PARTS.dial.children[0].material.map?'yes':'no')
+    +' | dialZ:'+(PARTS.dial?PARTS.dial.position.z.toFixed(3):'-')
 };
 </script>
 </body>
