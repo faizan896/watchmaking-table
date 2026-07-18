@@ -184,10 +184,11 @@ function dialCanvas(fam,mv,shape){
   /* sunray: hundreds of alpha rays from centre */
   if(fam.sunray){
     x.save();x.translate(cx,cy);
-    for(let i=0;i<720;i++){
-      x.rotate(Math.PI/360);
-      x.strokeStyle=`rgba(255,255,255,${.02+.05*Math.abs(Math.sin(i*.35))})`;
-      x.lineWidth=1.1;x.beginPath();x.moveTo(0,0);x.lineTo(0,-S*.52);x.stroke();
+    for(let i=0;i<360;i++){
+      x.rotate(Math.PI/180);
+      const a2=Math.abs(Math.sin(i*.6));
+      x.strokeStyle=i%2?`rgba(255,255,255,${.012+.05*a2})`:`rgba(0,0,0,${.012+.04*(1-a2)})`;
+      x.lineWidth=1.6;x.beginPath();x.moveTo(0,0);x.lineTo(0,-S*.52);x.stroke();
     }
     x.restore();
   }
@@ -234,6 +235,9 @@ function dialCanvas(fam,mv,shape){
     x.beginPath();x.moveTo(cx-22,cy+S*.42);x.lineTo(cx+22,cy+S*.42);x.lineTo(cx,cy+S*.35);x.fill();
   }else if(fam.k==='salmon'){
     for(let h=1;h<=12;h++)num(String(h),h,S*.4,`600 ${S*.052}px "Cormorant Garamond"`);
+  }else if(fam.sunray){
+    /* sunray sheets: bold 12 · 6 with the applied metal batons elsewhere */
+    [[12,'12'],[6,'6']].forEach(q=>num(q[1],q[0],S*.36,`600 ${S*.09}px "Archivo Narrow"`));
   }
   /* petite seconde register */
   if(mv==='petite'){
@@ -537,7 +541,7 @@ function buildDial(dl,cs,mv){
   if(dl.applied&&!cs.rect){
     const met=SEL.metal;
     for(let h=0;h<12;h++){
-      if(mv.k==='petite'&&h===6)continue;
+      if(h===0||h===6)continue; /* numerals live at 12 and 6 */
       const a=h*Math.PI/6,r=cs.holeR*.78;
       const bar=new THREE.Mesh(new THREE.BoxGeometry(.045,.15,.03),met.pol());
       bar.position.set(Math.sin(a)*r,Math.cos(a)*r,.02);
