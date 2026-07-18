@@ -170,9 +170,10 @@ const inkMat=()=>new THREE.MeshPhysicalMaterial({color:0x17140f,metalness:.4,rou
 const lumeMat=()=>new THREE.MeshPhysicalMaterial({color:0xe9e3c8,metalness:0,roughness:.6,emissive:0x2a2718});
 const vermMat=()=>new THREE.MeshPhysicalMaterial({color:0xc9391b,metalness:.2,roughness:.35});
 function glassMat(){
-  return new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.03,
-    transmission:.96,thickness:.04,ior:1.5,transparent:true,envMapIntensity:.5,
-    specularIntensity:.6});
+  /* reflection-glass: dial stays crisp beneath, highlights live on top, zero transmission cost */
+  return new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.02,
+    transparent:true,opacity:.13,envMapIntensity:1.1,
+    clearcoat:1,clearcoatRoughness:.02,side:THREE.DoubleSide,depthWrite:false});
 }
 /* ————— canvas dial textures: crisp print, real typography ————— */
 function dialCanvas(fam,mv,shape){
