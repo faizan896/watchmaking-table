@@ -576,7 +576,7 @@ function drawStrap(c,R,fam){
       for(let i=0;i<rows;i++){
         const t=i/rows, t2=(i+.88)/rows;
         const y0=dir*(top+ (far-top)*t), y1=dir*(top+(far-top)*t2);
-        const w0=halfW*(1-t*.30), w1=halfW*(1-t2*.30);
+        const w0=halfW*(1-t*.13), w1=halfW*(1-t2*.13);
         const cols=(k==='jubilee')?[.20,.13,.34,.13,.20]:(k==='president'?[.28,.44,.28]:[.30,.40,.30]);
         let x=-w0,x1=-w1;
         cols.forEach((cw,ci)=>{
@@ -808,10 +808,10 @@ function drawCrystal(c,R){
   g.addColorStop(0,'rgba(255,255,255,.26)');g.addColorStop(.34,'rgba(255,255,255,.05)');
   g.addColorStop(1,'rgba(255,255,255,0)');
   c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
-  c.globalAlpha=.22;c.fillStyle='#fff';
-  c.beginPath();c.ellipse(-R*.36,-R*.42,R*.42,R*.17,-.72,0,TAU);c.fill();
-  c.globalAlpha=.10;
-  c.beginPath();c.ellipse(R*.34,R*.44,R*.3,R*.1,-.7,0,TAU);c.fill();
+  c.globalAlpha=.10;c.fillStyle='#fff';
+  c.beginPath();c.ellipse(-R*.40,-R*.46,R*.36,R*.11,-.72,0,TAU);c.fill();
+  c.globalAlpha=.05;
+  c.beginPath();c.ellipse(R*.40,R*.48,R*.24,R*.07,-.7,0,TAU);c.fill();
   c.globalAlpha=1;c.restore();
 }
 function render(){
