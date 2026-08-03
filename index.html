@@ -144,7 +144,7 @@ const S={
   /* strap */
   strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
   /* meta */
-  name:'', wrist:false,
+  name:'', wrist:false, skin:'light',
   /* stage */
   bg:'#121110'
 };
@@ -981,10 +981,29 @@ function renderBase(){
   X.clearRect(0,0,w,h);
   X.fillStyle=S.bg;X.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
-  const R=Math.min(w,h)*.185*(S.size/38)*(S.wrist?.86:1);
+  const R=Math.min(w,h)*.185*(S.size/38)*(S.wrist?.82:1);
   X.save();X.translate(w/2,h/2);
-  if(S.wrist)drawWrist(X,R,w,h);
-  drawStrap(X,R,fam);
+  if(S.wrist){
+    drawWrist(X,R,w,h);
+    /* strap wraps the arm and vanishes at its edges */
+    X.save();clipArm(X,R,h);
+    drawStrap(X,R,fam);
+    /* the strap presses into the skin */
+    X.globalCompositeOperation='multiply';
+    const cs=X.createLinearGradient(-R*1.6,0,R*1.6,0);
+    cs.addColorStop(0,'rgba(0,0,0,.45)');cs.addColorStop(.5,'rgba(0,0,0,0)');
+    cs.addColorStop(1,'rgba(0,0,0,.45)');
+    X.fillStyle=cs;X.fillRect(-R*1.6,-h,R*3.2,2*h);
+    X.restore();
+    /* contact shadow under the case */
+    X.save();
+    try{X.filter='blur(16px)';}catch(e){}
+    X.globalAlpha=.55;X.fillStyle='#000';
+    X.beginPath();X.ellipse(R*.10,R*.16,R*1.05,R*1.02,0,0,TAU);X.fill();
+    X.restore();
+  }else{
+    drawStrap(X,R,fam);
+  }
   drawLugs(X,R,fam,M);
   drawCrown(X,R,fam,M);
   drawCase(X,R,fam,M);
@@ -1116,6 +1135,7 @@ function build(){
     });
     g.appendChild(box);add(g);
     add(chips('View',[{v:false,n:'Studio'},{v:true,n:'On the wrist'}],S.wrist,v=>S.wrist=v));
+    if(S.wrist)add(chips('Skin tone',Object.keys(SKIN).map(k=>({v:k,n:SKIN[k].n,c:SKIN[k].mid})),S.skin,v=>S.skin=v,true));
     const nm=document.createElement('div');nm.className='grp';
     nm.innerHTML='<h4>Name your design</h4>';
     const inp=document.createElement('input');inp.className='tin';
@@ -1239,25 +1259,74 @@ function thumb(cvs,spec){
   Object.assign(S,keep);
 }
 /* ————— the wrist ————— */
-function drawWrist(c,R,w,h){
-  const armW=R*2.9;
-  const g=c.createLinearGradient(-armW/2,0,armW/2,0);
-  g.addColorStop(0,'#4c3a2d');g.addColorStop(.28,'#8a6a51');
-  g.addColorStop(.55,'#9d7a5e');g.addColorStop(1,'#4a382b');
-  c.save();
-  c.fillStyle=g;
+const SKIN={
+  fair  :{n:'Fair',   hi:'#f0cdb2',mid:'#dfae8d',lo:'#a97a5c',deep:'#7a5340'},
+  light :{n:'Light',  hi:'#e6bd9a',mid:'#cf9d76',lo:'#9a6b4a',deep:'#6d4831'},
+  olive :{n:'Olive',  hi:'#d8ab7c',mid:'#bd8a58',lo:'#8a5f38',deep:'#5d3f26'},
+  brown :{n:'Brown',  hi:'#a9714a',mid:'#8a5733',lo:'#5f3a21',deep:'#3f2616'},
+  deep  :{n:'Deep',   hi:'#7c4f31',mid:'#5f3a22',lo:'#402614',deep:'#28170c'}
+};
+/* the forearm silhouette: narrow at the hand, wider toward the elbow, with the ulna bump */
+function armPath(c,R,h){
+  const wTop=R*2.35, wBot=R*3.15;
   c.beginPath();
-  c.moveTo(-armW/2,-h);
-  c.quadraticCurveTo(-armW*.54,0,-armW/2*.86,h);
-  c.lineTo(armW/2*.86,h);
-  c.quadraticCurveTo(armW*.54,0,armW/2,-h);
-  c.closePath();c.fill();
-  /* soft shading under the case */
-  const sg=c.createRadialGradient(0,0,R*.4,0,0,R*2.2);
-  sg.addColorStop(0,'rgba(0,0,0,.42)');sg.addColorStop(1,'rgba(0,0,0,0)');
-  c.fillStyle=sg;c.fillRect(-armW,-h,armW*2,h*2);
+  c.moveTo(-wTop/2,-h*1.1);
+  c.bezierCurveTo(-wTop/2-R*.06,-h*.34, -wTop*.60,-R*.15, -wTop*.545,R*.30);
+  c.bezierCurveTo(-wBot*.52,h*.45, -wBot/2,h*.8, -wBot/2,h*1.1);
+  c.lineTo(wBot/2,h*1.1);
+  c.bezierCurveTo(wBot/2,h*.8, wBot*.52,h*.45, wTop*.545,R*.30);
+  c.bezierCurveTo(wTop*.60,-R*.15, wTop/2+R*.06,-h*.34, wTop/2,-h*1.1);
+  c.closePath();
+}
+function drawWrist(c,R,w,h){
+  const T=SKIN[S.skin]||SKIN.light, wBot=R*3.15;
+  c.save();
+  /* out-of-focus room behind the arm */
+  const bg=c.createRadialGradient(0,-h*.2,R*.5,0,0,h*1.6);
+  bg.addColorStop(0,shade(S.bg,.06));bg.addColorStop(1,shade(S.bg,-.30));
+  c.fillStyle=bg;c.fillRect(-w,-h,w*2,h*2);
+  /* soft body shadow thrown on the surface */
+  c.save();
+  try{c.filter='blur(26px)';}catch(e){}
+  c.globalAlpha=.5;c.fillStyle='#000';
+  c.save();c.translate(R*.16,R*.2);armPath(c,R*1.02,h);c.fill();c.restore();
+  c.restore();
+  /* the arm, with a blurred silhouette edge so skin never looks die-cut */
+  c.save();
+  try{c.filter='blur(3.5px)';}catch(e){}
+  armPath(c,R,h);
+  const g=c.createLinearGradient(-wBot/2,0,wBot/2,0);
+  g.addColorStop(0,T.deep);g.addColorStop(.10,T.lo);g.addColorStop(.30,T.mid);
+  g.addColorStop(.46,T.hi);g.addColorStop(.62,T.mid);g.addColorStop(.88,T.lo);
+  g.addColorStop(1,T.deep);
+  c.fillStyle=g;c.fill();
+  c.restore();
+  /* skin: pores, and the faint blue of a vein */
+  c.save();armPath(c,R,h);c.clip();
+  seed(88117);
+  for(let i=0;i<2600;i++){
+    const px=(rnd()-.5)*wBot, py=(rnd()-.5)*2*h;
+    c.fillStyle=rnd()>.5?'rgba(255,255,255,.028)':'rgba(0,0,0,.045)';
+    c.beginPath();c.arc(px,py,rnd()*2.1+.3,0,TAU);c.fill();
+  }
+  c.strokeStyle='rgba(80,110,150,.10)';c.lineWidth=R*.05;
+  c.beginPath();
+  c.moveTo(-R*.9,-h);c.bezierCurveTo(-R*.5,-h*.3,-R*1.0,h*.2,-R*.5,h);c.stroke();
+  c.beginPath();
+  c.moveTo(R*.75,-h);c.bezierCurveTo(R*1.05,-h*.4,R*.6,h*.1,R*.95,h);c.stroke();
+  /* tendon highlight down the centre, then the ulna bump catching light */
+  const tg=c.createLinearGradient(0,-h,0,h);
+  tg.addColorStop(0,'rgba(255,255,255,0)');tg.addColorStop(.5,'rgba(255,255,255,.05)');
+  tg.addColorStop(1,'rgba(255,255,255,0)');
+  c.fillStyle=tg;c.fillRect(-R*.4,-h,R*.8,2*h);
+  const ug=c.createRadialGradient(-R*1.02,-R*.1,R*.05,-R*1.02,-R*.1,R*.55);
+  ug.addColorStop(0,'rgba(255,255,255,.13)');ug.addColorStop(1,'rgba(255,255,255,0)');
+  c.fillStyle=ug;c.fillRect(-wBot,-h,wBot,2*h);
+  c.restore();
   c.restore();
 }
+/* the strap must disappear behind the arm, not float over the room */
+function clipArm(c,R,h){armPath(c,R,h);c.clip();}
 /* ————— certificate ————— */
 function certificate(){
   const W=1400,H=1900,c=document.createElement('canvas');
