@@ -144,7 +144,7 @@ const S={
   /* strap */
   strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
   /* meta */
-  name:'', wrist:false, skin:'light',
+  name:'', view:'studio', wrist:false, skin:'light',
   /* stage */
   bg:'#121110'
 };
@@ -185,7 +185,16 @@ const PRESETS=[
     hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
   {n:'Verdigris',s:{family:'porthole',size:40,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'rose',finish:'polish',
     layout:'quarter',dialCol:'tiff',texture:'enamel',track:'railroad',indexMat:'applied',comp:'none',date:'none',
-    hands:'alpha',handMat:'blued',lume:false,strap:'mesh'}}
+    hands:'alpha',handMat:'blued',lume:false,strap:'mesh'}},
+  {n:'Panda chrono',s:{family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+    layout:'baton',dialCol:'white',texture:'matte',track:'ticks',indexMat:'applied',comp:'chrono2',date:'none',
+    hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
+  {n:'Racing chrono',s:{family:'cushion',size:41,thick:'sport',lug:'straight',bezel:'tachy',bezelW:.11,metal:'black',finish:'sand',
+    layout:'bar',dialCol:'black',texture:'grain',track:'ticks',indexMat:'applied',comp:'chrono3',date:'6',
+    hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
+  {n:'Field chrono',s:{family:'round',size:40,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'titan',finish:'sand',
+    layout:'arabic',dialCol:'green',texture:'matte',track:'railroad',indexMat:'printed',numFont:'cond',comp:'chrono2',date:'none',
+    hands:'syringe',handMat:'steel',lume:true,strap:'canvas',strapCol:'#5a4a30',stitch:'contrast'}}
 ];
 
 /* ————— materials ————— */
@@ -312,16 +321,16 @@ function pathPoly(c,n,R,rot){
   for(let i=0;i<n;i++){const a=rot+i*TAU/n;const x=Math.cos(a)*R,y=Math.sin(a)*R;i?c.lineTo(x,y):c.moveTo(x,y);}
   c.closePath();
 }
-/* ap = largest circle the case can hold (fraction of R) — keeps dials inside shaped cases */
+/* ap = largest circle the case can hold · ow = outer half-width, for the profile view */
 const FAMILY={
-  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ap:1.00},
-  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ap:.955},
-  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ap:.845},
-  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ap:.665,rect:1},
-  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ap:.915},
-  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ap:.945},
-  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ap:1.00,ears:1},
-  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ap:.975,slab:1}
+  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ap:1.00,ow:1.00},
+  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ap:.955,ow:1.00},
+  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ap:.845,ow:.86},
+  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ap:.665,ow:.68,rect:1},
+  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ap:.915,ow:.93},
+  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ap:.945,ow:1.03},
+  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ap:1.00,ow:1.02,ears:1},
+  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ap:.975,ow:.99,slab:1}
 };
 /* deterministic noise: a design must look identical on every repaint */
 let _sd=1;
@@ -466,6 +475,8 @@ function drawIndices(c,R,D,M){
   const skip=[];
   if(S.comp==='small')skip.push(6);
   if(S.comp==='moon')skip.push(6);
+  if(S.comp==='chrono2'||S.comp==='chrono3')skip.push(3,9);
+  if(S.comp==='chrono3')skip.push(6);
   if(S.date==='3')skip.push(3);
   if(S.date==='6')skip.push(6);
   if(lay==='none')return;
@@ -577,7 +588,40 @@ function subDial(c,cx,cy,rr,ink,label){
     c.font=`400 ${rr*.30}px ${FONTS.grot}`;c.fillText(label,0,rr*1.5);c.globalAlpha=1;}
   c.restore();
 }
+function chronoReg(c,cx,cy,rr,ink,marks,label){
+  c.save();c.translate(cx,cy);
+  c.globalAlpha=.13;c.fillStyle='#000';c.beginPath();c.arc(0,0,rr,0,TAU);c.fill();c.globalAlpha=1;
+  /* snailed register floor */
+  c.save();c.beginPath();c.arc(0,0,rr,0,TAU);c.clip();
+  c.strokeStyle=ink;c.globalAlpha=.07;c.lineWidth=1;
+  for(let i=2;i<rr;i+=2.4){c.beginPath();c.arc(rr*.06,0,i,0,TAU);c.stroke();}
+  c.restore();
+  c.strokeStyle=ink;c.globalAlpha=.6;c.lineWidth=1;
+  c.beginPath();c.arc(0,0,rr,0,TAU);c.stroke();
+  for(let i=0;i<marks;i++){
+    const a=i*TAU/marks, maj=i%(marks/4)===0;
+    c.lineWidth=maj?1.8:.8;c.globalAlpha=maj?.9:.55;
+    c.beginPath();
+    c.moveTo(Math.cos(a)*rr*(maj?.74:.82),Math.sin(a)*rr*(maj?.74:.82));
+    c.lineTo(Math.cos(a)*rr*.95,Math.sin(a)*rr*.95);c.stroke();
+  }
+  c.globalAlpha=1;
+  /* register hand, parked at zero */
+  c.strokeStyle=ink;c.lineWidth=rr*.075;c.lineCap='round';
+  c.beginPath();c.moveTo(0,rr*.12);c.lineTo(0,-rr*.72);c.stroke();
+  c.fillStyle=ink;c.beginPath();c.arc(0,0,rr*.1,0,TAU);c.fill();
+  if(label){c.globalAlpha=.55;c.textAlign='center';c.font=`400 ${rr*.26}px ${FONTS.grot}`;
+    c.fillText(label,0,rr*.55);c.globalAlpha=1;}
+  c.restore();
+}
 function drawComp(c,R,ink,M){
+  if(S.comp==='chrono2'||S.comp==='chrono3'){
+    const rr=R*.235;
+    chronoReg(c,-R*.50,0,rr,ink,60,'60');              /* running seconds at 9 */
+    chronoReg(c, R*.50,0,rr,ink,30,'30');              /* 30-minute counter at 3 */
+    if(S.comp==='chrono3')chronoReg(c,0,R*.50,rr,ink,12,'12');  /* 12-hour at 6 */
+    return;
+  }
   if(S.comp==='small'){subDial(c,0,R*.44,R*.19,ink);}
   else if(S.comp==='gmt'){
     c.strokeStyle=ink;c.globalAlpha=.5;c.lineWidth=.8;
@@ -944,8 +988,20 @@ function drawLugs(c,R,fam,M){
     c.restore();
   });
 }
+function drawPushers(c,R,fam,M){
+  if(S.comp!=='chrono2'&&S.comp!=='chrono3')return;
+  const x=(fam.ow||1)*R;
+  [-1,1].forEach(dir=>{
+    c.save();c.translate(x*.93,dir*R*.42);
+    c.fillStyle=metalFill(c,R*.16,S.metal,'polish');
+    c.fillRect(0,-R*.048,R*.12,R*.096);
+    c.beginPath();c.arc(R*.14,0,R*.052,0,TAU);c.fill();
+    c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1;c.stroke();
+    c.restore();
+  });
+}
 function drawCrown(c,R,fam,M){
-  const x=(fam.rect?R*.68:R)*1.0;
+  const x=(fam.ow||1)*R*1.0;
   const w=R*.09,h=R*.14;
   c.save();c.translate(x,0);
   c.fillStyle=metalFill(c,R*.2,S.metal,'polish');
@@ -982,6 +1038,13 @@ function renderBase(){
   X.fillStyle=S.bg;X.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
   const R=Math.min(w,h)*.185*(S.size/38)*(S.wrist?.82:1);
+  geom={R,dR:0,w,h,profile:S.view==='profile'};
+  if(S.view==='profile'){
+    X.save();X.translate(w/2,h/2);
+    drawProfile(X,R*1.05,fam,M);
+    X.restore();
+    return;
+  }
   X.save();X.translate(w/2,h/2);
   if(S.wrist){
     drawWrist(X,R,w,h);
@@ -1006,6 +1069,7 @@ function renderBase(){
   }
   drawLugs(X,R,fam,M);
   drawCrown(X,R,fam,M);
+  drawPushers(X,R,fam,M);
   drawCase(X,R,fam,M);
   drawBezel(X,R,fam,M);
   /* dial sits exactly inside the bezel aperture */
@@ -1042,6 +1106,7 @@ function render(){
   X.setTransform(DPR,0,0,DPR,0,0);
   X.clearRect(0,0,w,h);
   X.drawImage(base,0,0,w,h);
+  if(geom.profile)return;   /* no hands visible from the side */
   const M=METAL[S.metal],D=DIALCOL[S.dialCol];
   X.save();X.translate(w/2,h/2);
   X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
@@ -1060,7 +1125,15 @@ function render(){
   drawHand(X,S.hands,dR*.52,dR*.055,M,S.lume,blue);X.restore();
   X.save();X.rotate((now.getMinutes()+sec/60)*TAU/60);
   drawHand(X,S.hands,dR*.80,dR*.042,M,S.lume,blue);X.restore();
-  if(S.comp!=='small'&&S.comp!=='moon'){
+  if(S.comp==='chrono2'||S.comp==='chrono3'){
+    /* a chronograph at rest: the central hand is parked at twelve */
+    X.save();
+    X.strokeStyle='#c9391b';X.lineWidth=dR*.017;X.lineCap='round';
+    X.beginPath();X.moveTo(0,dR*.20);X.lineTo(0,-dR*.88);X.stroke();
+    X.fillStyle='#c9391b';
+    X.beginPath();X.arc(0,dR*.20,dR*.030,0,TAU);X.fill();
+    X.restore();
+  }else if(S.comp!=='small'&&S.comp!=='moon'){
     X.save();X.rotate(sec*TAU/60);
     X.strokeStyle=blue?'#3f63c4':'#c9391b';X.lineWidth=dR*.014;X.lineCap='round';
     X.beginPath();X.moveTo(0,dR*.18);X.lineTo(0,-dR*.86);X.stroke();
@@ -1134,8 +1207,9 @@ function build(){
       thumb(cvs,p.s);
     });
     g.appendChild(box);add(g);
-    add(chips('View',[{v:false,n:'Studio'},{v:true,n:'On the wrist'}],S.wrist,v=>S.wrist=v));
-    if(S.wrist)add(chips('Skin tone',Object.keys(SKIN).map(k=>({v:k,n:SKIN[k].n,c:SKIN[k].mid})),S.skin,v=>S.skin=v,true));
+    add(chips('View',[{v:'studio',n:'Studio'},{v:'wrist',n:'On the wrist'},{v:'profile',n:'Profile'}],
+      S.view,v=>{S.view=v;S.wrist=(v==='wrist');}));
+    if(S.view==='wrist')add(chips('Skin tone',Object.keys(SKIN).map(k=>({v:k,n:SKIN[k].n,c:SKIN[k].mid})),S.skin,v=>S.skin=v,true));
     const nm=document.createElement('div');nm.className='grp';
     nm.innerHTML='<h4>Name your design</h4>';
     const inp=document.createElement('input');inp.className='tin';
@@ -1188,7 +1262,8 @@ function build(){
   }
   else if(tab==='comp'){
     add(chips('Complication',[{v:'none',n:'Time only'},{v:'small',n:'Small seconds'},
-      {v:'gmt',n:'GMT / 24h'},{v:'moon',n:'Moonphase'},{v:'power',n:'Power reserve'}],S.comp,v=>S.comp=v));
+      {v:'gmt',n:'GMT / 24h'},{v:'moon',n:'Moonphase'},{v:'power',n:'Power reserve'},
+      {v:'chrono2',n:'Chronograph, 2 registers'},{v:'chrono3',n:'Chronograph, 3 registers'}],S.comp,v=>S.comp=v));
     add(chips('Date window',[{v:'none',n:'No date'},{v:'3',n:'At 3'},{v:'6',n:'At 6'},{v:'12',n:'At 12'}],S.date,v=>S.date=v));
   }
   else if(tab==='hands'){
@@ -1209,7 +1284,8 @@ function build(){
 }
 const STRAPN={leather:'Leather strap',rubber:'Rubber strap',canvas:'Canvas strap',nato:'NATO strap',
   oyster:'3-link bracelet',jubilee:'5-link bracelet',president:'Round-link bracelet',mesh:'Milanese mesh'};
-const COMPN={none:'Time only',small:'Small seconds',gmt:'GMT',moon:'Moonphase',power:'Power reserve'};
+const COMPN={none:'Time only',small:'Small seconds',gmt:'GMT',moon:'Moonphase',power:'Power reserve',
+  chrono2:'Chronograph, two registers',chrono3:'Chronograph, three registers'};
 function spec(){
   const F=FAMILY[S.family];
   document.getElementById('specline').innerHTML=
@@ -1329,6 +1405,147 @@ function drawWrist(c,R,w,h){
 }
 /* the strap must disappear behind the arm, not float over the room */
 function clipArm(c,R,h){c.rotate(ARM_TILT);armPath(c,R,h);c.rotate(-ARM_TILT);c.clip();}
+
+/* ============================================================
+   PROFILE — the elevation. Where thickness, crystal and lug
+   curve finally become visible.
+   ============================================================ */
+function drawProfile(c,R,fam,M){
+  const t=THICK[S.thick].v, W=R*(fam.ow||1);
+  const H=R*t*3.4;                       /* midcase height */
+  const bezH=R*.045, backH=R*.10;
+  const yTop=-H/2, yBot=H/2;
+  /* ————— strap, leaving the lugs and falling away ————— */
+  const strapCol=(S.strap==='leather'||S.strap==='rubber'||S.strap==='canvas')?S.strapCol:null;
+  [-1,1].forEach(dir=>{
+    c.save();
+    c.beginPath();
+    c.moveTo(dir*W*.86,yBot-H*.1);
+    c.quadraticCurveTo(dir*W*1.55,yBot+H*.2,dir*W*1.95,R*.85);
+    c.lineTo(dir*W*1.72,R*.92);
+    c.quadraticCurveTo(dir*W*1.36,yBot+H*.34,dir*W*.80,yBot+H*.16);
+    c.closePath();
+    if(strapCol){
+      const g=c.createLinearGradient(0,yBot,0,R);
+      g.addColorStop(0,shade(strapCol,.10));g.addColorStop(1,shade(strapCol,-.34));
+      c.fillStyle=g;
+    }else{
+      c.fillStyle=metalFill(c,R*.5,S.metal,'brush');
+    }
+    c.fill();
+    c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1;c.stroke();
+    c.restore();
+  });
+  /* ————— caseback: a shallow dome ————— */
+  c.save();
+  c.beginPath();
+  c.moveTo(-W*.80,yBot-2);
+  c.quadraticCurveTo(0,yBot+backH*2.1,W*.80,yBot-2);
+  c.closePath();
+  c.fillStyle=metalFill(c,R,S.metal,'brush');c.fill();
+  c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.2;c.stroke();
+  c.restore();
+  /* ————— midcase flank ————— */
+  c.save();
+  c.beginPath();
+  c.moveTo(-W,yTop);
+  c.lineTo(W,yTop);
+  c.quadraticCurveTo(W*1.02,0,W*.80,yBot);
+  c.lineTo(-W*.80,yBot);
+  c.quadraticCurveTo(-W*1.02,0,-W,yTop);
+  c.closePath();
+  c.fillStyle=metalFill(c,R,S.metal,S.finish);c.fill();
+  if(S.finish==='brush'){c.save();c.clip();brushStrokes(c,R,.09);c.restore();}
+  /* polished chamfer catching the light along the top edge */
+  const cg=c.createLinearGradient(0,yTop,0,yBot);
+  cg.addColorStop(0,'rgba(255,255,255,.34)');cg.addColorStop(.22,'rgba(255,255,255,.04)');
+  cg.addColorStop(.8,'rgba(0,0,0,.18)');cg.addColorStop(1,'rgba(0,0,0,.38)');
+  c.fillStyle=cg;c.fill();
+  c.strokeStyle='rgba(0,0,0,.6)';c.lineWidth=1.3;c.stroke();
+  c.restore();
+  /* ————— lugs, curving down toward the wrist ————— */
+  if(S.lug!=='none'&&!fam.slab){
+    [-1,1].forEach(dir=>{
+      c.save();
+      c.beginPath();
+      c.moveTo(dir*W*.86,yTop+H*.1);
+      c.quadraticCurveTo(dir*W*1.42,yTop+H*.35,dir*W*1.30,yBot+H*.55);
+      c.lineTo(dir*W*1.02,yBot+H*.42);
+      c.quadraticCurveTo(dir*W*1.06,yTop+H*.6,dir*W*.72,yTop+H*.2);
+      c.closePath();
+      c.fillStyle=metalFill(c,R*.6,S.metal,S.finish);c.fill();
+      c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.1;c.stroke();
+      c.restore();
+    });
+  }
+  /* ————— crown, and pushers on a chronograph ————— */
+  c.save();
+  const cw=R*.10,ch=R*.15;
+  c.fillStyle=metalFill(c,R*.2,S.metal,'polish');
+  c.fillRect(W*.96,-ch/2,cw,ch);
+  c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1;c.strokeRect(W*.96,-ch/2,cw,ch);
+  for(let i=0;i<6;i++){c.beginPath();
+    c.moveTo(W*.96+cw*(i+.5)/6,-ch/2);c.lineTo(W*.96+cw*(i+.5)/6,ch/2);c.stroke();}
+  if(S.comp==='chrono2'||S.comp==='chrono3'){
+    [-1,1].forEach(dir=>{
+      c.fillStyle=metalFill(c,R*.14,S.metal,'polish');
+      c.fillRect(W*.96,dir*ch*.95-ch*.26,cw*.8,ch*.52);
+      c.strokeRect(W*.96,dir*ch*.95-ch*.26,cw*.8,ch*.52);
+    });
+  }
+  c.restore();
+  /* ————— bezel step ————— */
+  c.save();
+  c.beginPath();
+  c.moveTo(-W,yTop);c.lineTo(W,yTop);
+  c.lineTo(W*.985,yTop-bezH);c.lineTo(-W*.985,yTop-bezH);
+  c.closePath();
+  c.fillStyle=metalFill(c,R,S.metal,S.bezel==='dive'?'brush':'polish');c.fill();
+  c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.1;c.stroke();
+  c.restore();
+  /* ————— the crystal: this is the whole point of the view ————— */
+  const yG=yTop-bezH;
+  const rIn=W*(1-S.bezelW*1.05);
+  c.save();
+  c.beginPath();
+  if(S.crystal==='flat'){
+    c.moveTo(-rIn,yG);c.lineTo(-rIn,yG-R*.030);
+    c.lineTo(rIn,yG-R*.030);c.lineTo(rIn,yG);
+  }else if(S.crystal==='domed'){
+    c.moveTo(-rIn,yG);
+    c.quadraticCurveTo(0,yG-R*.20,rIn,yG);
+  }else if(S.crystal==='ddomed'){
+    c.moveTo(-rIn,yG);
+    c.bezierCurveTo(-rIn*.5,yG-R*.26,rIn*.5,yG-R*.26,rIn,yG);
+  }else{ /* box */
+    c.moveTo(-rIn,yG);c.lineTo(-rIn,yG-R*.15);
+    c.quadraticCurveTo(0,yG-R*.20,rIn,yG-R*.15);
+    c.lineTo(rIn,yG);
+  }
+  c.closePath();
+  const gg=c.createLinearGradient(-rIn,yG-R*.2,rIn,yG);
+  gg.addColorStop(0,'rgba(255,255,255,.30)');gg.addColorStop(.34,'rgba(255,255,255,.06)');
+  gg.addColorStop(.62,'rgba(190,215,225,.12)');gg.addColorStop(1,'rgba(255,255,255,.24)');
+  c.fillStyle=gg;c.fill();
+  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1.2;c.stroke();
+  c.restore();
+  /* the dial, edge-on, seen through the glass */
+  c.save();
+  c.fillStyle=shade(DIALCOL[S.dialCol].base,-.35);
+  c.fillRect(-rIn,yG-1,rIn*2,R*.012);
+  c.restore();
+  /* ————— caption ————— */
+  const mm=(t*3.4*R)/(R/(S.size/2))*1;   /* case height back to millimetres */
+  c.save();
+  c.fillStyle='rgba(233,228,216,.45)';c.textAlign='center';
+  c.font=`400 ${R*.075}px ${FONTS.grot}`;
+  c.fillText(`${S.size} MM × ${(S.size*t*1.7).toFixed(1)} MM`,0,R*1.30);
+  c.font=`400 ${R*.062}px ${FONTS.grot}`;
+  c.fillStyle='rgba(233,228,216,.28)';
+  c.fillText(`${THICK[S.thick].n.toUpperCase()} PROFILE · ${CRYSTN[S.crystal].toUpperCase()} CRYSTAL`,0,R*1.44);
+  c.restore();
+}
+const CRYSTN={flat:'Flat',domed:'Domed',ddomed:'Double domed',box:'Box'};
 /* ————— certificate ————— */
 function certificate(){
   const W=1400,H=1900,c=document.createElement('canvas');
@@ -1409,7 +1626,7 @@ function randomize(){
   S.indexMat=pick(['applied','printed']);
   S.numFont=pick(['grot','cond','serif']);
   S.track=pick(['railroad','ticks','dots','none']);
-  S.comp=pick(['none','none','small','gmt','moon','power']);
+  S.comp=pick(['none','none','small','gmt','moon','power','chrono2','chrono3']);
   S.date=pick(['none','none','3','6']);
   S.hands=pick(Object.keys(HANDS));
   S.handMat=pick(['steel','steel','blued']);
@@ -1423,6 +1640,10 @@ function randomize(){
   if(S.bezel==='dive'&&S.layout==='roman')S.layout='baton';
   if(S.texture==='sector')S.layout=pick(['arabic','baton','mixed']);
   if(S.comp==='moon'&&S.date==='6')S.date='none';
+  if(S.comp==='chrono2'||S.comp==='chrono3'){
+    S.date=pick(['none','none','6']);
+    if(S.layout==='explorer'||S.layout==='california')S.layout='baton';
+  }
   build();paint();
 }
 function download(){
