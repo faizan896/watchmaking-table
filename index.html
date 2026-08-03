@@ -1278,6 +1278,7 @@ function armPath(c,R,h){
   c.bezierCurveTo(wTop*.60,-R*.15, wTop/2+R*.06,-h*.34, wTop/2,-h*1.1);
   c.closePath();
 }
+const ARM_TILT=-8*Math.PI/180;   /* nobody photographs a wrist perfectly upright */
 function drawWrist(c,R,w,h){
   const T=SKIN[S.skin]||SKIN.light, wBot=R*3.15;
   c.save();
@@ -1285,6 +1286,7 @@ function drawWrist(c,R,w,h){
   const bg=c.createRadialGradient(0,-h*.2,R*.5,0,0,h*1.6);
   bg.addColorStop(0,shade(S.bg,.06));bg.addColorStop(1,shade(S.bg,-.30));
   c.fillStyle=bg;c.fillRect(-w,-h,w*2,h*2);
+  c.rotate(ARM_TILT);
   /* soft body shadow thrown on the surface */
   c.save();
   try{c.filter='blur(26px)';}catch(e){}
@@ -1326,7 +1328,7 @@ function drawWrist(c,R,w,h){
   c.restore();
 }
 /* the strap must disappear behind the arm, not float over the room */
-function clipArm(c,R,h){armPath(c,R,h);c.clip();}
+function clipArm(c,R,h){c.rotate(ARM_TILT);armPath(c,R,h);c.rotate(-ARM_TILT);c.clip();}
 /* ————— certificate ————— */
 function certificate(){
   const W=1400,H=1900,c=document.createElement('canvas');
