@@ -173,16 +173,21 @@ function pathPoly(c,n,R,rot){
   for(let i=0;i<n;i++){const a=rot+i*TAU/n;const x=Math.cos(a)*R,y=Math.sin(a)*R;i?c.lineTo(x,y):c.moveTo(x,y);}
   c.closePath();
 }
+/* ap = largest circle the case can hold (fraction of R) — keeps dials inside shaped cases */
 const FAMILY={
-  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ar:1},
-  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ar:1},
-  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ar:1.14},
-  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ar:1.16,rect:1},
-  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ar:1},
-  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ar:1},
-  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ar:1,ears:1},
-  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ar:1,slab:1}
+  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ap:1.00},
+  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ap:.955},
+  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ap:.845},
+  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ap:.665,rect:1},
+  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ap:.915},
+  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ap:.945},
+  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ap:1.00,ears:1},
+  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ap:.975,slab:1}
 };
+/* deterministic noise: a design must look identical on every repaint */
+let _sd=1;
+function seed(s){_sd=s>>>0||1;}
+function rnd(){_sd^=_sd<<13;_sd^=_sd>>>17;_sd^=_sd<<5;return ((_sd>>>0)%100000)/100000;}
 const THICK={slim:{n:'Slim',v:.055},std:{n:'Standard',v:.085},sport:{n:'Sport',v:.125}};
 const LUGS={
   wire:'Wire', straight:'Straight', twisted:'Twisted', horn:'Horn', none:'None (integrated)'
@@ -211,10 +216,11 @@ function metalFill(c,R,m,finish,ang){
   return g;
 }
 function brushStrokes(c,R,alpha){
+  seed(7331);
   c.save();c.globalAlpha=alpha;c.lineWidth=.7;
   for(let i=-R;i<R;i+=1.6){
-    c.strokeStyle=Math.random()>.5?'#ffffff':'#000000';
-    c.globalAlpha=alpha*(.25+Math.random()*.75);
+    c.strokeStyle=rnd()>.5?'#ffffff':'#000000';
+    c.globalAlpha=alpha*(.25+rnd()*.75);
     c.beginPath();c.moveTo(-R*1.2,i);c.lineTo(R*1.2,i+R*.12);c.stroke();
   }
   c.restore();
@@ -273,10 +279,11 @@ function dialTexture(c,R,tex,col){
     g.addColorStop(0,shade(base,.30));g.addColorStop(.55,base);g.addColorStop(1,shade(base,-.62));
     c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
   }else if(tex==='grain'){
-    for(let i=0;i<5200;i++){
-      c.fillStyle=Math.random()>.5?'rgba(255,255,255,.07)':'rgba(0,0,0,.09)';
-      c.beginPath();c.arc((Math.random()-.5)*2*R,(Math.random()-.5)*2*R,Math.random()*1.5,0,TAU);c.fill();
-    }
+    seed(20260716);
+    c.fillStyle='rgba(255,255,255,.07)';
+    for(let i=0;i<1500;i++){c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*1.5,0,TAU);c.fill();}
+    c.fillStyle='rgba(0,0,0,.09)';
+    for(let i=0;i<1500;i++){c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*1.5,0,TAU);c.fill();}
   }else if(tex==='linen'){
     c.globalAlpha=.5;
     for(let i=-R;i<R;i+=2){
@@ -612,10 +619,11 @@ function drawStrap(c,R,fam){
     c.fillStyle=g;c.fill();
     c.save();c.clip();
     if(k==='leather'){
-      for(let i=0;i<900;i++){
-        c.fillStyle=Math.random()>.5?'rgba(255,255,255,.045)':'rgba(0,0,0,.06)';
-        c.beginPath();c.arc((Math.random()-.5)*halfW*2,y0+Math.random()*(y1-y0),Math.random()*2.4,0,TAU);c.fill();
-      }
+      seed(dir>0?4242:9119);
+      c.fillStyle='rgba(255,255,255,.045)';
+      for(let i=0;i<380;i++){c.beginPath();c.arc((rnd()-.5)*halfW*2,y0+rnd()*(y1-y0),rnd()*2.4,0,TAU);c.fill();}
+      c.fillStyle='rgba(0,0,0,.06)';
+      for(let i=0;i<380;i++){c.beginPath();c.arc((rnd()-.5)*halfW*2,y0+rnd()*(y1-y0),rnd()*2.4,0,TAU);c.fill();}
     }else if(k==='rubber'){
       c.strokeStyle='rgba(0,0,0,.30)';c.lineWidth=3;
       for(let i=0;i<28;i++){
@@ -738,11 +746,21 @@ function drawBezel(c,R,fam,M){
   c.save();fam.path(c,R);c.stroke();c.restore();
 }
 function drawCase(c,R,fam,M){
-  /* drop shadow */
+  const t=THICK[S.thick].v;
+  /* drop shadow — a thicker case throws a longer one */
   c.save();
-  c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=R*.22;c.shadowOffsetY=R*.12;
+  c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=R*(.16+t*1.6);c.shadowOffsetY=R*(.07+t*1.2);
   fam.path(c,R*1.005);c.fillStyle='#000';c.fill();
   c.restore();
+  /* case flank: the band of metal you see because the watch has height */
+  const steps=Math.max(2,Math.round(t*70));
+  for(let i=steps;i>0;i--){
+    const off=R*t*2.1*(i/steps);
+    c.save();c.translate(0,off);
+    fam.path(c,R*(1-.004*(i/steps)));
+    c.fillStyle=shade(M.lo,-.30+.22*(1-i/steps));
+    c.fill();c.restore();
+  }
   /* body */
   c.save();
   fam.path(c,R);
@@ -814,8 +832,14 @@ function drawCrystal(c,R){
   c.beginPath();c.ellipse(R*.40,R*.48,R*.24,R*.07,-.7,0,TAU);c.fill();
   c.globalAlpha=1;c.restore();
 }
-function render(){
+/* ————— static layers are cached; only the hands move ————— */
+const base=document.createElement('canvas');
+const BX=base.getContext('2d');
+let geom={R:0,dR:0,w:0,h:0};
+function renderBase(){
   const w=cv.width/DPR,h=cv.height/DPR;
+  base.width=cv.width;base.height=cv.height;
+  const X=BX;
   X.setTransform(DPR,0,0,DPR,0,0);
   X.clearRect(0,0,w,h);
   X.fillStyle=S.bg;X.fillRect(0,0,w,h);
@@ -827,8 +851,9 @@ function render(){
   drawCrown(X,R,fam,M);
   drawCase(X,R,fam,M);
   drawBezel(X,R,fam,M);
-  /* dial */
-  const dR=R-R*S.bezelW-R*.012;
+  /* dial — never wider than the case can hold */
+  const dR=R*fam.ap-R*S.bezelW-R*.012;
+  geom={R,dR,w,h};
   X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
   X.fillStyle=D.base;X.fillRect(-dR,-dR,dR*2,dR*2);
   dialTexture(X,dR,S.texture,S.dialCol);
@@ -847,9 +872,30 @@ function render(){
     X.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIQUE',0,dR*.80);
     X.globalAlpha=1;
   }
-  /* hands */
+  X.restore(); /* dial clip */
+  X.restore(); /* centre */
+}
+/* live layer: hands + crystal, drawn over the cached base */
+function render(){
+  if(baseDirty){renderBase();baseDirty=false;}
+  const {R,dR,w,h}=geom;
+  X.setTransform(DPR,0,0,DPR,0,0);
+  X.clearRect(0,0,w,h);
+  X.drawImage(base,0,0,w,h);
+  const M=METAL[S.metal],D=DIALCOL[S.dialCol];
+  X.save();X.translate(w/2,h/2);
+  X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
   const now=new Date(),sec=now.getSeconds()+now.getMilliseconds()/1000;
   const blue=S.handMat==='blued';
+  /* GMT: a fourth hand, one turn a day */
+  if(S.comp==='gmt'){
+    X.save();X.rotate((now.getHours()+now.getMinutes()/60)*TAU/24);
+    X.strokeStyle='#c07a2e';X.lineWidth=dR*.022;X.lineCap='round';
+    X.beginPath();X.moveTo(0,dR*.14);X.lineTo(0,-dR*.52);X.stroke();
+    X.fillStyle='#c07a2e';X.beginPath();
+    X.moveTo(0,-dR*.66);X.lineTo(dR*.055,-dR*.50);X.lineTo(-dR*.055,-dR*.50);X.closePath();X.fill();
+    X.restore();
+  }
   X.save();X.rotate(((now.getHours()%12)+now.getMinutes()/60)*TAU/12);
   drawHand(X,S.hands,dR*.52,dR*.055,M,S.lume,blue);X.restore();
   X.save();X.rotate((now.getMinutes()+sec/60)*TAU/60);
@@ -962,13 +1008,29 @@ function build(){
   }
   spec();
 }
+const STRAPN={leather:'Leather strap',rubber:'Rubber strap',canvas:'Canvas strap',nato:'NATO strap',
+  oyster:'3-link bracelet',jubilee:'5-link bracelet',president:'Round-link bracelet',mesh:'Milanese mesh'};
+const COMPN={none:'Time only',small:'Small seconds',gmt:'GMT',moon:'Moonphase',power:'Power reserve'};
 function spec(){
   const F=FAMILY[S.family];
   document.getElementById('specline').innerHTML=
-    `${F.n} · ${S.size} mm · ${METAL[S.metal].name}<br>`+
-    `${DIALCOL[S.dialCol].name} ${TEXTURES[S.texture].toLowerCase()} · ${LAYOUTS[S.layout].toLowerCase()}<br>`+
-    `${HANDS[S.hands]} hands · ${BEZELS[S.bezel].toLowerCase()} bezel`;
+    `${F.n} · ${S.size} mm · ${THICK[S.thick].n.toLowerCase()} · ${METAL[S.metal].name} ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')}<br>`+
+    `${DIALCOL[S.dialCol].name} ${TEXTURES[S.texture].toLowerCase()} · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp].toLowerCase()}${S.date!=='none'?' · date at '+S.date:''}<br>`+
+    `${HANDS[S.hands]} hands · ${BEZELS[S.bezel].toLowerCase()} bezel · ${STRAPN[S.strap].toLowerCase()}`;
 }
+/* ————— shareable designs ————— */
+function encode(){
+  try{return btoa(unescape(encodeURIComponent(JSON.stringify(S)))).replace(/=+$/,'');}catch(e){return '';}
+}
+function decode(){
+  try{
+    const h=location.hash.slice(1);if(!h)return false;
+    const o=JSON.parse(decodeURIComponent(escape(atob(h))));
+    Object.keys(S).forEach(k=>{if(o[k]!==undefined)S[k]=o[k];});
+    return true;
+  }catch(e){return false;}
+}
+function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
 /* ————— actions ————— */
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function randomize(){
@@ -1007,18 +1069,23 @@ function download(){
   a.download='calame-design.png';
   document.body.appendChild(a);a.click();a.remove();
 }
+const DEFAULTS=JSON.parse(JSON.stringify(S));
 document.getElementById('bRand').onclick=randomize;
 document.getElementById('bPng').onclick=download;
-document.getElementById('bSave').onclick=download;
-document.getElementById('bReset').onclick=()=>{location.reload();};
+document.getElementById('bSave').onclick=()=>{
+  navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
+  const b=document.getElementById('bSave'),t=b.textContent;
+  b.textContent='Link copied';setTimeout(()=>b.textContent=t,1600);
+};
+document.getElementById('bReset').onclick=()=>{Object.assign(S,DEFAULTS);build();paint();};
 document.querySelectorAll('.bgs').forEach(b=>b.onclick=()=>{S.bg=b.dataset.bg;paint();});
 
-/* ————— loop: repaint only what moves ————— */
-let dirty=true;
-function paint(){dirty=true;spec();}
+/* ————— loop: base cached, hands live ————— */
+let dirty=true,baseDirty=true;
+function paint(){dirty=true;baseDirty=true;spec();syncHash();}
 let last=0;
 function loop(t){
-  if(dirty||t-last>250){render();dirty=false;last=t;}
+  if(dirty||t-last>200){render();dirty=false;last=t;}
   requestAnimationFrame(loop);
 }
 function resize(){
@@ -1029,12 +1096,15 @@ function resize(){
   paint();
 }
 addEventListener('resize',resize);
+decode();
 resize();build();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{build();resize();});
 requestAnimationFrame(loop);
 setInterval(()=>{if(document.hidden)render();},400);
-window.CAL={S,render,randomize,setTab:t=>{tab=t;build();},
-  png:()=>cv.toDataURL('image/png').length};
+window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
+  renderBase:()=>{baseDirty=true;render();},
+  png:()=>cv.toDataURL('image/png').length,
+  link:()=>location.href};
 
 </script>
 </body>
