@@ -1523,16 +1523,25 @@ function drawProfile(c,R,fam,M){
     c.lineTo(rIn,yG);
   }
   c.closePath();
+  /* sapphire has body: a pale tint, then hard speculars along the edges */
   const gg=c.createLinearGradient(-rIn,yG-R*.2,rIn,yG);
-  gg.addColorStop(0,'rgba(255,255,255,.30)');gg.addColorStop(.34,'rgba(255,255,255,.06)');
-  gg.addColorStop(.62,'rgba(190,215,225,.12)');gg.addColorStop(1,'rgba(255,255,255,.24)');
+  gg.addColorStop(0,'rgba(228,240,246,.62)');gg.addColorStop(.22,'rgba(198,218,228,.30)');
+  gg.addColorStop(.5,'rgba(214,230,238,.42)');gg.addColorStop(.78,'rgba(190,212,224,.28)');
+  gg.addColorStop(1,'rgba(232,243,248,.60)');
   c.fillStyle=gg;c.fill();
-  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1.2;c.stroke();
+  c.save();c.clip();
+  /* the streak the window leaves across the glass */
+  c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=R*.016;c.lineCap='round';
+  c.beginPath();c.moveTo(-rIn*.72,yG-R*.075);c.lineTo(-rIn*.18,yG-R*.115);c.stroke();
+  c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=R*.008;
+  c.beginPath();c.moveTo(rIn*.30,yG-R*.055);c.lineTo(rIn*.62,yG-R*.045);c.stroke();
+  c.restore();
+  c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.4;c.stroke();
   c.restore();
   /* the dial, edge-on, seen through the glass */
   c.save();
-  c.fillStyle=shade(DIALCOL[S.dialCol].base,-.35);
-  c.fillRect(-rIn,yG-1,rIn*2,R*.012);
+  c.fillStyle=shade(DIALCOL[S.dialCol].base,-.15);
+  c.fillRect(-rIn,yG-R*.008,rIn*2,R*.010);
   c.restore();
   /* ————— caption ————— */
   const mm=(t*3.4*R)/(R/(S.size/2))*1;   /* case height back to millimetres */
