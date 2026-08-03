@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CALAME — Watch Design Studio</title>
+<title>AXIS — Watch Design Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Cg transform='translate(32 32)' fill='none' stroke='%23e9e4d8'%3E%3Cellipse rx='24' ry='11' transform='rotate(-32)' stroke-width='5'/%3E%3Cellipse rx='24' ry='11' transform='rotate(32)' stroke-width='5'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='3.4' fill='%23c9391b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Archivo+Narrow:wght@400;500;600&family=Barlow+Condensed:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -18,9 +19,12 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--gr
 /* ————— stage ————— */
 #stage{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #cv{max-width:100%;max-height:100%;display:block}
-#brand{position:absolute;top:22px;left:26px;pointer-events:none}
-#brand b{font-family:var(--serif);font-style:italic;font-weight:600;font-size:23px;display:block;line-height:1}
-#brand span{font-size:9.5px;letter-spacing:.28em;color:var(--dim);text-transform:uppercase}
+#brand{position:absolute;top:20px;left:26px;pointer-events:none;display:flex;align-items:center;gap:12px}
+#logo{width:52px;height:30px;flex:none}
+#logo path{fill:var(--ink)}
+#logo circle{fill:var(--acc)}
+#brand b{font-size:21px;display:block;line-height:1;letter-spacing:.34em;font-weight:600}
+#brand span{font-size:8.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;display:block;margin-top:3px}
 #specline{position:absolute;bottom:20px;left:26px;font-size:10px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;line-height:1.9;pointer-events:none}
 #stageBtns{position:absolute;top:20px;right:20px;display:flex;gap:8px}
 .gbtn{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
@@ -32,7 +36,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--gr
 /* ————— panel ————— */
 #panel{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 #tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line);flex:none}
-.tab{flex:1 0 33.33%;padding:11px 4px;text-align:center;font-size:9px;letter-spacing:.14em;
+.tab{flex:1 0 33.33%;padding:10px 3px;text-align:center;font-size:8.5px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;user-select:none}
 .tab:hover{color:var(--ink)}
 .tab.on{color:var(--ink);border-bottom-color:var(--acc)}
@@ -48,6 +52,20 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--gr
 .chip.on{background:var(--ink);color:#17150f;border-color:var(--ink);font-weight:500}
 .sw{width:26px;height:26px;padding:0;border-radius:3px}
 .sw.on{outline:2px solid var(--ink);outline-offset:2px}
+.presets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pcard{cursor:pointer;text-align:center;border:1px solid var(--line);background:#1c1b19;padding:5px 3px 6px;transition:.15s}
+.pcard:hover{border-color:#57524a;background:#232220}
+.pcard canvas{width:100%;height:auto;display:block}
+.pcard span{display:block;font-size:9px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-top:3px}
+.tin{width:100%;background:#1e1d1b;border:1px solid var(--line);color:var(--ink);
+  padding:10px 12px;font-family:var(--serif);font-style:italic;font-size:17px;outline:none}
+.tin:focus{border-color:#57524a}
+.note{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:-2px}
+.bigbtn{text-align:center;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  padding:13px 0;margin-bottom:8px;cursor:pointer;user-select:none;
+  background:var(--ink);color:#17150f;font-weight:600}
+.bigbtn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:400}
+.bigbtn:hover{opacity:.88}
 .row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
 .row label{font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;width:86px;flex:none}
 .row input[type=range]{flex:1;accent-color:var(--acc);height:3px}
@@ -57,14 +75,30 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--gr
   padding:10px 0;border:1px solid var(--line);cursor:pointer;user-select:none;background:#1d1c1a}
 #foot div:hover{border-color:#57524a}
 #foot .prime{background:var(--ink);color:#17150f;border-color:var(--ink);font-weight:600}
-@media(max-width:900px){#app{grid-template-columns:1fr;grid-template-rows:1fr 46%}#panel{border-left:0;border-top:1px solid var(--line)}}
+@media(max-width:900px){
+  #app{grid-template-columns:1fr;grid-template-rows:1fr 52%}
+  #panel{border-left:0;border-top:1px solid var(--line)}
+  .chip{padding:10px 13px;font-size:13px}
+  .sw{width:32px;height:32px}
+  .tab{flex:1 0 25%;padding:12px 3px;font-size:9px}
+  #brand{top:14px;left:16px}#logo{width:42px}
+  #brand b{font-size:17px}
+  #specline{font-size:9px;left:16px;bottom:14px}
+  #stageBtns{top:14px;right:14px}
+  .presets{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="stage">
     <canvas id="cv"></canvas>
-    <div id="brand"><b>Calame</b><span>Design Studio</span></div>
+    <div id="brand">
+      <svg id="logo" viewBox="-60 -34 120 68" aria-label="Axis">
+        <g id="logoMark"></g>
+      </svg>
+      <div><b>AXIS</b><span>Instruments of rotation</span></div>
+    </div>
     <div id="specline"></div>
     <div id="stageBtns">
       <div class="gbtn" id="bRand">Surprise me</div>
@@ -88,7 +122,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--gr
 </div>
 <script>
 /* ============================================================
-   CALAME · PARAMETRIC WATCH STUDIO
+   AXIS · PARAMETRIC WATCH STUDIO
    Every control is a real design parameter, not a colour swap.
    ============================================================ */
 const cv=document.getElementById('cv'),X=cv.getContext('2d');
@@ -109,9 +143,50 @@ const S={
   hands:'dauphine', handMat:'steel', lume:true,
   /* strap */
   strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
+  /* meta */
+  name:'', wrist:false,
   /* stage */
   bg:'#121110'
 };
+/* ————— curated starting points ————— */
+const PRESETS=[
+  {n:'Bauhaus',s:{family:'round',size:38,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+    layout:'baton',dialCol:'white',texture:'matte',track:'ticks',indexMat:'printed',comp:'none',date:'none',
+    hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#26231f',stitch:'tonal'}},
+  {n:'Dress noir',s:{family:'round',size:37,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.08,metal:'white',finish:'polish',
+    layout:'roman',dialCol:'black',texture:'sunray',track:'railroad',indexMat:'applied',comp:'small',date:'none',
+    hands:'leaf',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
+  {n:'Skin diver',s:{family:'round',size:40,thick:'sport',lug:'straight',bezel:'dive',bezelW:.13,metal:'steel',finish:'brush',
+    layout:'dot',dialCol:'black',texture:'matte',track:'ticks',indexMat:'applied',comp:'none',date:'3',
+    hands:'mercedes',handMat:'steel',lume:true,strap:'nato',strapCol:'#2f4034',stitch:'tonal'}},
+  {n:'Flieger',s:{family:'round',size:42,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'black',finish:'sand',
+    layout:'arabic',dialCol:'black',texture:'matte',track:'railroad',indexMat:'printed',numFont:'cond',comp:'none',date:'none',
+    hands:'cathedral',handMat:'steel',lume:true,strap:'leather',strapCol:'#4d3524',stitch:'contrast'}},
+  {n:'Royal octagon',s:{family:'octagon',size:41,thick:'slim',lug:'none',bezel:'screws',bezelW:.13,metal:'steel',finish:'brush',
+    layout:'baton',dialCol:'blue',texture:'tapestry',track:'ticks',indexMat:'applied',comp:'none',date:'3',
+    hands:'baton',handMat:'steel',lume:true,strap:'oyster'}},
+  {n:'Tank',s:{family:'rect',size:36,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'yellow',finish:'polish',
+    layout:'roman',dialCol:'white',texture:'guilloche',track:'railroad',indexMat:'printed',numFont:'serif',comp:'none',date:'none',
+    hands:'breguet',handMat:'blued',lume:false,strap:'leather',strapCol:'#5a2c2e',stitch:'tonal'}},
+  {n:'Salmon sector',s:{family:'cushion',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'rose',finish:'polish',
+    layout:'arabic',dialCol:'salmon',texture:'sector',track:'railroad',indexMat:'printed',numFont:'serif',comp:'small',date:'none',
+    hands:'leaf',handMat:'blued',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
+  {n:'Explorer',s:{family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'brush',
+    layout:'explorer',dialCol:'black',texture:'matte',track:'ticks',indexMat:'applied',comp:'none',date:'none',
+    hands:'mercedes',handMat:'steel',lume:true,strap:'oyster'}},
+  {n:'Moonlit',s:{family:'round',size:39,thick:'slim',lug:'horn',bezel:'fluted',bezelW:.11,metal:'yellow',finish:'polish',
+    layout:'mixed',dialCol:'champ',texture:'sunray',track:'dots',indexMat:'applied',comp:'moon',date:'none',
+    hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
+  {n:'Voyager GMT',s:{family:'round',size:40,thick:'std',lug:'twisted',bezel:'gmt',bezelW:.12,metal:'steel',finish:'brush',
+    layout:'baton',dialCol:'slate',texture:'sunray',track:'ticks',indexMat:'applied',comp:'gmt',date:'3',
+    hands:'mercedes',handMat:'steel',lume:true,strap:'jubilee'}},
+  {n:'Tonneau blue',s:{family:'tonneau',size:38,thick:'sport',lug:'none',bezel:'coin',bezelW:.10,metal:'titan',finish:'sand',
+    layout:'bar',dialCol:'ice',texture:'linen',track:'none',indexMat:'applied',comp:'power',date:'none',
+    hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
+  {n:'Verdigris',s:{family:'porthole',size:40,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'rose',finish:'polish',
+    layout:'quarter',dialCol:'tiff',texture:'enamel',track:'railroad',indexMat:'applied',comp:'none',date:'none',
+    hands:'alpha',handMat:'blued',lume:false,strap:'mesh'}}
+];
 
 /* ————— materials ————— */
 const METAL={
@@ -137,6 +212,70 @@ const DIALCOL={
   cream :{base:'#e8ddc2',ink:'#2b2419',name:'Patina cream'}
 };
 const STRAPCOL=['#8a5c34','#4d3524','#232120','#5a2c2e','#2f4034','#1f3550','#9d9a92','#c9b28a'];
+
+/* ============================================================
+   THE AXIS MARK
+   Two orbits crossing on a shared pivot. Each ring swells at the
+   flank and tapers at the tips — a stroke, not a hoop.
+   ============================================================ */
+function orbitPoints(a,b,rotDeg,wMax,wMin,steps){
+  steps=steps||140;
+  const rot=rotDeg*Math.PI/180, cs=Math.cos(rot), sn=Math.sin(rot);
+  const out=[],inn=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps*TAU;
+    const ct=Math.cos(t), st=Math.sin(t);
+    const px=a*ct, py=b*st;
+    /* outward normal of the ellipse */
+    let nx=ct/a, ny=st/b;
+    const nl=Math.hypot(nx,ny)||1; nx/=nl; ny/=nl;
+    const w=(wMin+(wMax-wMin)*Math.abs(st))/2;
+    const ox=px+nx*w, oy=py+ny*w, ix=px-nx*w, iy=py-ny*w;
+    out.push([ox*cs-oy*sn, ox*sn+oy*cs]);
+    inn.push([ix*cs-iy*sn, ix*sn+iy*cs]);
+  }
+  return {out,inn};
+}
+function ptsToPath(p){
+  const {out,inn}=p;
+  let d='M'+out[0][0].toFixed(2)+' '+out[0][1].toFixed(2);
+  for(let i=1;i<out.length;i++)d+='L'+out[i][0].toFixed(2)+' '+out[i][1].toFixed(2);
+  d+='Z M'+inn[0][0].toFixed(2)+' '+inn[0][1].toFixed(2);
+  for(let i=inn.length-1;i>=0;i--)d+='L'+inn[i][0].toFixed(2)+' '+inn[i][1].toFixed(2);
+  return d+'Z';
+}
+const MARK={a:1,b:.44,tilt:32,wMax:.20,wMin:.045};
+function markPts(scale){
+  const M=MARK,s=scale;
+  return [orbitPoints(M.a*s,M.b*s,-M.tilt,M.wMax*s,M.wMin*s),
+          orbitPoints(M.a*s,M.b*s, M.tilt,M.wMax*s,M.wMin*s)];
+}
+/* draw the mark on any 2d context, centred on (0,0) */
+function drawMark(c,scale,col,pivotCol){
+  const rings=markPts(scale);
+  c.save();c.fillStyle=col;
+  rings.forEach(({out,inn})=>{
+    c.beginPath();
+    c.moveTo(out[0][0],out[0][1]);
+    for(let i=1;i<out.length;i++)c.lineTo(out[i][0],out[i][1]);
+    c.closePath();
+    c.moveTo(inn[inn.length-1][0],inn[inn.length-1][1]);
+    for(let i=inn.length-2;i>=0;i--)c.lineTo(inn[i][0],inn[i][1]);
+    c.closePath();
+    c.fill('evenodd');
+  });
+  if(pivotCol){c.fillStyle=pivotCol;c.beginPath();c.arc(0,0,scale*.085,0,TAU);c.fill();}
+  c.restore();
+}
+/* header mark */
+(function(){
+  const g=document.getElementById('logoMark');
+  if(!g)return;
+  const [r1,r2]=markPts(30);
+  g.innerHTML=`<path d="${ptsToPath(r1)}" fill-rule="evenodd"/>`+
+    `<path d="${ptsToPath(r2)}" fill-rule="evenodd"/>`+
+    `<circle cx="0" cy="0" r="2.6"/>`;
+})();
 
 function lerpHex(a,b,t){
   const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),pb=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
@@ -842,8 +981,9 @@ function renderBase(){
   X.clearRect(0,0,w,h);
   X.fillStyle=S.bg;X.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
-  const R=Math.min(w,h)*.185*(S.size/38);
+  const R=Math.min(w,h)*.185*(S.size/38)*(S.wrist?.86:1);
   X.save();X.translate(w/2,h/2);
+  if(S.wrist)drawWrist(X,R,w,h);
   drawStrap(X,R,fam);
   drawLugs(X,R,fam,M);
   drawCrown(X,R,fam,M);
@@ -861,13 +1001,16 @@ function renderBase(){
   drawIndices(X,dR,D,M);
   drawComp(X,dR,D.ink,M);
   if(S.logo){
+    /* applied mark, then the wordmark beneath it */
+    X.save();X.translate(0,-dR*.44);
+    drawMark(X,dR*.105,D.ink,'#c9391b');
+    X.restore();
     X.fillStyle=D.ink;X.textAlign='center';X.textBaseline='middle';
-    X.font=`italic 600 ${dR*.15}px ${FONTS.serif}`;
-    X.fillText('Calame',0,-dR*.38);
-    X.globalAlpha=.62;X.font=`400 ${dR*.048}px ${FONTS.grot}`;
-    X.fillText('L E   L O C L E',0,-dR*.25);
+    X.font=`600 ${dR*.085}px ${FONTS.grot}`;
+    X.save();if(X.letterSpacing!==undefined)X.letterSpacing=`${dR*.045}px`;
+    X.fillText('AXIS',0,-dR*.30);X.restore();
     X.globalAlpha=.55;X.font=`400 ${dR*.042}px ${FONTS.grot}`;
-    X.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIQUE',0,dR*.80);
+    X.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIC',0,dR*.80);
     X.globalAlpha=1;
   }
   X.restore(); /* dial clip */
@@ -919,11 +1062,11 @@ function render(){
    PANEL
    ============================================================ */
 const TABS=[
-  {k:'case',n:'Case'},{k:'bezel',n:'Bezel'},{k:'dial',n:'Dial'},
+  {k:'start',n:'Start'},{k:'case',n:'Case'},{k:'bezel',n:'Bezel'},{k:'dial',n:'Dial'},
   {k:'index',n:'Indices'},{k:'comp',n:'Functions'},{k:'hands',n:'Hands'},
-  {k:'strap',n:'Strap'}
+  {k:'strap',n:'Strap'},{k:'finish',n:'Finish'}
 ];
-let tab='case';
+let tab='start';
 function chips(title,opts,cur,cb,swatch){
   const g=document.createElement('div');g.className='grp';
   g.innerHTML=`<h4>${title}</h4>`;
@@ -958,7 +1101,45 @@ function build(){
   });
   const B=document.getElementById('body');B.innerHTML='';
   const add=e=>B.appendChild(e);
-  if(tab==='case'){
+  if(tab==='start'){
+    const g=document.createElement('div');g.className='grp';
+    g.innerHTML='<h4>Start from a design</h4>';
+    const box=document.createElement('div');box.className='presets';
+    PRESETS.forEach(p=>{
+      const card=document.createElement('div');card.className='pcard';
+      const cvs=document.createElement('canvas');cvs.width=cvs.height=160;
+      card.appendChild(cvs);
+      const lb=document.createElement('span');lb.textContent=p.n;card.appendChild(lb);
+      card.onclick=()=>{Object.assign(S,p.s);S.name=p.n;build();paint();};
+      box.appendChild(card);
+      thumb(cvs,p.s);
+    });
+    g.appendChild(box);add(g);
+    add(chips('View',[{v:false,n:'Studio'},{v:true,n:'On the wrist'}],S.wrist,v=>S.wrist=v));
+    const nm=document.createElement('div');nm.className='grp';
+    nm.innerHTML='<h4>Name your design</h4>';
+    const inp=document.createElement('input');inp.className='tin';
+    inp.placeholder='e.g. Northline';inp.value=S.name;inp.maxLength=22;
+    inp.oninput=()=>{S.name=inp.value;paint();};
+    nm.appendChild(inp);add(nm);
+  }
+  else if(tab==='finish'){
+    const g=document.createElement('div');g.className='grp';
+    g.innerHTML='<h4>Your instrument</h4>'+
+      `<p class="note">${S.name?'“'+S.name+'”':'Unnamed design'} — ready to export. `+
+      `The certificate carries the full specification and a serial number.</p>`;
+    add(g);
+    add(chips('Backdrop',[{v:'#121110',n:'Black'},{v:'#e7e2d6',n:'Bone'},{v:'#2a2119',n:'Walnut'},{v:'#5d5a54',n:'Concrete'}],S.bg,v=>S.bg=v));
+    const b1=document.createElement('div');b1.className='bigbtn';b1.textContent='Download image';
+    b1.onclick=download;add(b1);
+    const b2=document.createElement('div');b2.className='bigbtn';b2.textContent='Download certificate';
+    b2.onclick=certificate;add(b2);
+    const b3=document.createElement('div');b3.className='bigbtn ghost';b3.textContent='Copy shareable link';
+    b3.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
+      b3.textContent='Link copied';setTimeout(()=>b3.textContent='Copy shareable link',1600);};
+    add(b3);
+  }
+  else if(tab==='case'){
     add(chips('Shape family',Object.keys(FAMILY).map(k=>({v:k,n:FAMILY[k].n})),S.family,v=>{
       S.family=v;if(FAMILY[v].slab)S.lug='none';else if(S.lug==='none')S.lug='straight';
       if(FAMILY[v].slab&&['leather','rubber','canvas','nato'].includes(S.strap))S.strap='oyster';}));
@@ -1029,6 +1210,118 @@ function decode(){
   }catch(e){return false;}
 }
 function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
+/* ————— preset thumbnails: same engine, tiny canvas ————— */
+function thumb(cvs,spec){
+  const keep=JSON.parse(JSON.stringify(S));
+  Object.assign(S,spec);S.wrist=false;
+  const c=cvs.getContext('2d');
+  const w=cvs.width,h=cvs.height;
+  c.fillStyle='#1a1917';c.fillRect(0,0,w,h);
+  const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
+  const R=w*.36;
+  c.save();c.translate(w/2,h/2);
+  drawLugs(c,R,fam,M);
+  drawCase(c,R,fam,M);
+  drawBezel(c,R,fam,M);
+  const dR=R*fam.ap*(1-S.bezelW)-R*.006;
+  c.save();c.beginPath();c.arc(0,0,dR,0,TAU);c.clip();
+  c.fillStyle=D.base;c.fillRect(-dR,-dR,dR*2,dR*2);
+  dialTexture(c,dR,S.texture,S.dialCol);
+  drawTrack(c,dR,D.ink);
+  drawIndices(c,dR,D,M);
+  drawComp(c,dR,D.ink,M);
+  const blue=S.handMat==='blued';
+  c.save();c.rotate(-.9);drawHand(c,S.hands,dR*.52,dR*.055,M,S.lume,blue);c.restore();
+  c.save();c.rotate(1.4);drawHand(c,S.hands,dR*.80,dR*.042,M,S.lume,blue);c.restore();
+  c.restore();
+  drawCrystal(c,dR);
+  c.restore();
+  Object.assign(S,keep);
+}
+/* ————— the wrist ————— */
+function drawWrist(c,R,w,h){
+  const armW=R*2.9;
+  const g=c.createLinearGradient(-armW/2,0,armW/2,0);
+  g.addColorStop(0,'#4c3a2d');g.addColorStop(.28,'#8a6a51');
+  g.addColorStop(.55,'#9d7a5e');g.addColorStop(1,'#4a382b');
+  c.save();
+  c.fillStyle=g;
+  c.beginPath();
+  c.moveTo(-armW/2,-h);
+  c.quadraticCurveTo(-armW*.54,0,-armW/2*.86,h);
+  c.lineTo(armW/2*.86,h);
+  c.quadraticCurveTo(armW*.54,0,armW/2,-h);
+  c.closePath();c.fill();
+  /* soft shading under the case */
+  const sg=c.createRadialGradient(0,0,R*.4,0,0,R*2.2);
+  sg.addColorStop(0,'rgba(0,0,0,.42)');sg.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=sg;c.fillRect(-armW,-h,armW*2,h*2);
+  c.restore();
+}
+/* ————— certificate ————— */
+function certificate(){
+  const W=1400,H=1900,c=document.createElement('canvas');
+  c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle='#f2ede2';x.fillRect(0,0,W,H);
+  /* border */
+  x.strokeStyle='#c3bba6';x.lineWidth=2;x.strokeRect(56,56,W-112,H-112);
+  x.strokeStyle='#e0d9c6';x.lineWidth=1;x.strokeRect(70,70,W-140,H-140);
+  /* mark */
+  x.save();x.translate(W/2,196);drawMark(x,86,'#211d16','#c9391b');x.restore();
+  x.fillStyle='#211d16';x.textAlign='center';
+  x.font='600 46px "Archivo Narrow"';
+  if(x.letterSpacing!==undefined)x.letterSpacing='18px';
+  x.fillText('AXIS',W/2,320);
+  if(x.letterSpacing!==undefined)x.letterSpacing='6px';
+  x.fillStyle='#8d867a';x.font='400 17px "Archivo Narrow"';
+  x.fillText('INSTRUMENTS OF ROTATION',W/2,352);
+  /* the watch */
+  const keepBg=S.bg,keepWrist=S.wrist;S.bg='#f2ede2';S.wrist=false;
+  const prev=cv.width;renderBase();
+  x.drawImage(base,(W-1000)/2,400,1000,1000*(base.height/base.width));
+  S.bg=keepBg;S.wrist=keepWrist;baseDirty=true;
+  /* text block */
+  let y=H-620;
+  x.textAlign='center';x.fillStyle='#211d16';
+  if(x.letterSpacing!==undefined)x.letterSpacing='0px';
+  x.font='600 54px "Cormorant Garamond"';
+  x.fillText(S.name||'Unnamed design',W/2,y);y+=52;
+  x.strokeStyle='#c3bba6';x.beginPath();x.moveTo(W/2-90,y-14);x.lineTo(W/2+90,y-14);x.stroke();
+  y+=26;
+  const rows=[
+    ['CASE',`${FAMILY[S.family].n} · ${S.size} mm · ${THICK[S.thick].n}`],
+    ['MATERIAL',`${METAL[S.metal].name}, ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')}`],
+    ['BEZEL',`${BEZELS[S.bezel]}`],
+    ['DIAL',`${DIALCOL[S.dialCol].name} · ${TEXTURES[S.texture]}`],
+    ['INDICES',`${LAYOUTS[S.layout]} · ${S.indexMat==='applied'?'applied':'printed'}`],
+    ['FUNCTION',`${COMPN[S.comp]}${S.date!=='none'?', date at '+S.date:''}`],
+    ['HANDS',`${HANDS[S.hands]}${S.handMat==='blued'?', flame blued':''}`],
+    ['STRAP',`${STRAPN[S.strap]}`]
+  ];
+  x.font='400 21px "Archivo Narrow"';
+  rows.forEach(r=>{
+    x.textAlign='right';x.fillStyle='#8d867a';
+    if(x.letterSpacing!==undefined)x.letterSpacing='3px';
+    x.fillText(r[0],W/2-24,y);
+    x.textAlign='left';x.fillStyle='#211d16';
+    if(x.letterSpacing!==undefined)x.letterSpacing='0px';
+    x.font='400 23px "Archivo Narrow"';
+    x.fillText(r[1],W/2+24,y);
+    x.font='400 21px "Archivo Narrow"';
+    y+=40;
+  });
+  const serial='AX-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
+  x.textAlign='center';x.fillStyle='#8d867a';x.font='400 18px "Archivo Narrow"';
+  if(x.letterSpacing!==undefined)x.letterSpacing='5px';
+  x.fillText('DESIGN No. '+serial,W/2,y+34);
+  x.fillText('DESIGNED BY THE OWNER · AXIS STUDIO',W/2,y+66);
+  const a=document.createElement('a');
+  a.href=c.toDataURL('image/png');
+  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'axis')+'-certificate.png';
+  document.body.appendChild(a);a.click();a.remove();
+}
+function hashCode(s){let h=0;for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i);h|=0;}return h;}
+
 /* ————— actions ————— */
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function randomize(){
@@ -1064,7 +1357,7 @@ function randomize(){
 function download(){
   const a=document.createElement('a');
   a.href=cv.toDataURL('image/png');
-  a.download='calame-design.png';
+  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'axis')+'-design.png';
   document.body.appendChild(a);a.click();a.remove();
 }
 const DEFAULTS=JSON.parse(JSON.stringify(S));
