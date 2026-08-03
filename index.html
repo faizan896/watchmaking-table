@@ -665,19 +665,15 @@ function drawStrap(c,R,fam){
   c.lineWidth=R*.02;c.beginPath();c.moveTo(0,by);c.lineTo(0,by+R*.16);c.stroke();
 }
 function drawBezel(c,R,fam,M){
-  const k=S.bezel, bw=R*S.bezelW, rIn=R-bw;
+  const k=S.bezel, ap=R*fam.ap, bw=ap*S.bezelW, rIn=ap-bw;
+  /* ring only — never erase the case beneath it */
   c.save();
-  /* ring body */
-  fam.path(c,R);
-  c.save();c.globalCompositeOperation='source-over';
-  c.fillStyle=metalFill(c,R,S.metal,S.finish==='sand'?'sand':'polish');c.fill();
-  c.restore();
-  /* punch the aperture */
-  c.save();c.globalCompositeOperation='destination-out';
-  c.beginPath();c.arc(0,0,rIn,0,TAU);c.fill();c.restore();
+  c.beginPath();fam.path(c,R);c.arc(0,0,rIn,0,TAU,true);
+  c.fillStyle=metalFill(c,R,S.metal,S.finish==='sand'?'sand':'polish');
+  c.fill('evenodd');
   c.restore();
 
-  c.save();c.beginPath();fam.path(c,R);c.arc(0,0,rIn,0,TAU,true);c.clip();
+  c.save();c.beginPath();fam.path(c,R);c.arc(0,0,rIn,0,TAU,true);c.clip('evenodd');
   if(k==='coin'){
     c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=1.1;
     for(let i=0;i<150;i++){const a=i*TAU/150;
@@ -744,6 +740,8 @@ function drawBezel(c,R,fam,M){
   c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.4;
   c.beginPath();c.arc(0,0,rIn,0,TAU);c.stroke();
   c.save();fam.path(c,R);c.stroke();c.restore();
+  c.strokeStyle='rgba(255,255,255,.30)';c.lineWidth=1;
+  c.beginPath();c.arc(0,0,rIn+1.6,0,TAU);c.stroke();
 }
 function drawCase(c,R,fam,M){
   const t=THICK[S.thick].v;
@@ -851,8 +849,8 @@ function renderBase(){
   drawCrown(X,R,fam,M);
   drawCase(X,R,fam,M);
   drawBezel(X,R,fam,M);
-  /* dial — never wider than the case can hold */
-  const dR=R*fam.ap-R*S.bezelW-R*.012;
+  /* dial sits exactly inside the bezel aperture */
+  const dR=R*fam.ap*(1-S.bezelW)-R*.006;
   geom={R,dR,w,h};
   X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
   X.fillStyle=D.base;X.fillRect(-dR,-dR,dR*2,dR*2);
