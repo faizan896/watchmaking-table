@@ -138,11 +138,11 @@ const S={
   layout:'baton', dialCol:'silver', texture:'sunray', track:'railroad',
   indexMat:'applied', numFont:'grot', chapter:false,
   /* complications */
-  comp:'none', date:'none', logo:true,
+  comp:'none', date:'none', sig:'auto',
   /* hands */
   hands:'dauphine', handMat:'steel', lume:true,
   /* strap */
-  strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
+  strap:'leather', strapCol:'#8a5c34', stitch:'tonal',
   /* meta */
   name:'', view:'studio', tiltX:0, tiltY:0,
   /* stage */
@@ -402,7 +402,9 @@ const TEXTURES={sunray:'Sunray',matte:'Matte',enamel:'Grand feu',guilloche:'Guil
   /* art dials — the dial as a canvas */
   clay:'Clay court',grass:'Grass court',starry:'Starry night',wave:'Great wave',
   mondrian:'Composition',klimt:'Gold leaf',circuit:'Circuit',synth:'Grid horizon',
-  nebula:'Nebula',carbon:'Carbon',topo:'Topographic',lava:'Meteorite'};
+  nebula:'Nebula',carbon:'Carbon',topo:'Topographic',lava:'Meteorite',
+  aventurine:'Aventurine',malachite:'Malachite',lapis:'Lapis lazuli',
+  mop:'Mother of pearl',damascus:'Damascus',marble:'Marble'};
 /* art dials carry their own palette — the colour chip steps aside */
 const ARTDIAL={
   clay :{base:'#b4573a',ink:'#f6efe4'}, grass:{base:'#2f5c33',ink:'#f6f4e8'},
@@ -410,7 +412,10 @@ const ARTDIAL={
   mondrian:{base:'#f4f1e8',ink:'#141414'}, klimt:{base:'#8a6412',ink:'#20180a'},
   circuit:{base:'#0b1512',ink:'#7ef0c0'}, synth:{base:'#160a24',ink:'#ffd9f2'},
   nebula:{base:'#150d24',ink:'#e6dcf5'}, carbon:{base:'#191a1c',ink:'#e6e6e6'},
-  topo:{base:'#e6ddc6',ink:'#2f2a20'}, lava:{base:'#2a2724',ink:'#e8e2d4'}
+  topo:{base:'#e6ddc6',ink:'#2f2a20'}, lava:{base:'#2a2724',ink:'#e8e2d4'},
+  aventurine:{base:'#0d1b3f',ink:'#e6e2d2'}, malachite:{base:'#1d5340',ink:'#eef2e6'},
+  lapis:{base:'#17347a',ink:'#f0e7c4'}, mop:{base:'#e9e6e0',ink:'#2b2822'},
+  damascus:{base:'#3a3b3d',ink:'#eceae2'}, marble:{base:'#efece4',ink:'#2b2822'}
 };
 function dialTexture(c,R,tex,col){
   const D=DIALCOL[col],base=D.base;
@@ -511,7 +516,7 @@ function artDial(c,R,k){
     c.moveTo(-R*.62,0);c.lineTo(R*.62,0);           /* the net */
     c.stroke();
     c.strokeStyle='rgba(255,255,255,.28)';c.lineWidth=R*.010;
-    for(let y=-R*.03;y<R*.04;y+=R*.014){c.beginPath();c.moveTo(-R*.62,y);c.lineTo(R*.62,y);c.stroke();}
+    for(let y=-R*.03,st2=Math.max(R*.014,1);y<R*.04;y+=st2){c.beginPath();c.moveTo(-R*.62,y);c.lineTo(R*.62,y);c.stroke();}
   }else if(k==='grass'){
     /* mown stripes, then the same court in white */
     for(let i=-10;i<10;i++){
@@ -683,7 +688,7 @@ function artDial(c,R,k){
     }
   }else if(k==='carbon'){
     const cell=R*.11;
-    for(let y=-R;y<R;y+=cell)for(let x=-R;x<R;x+=cell){
+    for(let y=-R,cl=Math.max(cell,1);y<R;y+=cl)for(let x=-R;x<R;x+=cl){
       const even=(Math.round(x/cell)+Math.round(y/cell))%2===0;
       const g2=c.createLinearGradient(x,y,x+cell,y+cell);
       if(even){g2.addColorStop(0,'#2c2e31');g2.addColorStop(.5,'#4a4d52');g2.addColorStop(1,'#1a1b1d');}
@@ -710,6 +715,129 @@ function artDial(c,R,k){
         c.closePath();c.stroke();
       }
     });
+  }else if(k==='aventurine'){
+    /* glass with copper flecks suspended in it — a night sky you can hold */
+    const g=c.createRadialGradient(-R*.25,-R*.3,R*.04,0,0,R*1.2);
+    g.addColorStop(0,'#223f80');g.addColorStop(.5,'#122352');g.addColorStop(1,'#050a1e');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(9001);
+    for(let i=0;i<900;i++){
+      const px=(rnd()-.5)*2*R,py=(rnd()-.5)*2*R,rr=rnd()*1.5+.25;
+      const b=rnd();
+      c.fillStyle=b>.86?'rgba(255,244,214,.95)':(b>.5?'rgba(226,186,120,.72)':'rgba(150,180,235,.42)');
+      c.beginPath();c.arc(px,py,rr,0,TAU);c.fill();
+      if(b>.94){c.globalAlpha=.35;c.beginPath();c.arc(px,py,rr*3.4,0,TAU);c.fill();c.globalAlpha=1;}
+    }
+  }else if(k==='malachite'){
+    /* banded green stone: concentric rings around wandering nuclei */
+    c.fillStyle='#1d5340';c.fillRect(-R,-R,2*R,2*R);
+    seed(6410);
+    const cores=[[-R*.35,-R*.25],[R*.3,R*.1],[-R*.1,R*.45],[R*.45,-R*.5]];
+    cores.forEach((cr,ci)=>{
+      for(let i=1;i<26;i++){
+        const light=i%2===0;
+        c.strokeStyle=light?`rgba(150,215,175,${.30+rnd()*.35})`:`rgba(12,58,42,${.35+rnd()*.35})`;
+        c.lineWidth=R*(.012+rnd()*.026);
+        c.beginPath();
+        for(let a=0;a<=TAU+.1;a+=.16){
+          const wob=Math.sin(a*3+ci)*R*.045+Math.cos(a*5+i*.7)*R*.03;
+          const rr=R*.055*i+wob;
+          const px=cr[0]+Math.cos(a)*rr, py=cr[1]+Math.sin(a)*rr*.78;
+          a?c.lineTo(px,py):c.moveTo(px,py);
+        }
+        c.closePath();c.stroke();
+      }
+    });
+    const sg=c.createRadialGradient(-R*.3,-R*.35,R*.05,0,0,R*1.2);
+    sg.addColorStop(0,'rgba(255,255,255,.16)');sg.addColorStop(1,'rgba(0,0,0,.34)');
+    c.fillStyle=sg;c.fillRect(-R,-R,2*R,2*R);
+  }else if(k==='lapis'){
+    c.fillStyle='#17347a';c.fillRect(-R,-R,2*R,2*R);
+    seed(3301);
+    for(let i=0;i<130;i++){
+      const px=(rnd()-.5)*2*R,py=(rnd()-.5)*2*R,rr=R*(.03+rnd()*.14);
+      c.fillStyle=rnd()>.5?`rgba(10,25,70,${.2+rnd()*.4})`:`rgba(60,110,205,${.16+rnd()*.35})`;
+      c.beginPath();
+      for(let a=0;a<TAU;a+=.5){const w2=rr*(.6+rnd()*.7);
+        const x2=px+Math.cos(a)*w2,y2=py+Math.sin(a)*w2;a?c.lineTo(x2,y2):c.moveTo(x2,y2);}
+      c.closePath();c.fill();
+    }
+    /* pyrite: the gold flecks that prove it is real lapis */
+    for(let i=0;i<160;i++){
+      c.fillStyle=`rgba(232,196,110,${.4+rnd()*.6})`;
+      c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*1.5+.3,0,TAU);c.fill();
+    }
+    /* and the white calcite veining */
+    c.strokeStyle='rgba(230,235,245,.22)';
+    for(let i=0;i<7;i++){
+      c.lineWidth=R*(.006+rnd()*.014);
+      c.beginPath();let px=(rnd()-.5)*2*R,py=-R;
+      c.moveTo(px,py);
+      while(py<R){px+=(rnd()-.5)*R*.22;py+=Math.max(R*.14,1);c.lineTo(px,py);}
+      c.stroke();
+    }
+  }else if(k==='mop'){
+    /* nacre: overlapping iridescent plates */
+    c.fillStyle='#e9e6e0';c.fillRect(-R,-R,2*R,2*R);
+    seed(1234);
+    const tints=['rgba(255,205,225,','rgba(200,235,255,','rgba(215,255,225,','rgba(255,240,200,'];
+    for(let i=0;i<130;i++){
+      const px=(rnd()-.5)*2.1*R,py=(rnd()-.5)*2.1*R;
+      const w2=R*(.14+rnd()*.5),h2=R*(.05+rnd()*.15),a=rnd()*TAU;
+      c.save();c.translate(px,py);c.rotate(a);
+      const g2=c.createLinearGradient(-w2/2,0,w2/2,0);
+      const tint=tints[Math.floor(rnd()*4)];
+      g2.addColorStop(0,tint+'0)');g2.addColorStop(.5,tint+(.22+rnd()*.3)+')');
+      g2.addColorStop(1,tint+'0)');
+      c.fillStyle=g2;
+      c.beginPath();c.ellipse(0,0,w2/2,h2/2,0,0,TAU);c.fill();
+      c.restore();
+    }
+    const sg=c.createRadialGradient(-R*.3,-R*.4,R*.03,0,0,R*1.15);
+    sg.addColorStop(0,'rgba(255,255,255,.55)');sg.addColorStop(.6,'rgba(255,255,255,0)');
+    sg.addColorStop(1,'rgba(90,80,90,.25)');
+    c.fillStyle=sg;c.fillRect(-R,-R,2*R,2*R);
+  }else if(k==='damascus'){
+    /* folded steel: layered flow lines revealed by the etch */
+    c.fillStyle='#3a3b3d';c.fillRect(-R,-R,2*R,2*R);
+    seed(1095);
+    for(let i=0;i<58;i++){
+      const dark=i%2===0;
+      c.strokeStyle=dark?`rgba(20,21,23,${.5+rnd()*.4})`:`rgba(198,201,206,${.30+rnd()*.4})`;
+      c.lineWidth=R*(.012+rnd()*.030);
+      c.beginPath();
+      const baseY=-R+ (i/58)*2*R;
+      c.moveTo(-R*1.1,baseY);
+      for(let x2=-R,st=Math.max(R*.14,1);x2<=R;x2+=st){
+        const y2=baseY+Math.sin(x2/R*3.1+i*.8)*R*.075+Math.cos(x2/R*6.2+i)*R*.035;
+        c.lineTo(x2,y2);
+      }
+      c.stroke();
+    }
+    const sg=c.createRadialGradient(-R*.25,-R*.35,R*.05,0,0,R*1.2);
+    sg.addColorStop(0,'rgba(255,255,255,.18)');sg.addColorStop(1,'rgba(0,0,0,.32)');
+    c.fillStyle=sg;c.fillRect(-R,-R,2*R,2*R);
+  }else if(k==='marble'){
+    c.fillStyle='#efece4';c.fillRect(-R,-R,2*R,2*R);
+    seed(776);
+    for(let i=0;i<26;i++){
+      const grey=rnd()>.6;
+      c.strokeStyle=grey?`rgba(120,118,112,${.10+rnd()*.20})`:`rgba(60,58,54,${.14+rnd()*.30})`;
+      c.lineWidth=R*(.004+rnd()*.020);
+      c.beginPath();
+      let px=(rnd()-.5)*2*R, py=-R*1.1;
+      c.moveTo(px,py);
+      while(py<R*1.1){
+        const nx=px+(rnd()-.5)*R*.42, ny=py+Math.max(R*(.10+rnd()*.14),1);
+        c.quadraticCurveTo(px+(rnd()-.5)*R*.2,py+R*.06,nx,ny);
+        px=nx;py=ny;
+      }
+      c.stroke();
+    }
+    for(let i=0;i<1400;i++){
+      c.fillStyle=rnd()>.5?'rgba(255,255,255,.20)':'rgba(120,116,108,.10)';
+      c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*1.8,0,TAU);c.fill();
+    }
   }else if(k==='lava'){
     /* meteorite: Widmanstätten crystal lattice */
     const g=c.createRadialGradient(-R*.25,-R*.3,R*.05,0,0,R*1.2);
@@ -749,6 +877,68 @@ function appliedBar(c,x,y,ang,w,h,M,lume){
   c.restore();
 }
 function dialInk(){return ARTDIAL[S.texture]?ARTDIAL[S.texture].ink:DIALCOL[S.dialCol].ink;}
+
+/* ============================================================
+   SIGNATURE — the brand yields to the design, never the reverse.
+   Placement, size and variant all follow what else is on the dial.
+   ============================================================ */
+function sigPlan(){
+  /* what already occupies the dial? */
+  const c=S.comp, l=S.layout;
+  const topBusy = (c==='power');                       /* power reserve arcs across 12 */
+  const botBusy = (c==='small'||c==='moon'||c==='chrono3'||S.date==='6');
+  const ringBusy= (c==='gmt');                          /* inner 24h ring at .44 */
+  const sideBusy= (c==='chrono2'||c==='chrono3');
+  const numeralsAt12 = (l==='arabic'||l==='roman'||l==='railroad'||l==='mixed'||
+                        l==='explorer'||l==='field'||l==='breguet');
+  let y = -0.42, scale = 1, variant = S.sig;
+  if(variant==='auto'){
+    /* a crowded dial gets the mark alone; an open one gets the full lockup */
+    variant = (sideBusy||ringBusy||ARTDIAL[S.texture]) ? 'mark'
+            : (topBusy ? 'name' : 'full');
+  }
+  if(topBusy){ y = botBusy ? -0.20 : 0.30; }
+  else if(ringBusy){ y = -0.26; scale = .82; }
+  else if(sideBusy){ y = -0.40; scale = .84; }
+  if(numeralsAt12 && y < -0.40) y = -0.36;
+  if(botBusy && y > 0.20) y = -0.42;
+  return {y,scale,variant};
+}
+function drawSignature(c,dR,ink){
+  if(S.sig==='none')return;
+  const p=sigPlan(), art=!!ARTDIAL[S.texture];
+  c.save();
+  c.textAlign='center';c.textBaseline='middle';
+  /* on a painted dial the signature needs its own separation from the art */
+  if(art){c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=dR*.05;}
+  const yTop=dR*p.y, s=p.scale;
+  if(p.variant==='mark'){
+    c.save();c.translate(0,yTop+dR*.045);drawMark(c,dR*.115*s,ink,'#c9391b');c.restore();
+  }else if(p.variant==='name'){
+    c.fillStyle=ink;c.font=`600 ${dR*.098*s}px ${FONTS.grot}`;
+    if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.052*s}px`;
+    c.fillText('AXIS',dR*.026*s,yTop+dR*.05);
+    if(c.letterSpacing!==undefined)c.letterSpacing='0px';
+  }else{ /* full lockup: mark above, wordmark below */
+    c.save();c.translate(0,yTop);drawMark(c,dR*.092*s,ink,'#c9391b');c.restore();
+    c.fillStyle=ink;c.font=`600 ${dR*.076*s}px ${FONTS.grot}`;
+    if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.042*s}px`;
+    c.fillText('AXIS',dR*.021*s,yTop+dR*.115*s);
+    if(c.letterSpacing!==undefined)c.letterSpacing='0px';
+  }
+  /* the line at six, only where nothing else lives */
+  if(!botBusySix()){
+    c.globalAlpha=art?.7:.55;c.shadowBlur=art?dR*.04:0;
+    c.fillStyle=ink;c.font=`400 ${dR*.040}px ${FONTS.grot}`;
+    if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.012}px`;
+    c.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIC',0,dR*.815);
+  }
+  c.restore();
+}
+function botBusySix(){
+  return S.comp==='small'||S.comp==='moon'||S.comp==='chrono3'||S.date==='6'||
+         S.layout==='field'||(S.layout==='arabic'&&S.texture==='sector');
+}
 function drawIndices(c,R,D,M){
   const ink=dialInk(), lay=S.layout, r=R*.80;
   const printed=S.indexMat==='printed';
@@ -1029,6 +1219,25 @@ function drawStrap(c,R,fam){
   const top=(fam.rect?R*1.16:R)* (fam.slab?.98:1);
   const far=R*3.05;
   if(k==='oyster'||k==='jubilee'||k==='president'||k==='mesh'){
+    /* the folding clasp, closed, seen from above */
+    const clasp=()=>{
+      const cw=halfW*.80, cy=far*.86;
+      const g=c.createLinearGradient(-cw,0,cw,0);
+      g.addColorStop(0,M.lo);g.addColorStop(.30,M.mid);g.addColorStop(.5,M.hi);
+      g.addColorStop(.72,M.mid);g.addColorStop(1,M.lo);
+      c.fillStyle=g;
+      if(c.roundRect){c.beginPath();c.roundRect(-cw,cy-halfW*.30,cw*2,halfW*.60,halfW*.10);c.fill();}
+      else c.fillRect(-cw,cy-halfW*.30,cw*2,halfW*.60);
+      c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1.2;c.stroke();
+      c.strokeStyle='rgba(255,255,255,.30)';c.lineWidth=1;
+      c.beginPath();c.moveTo(-cw*.82,cy-halfW*.20);c.lineTo(cw*.82,cy-halfW*.20);c.stroke();
+      /* the release notch */
+      c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1.4;
+      c.beginPath();c.moveTo(-cw*.24,cy+halfW*.30);c.lineTo(-cw*.24,cy+halfW*.16);
+      c.lineTo(cw*.24,cy+halfW*.16);c.lineTo(cw*.24,cy+halfW*.30);c.stroke();
+      /* the mark, stamped small */
+      c.save();c.translate(0,cy);drawMark(c,halfW*.17,'rgba(0,0,0,.42)',null);c.restore();
+    };
     for(const dir of [-1,1]){
       if(k==='mesh'){
         c.save();c.beginPath();
@@ -1042,27 +1251,59 @@ function drawStrap(c,R,fam){
         for(let i=-halfW;i<halfW;i+=4){c.beginPath();c.moveTo(i,-far);c.lineTo(i+2,far);c.stroke();}
         c.restore();continue;
       }
-      const rows=13;
+      const rows=15, gap=.055;
       for(let i=0;i<rows;i++){
-        const t=i/rows, t2=(i+.88)/rows;
-        const y0=dir*(top+ (far-top)*t), y1=dir*(top+(far-top)*t2);
-        const w0=halfW*(1-t*.13), w1=halfW*(1-t2*.13);
-        const cols=(k==='jubilee')?[.20,.13,.34,.13,.20]:(k==='president'?[.28,.44,.28]:[.30,.40,.30]);
+        const t=i/rows, t2=(i+1-gap)/rows;
+        const y0=dir*(top+(far-top)*t), y1=dir*(top+(far-top)*t2);
+        const w0=halfW*(1-t*.20), w1=halfW*(1-t2*.20);
+        const cols=(k==='jubilee')?[.19,.125,.37,.125,.19]:(k==='president'?[.27,.46,.27]:[.29,.42,.29]);
         let x=-w0,x1=-w1;
         cols.forEach((cw,ci)=>{
           const centre=(cols.length===3&&ci===1)||(cols.length===5&&ci===2);
           const pol=(k==='jubilee')?(ci%2===1):centre;
+          const round=(k==='president');
+          const xa=x, xb=x+w0*2*cw, xc=x1+w1*2*cw, xd=x1;
+          const rr=round?Math.abs(xb-xa)*.42:Math.abs(xb-xa)*.16;
           c.beginPath();
-          c.moveTo(x,y0);c.lineTo(x+w0*2*cw,y0);c.lineTo(x1+w1*2*cw,y1);c.lineTo(x1,y1);c.closePath();
-          const g=c.createLinearGradient(x,0,x+w0*2*cw,0);
-          if(pol){g.addColorStop(0,M.mid);g.addColorStop(.4,M.hi);g.addColorStop(1,M.mid);}
-          else{g.addColorStop(0,M.lo);g.addColorStop(.45,M.mid);g.addColorStop(1,M.lo);}
+          if(c.roundRect){
+            /* a link is a solid billet, not a flat quad */
+            c.moveTo(xa+rr,y0);
+            c.quadraticCurveTo(xa,y0,xa+ (xd-xa)*.14, y0+(y1-y0)*.16);
+            c.lineTo(xd,y1-(y1-y0)*.10);
+            c.quadraticCurveTo(xd,y1,xd+rr,y1);
+            c.lineTo(xc-rr,y1);
+            c.quadraticCurveTo(xc,y1,xc-(xc-xb)*.14,y1-(y1-y0)*.16);
+            c.lineTo(xb,y0+(y1-y0)*.10);
+            c.quadraticCurveTo(xb,y0,xb-rr,y0);
+          }else{
+            c.moveTo(xa,y0);c.lineTo(xb,y0);c.lineTo(xc,y1);c.lineTo(xd,y1);
+          }
+          c.closePath();
+          const g=c.createLinearGradient(xa,0,xb,0);
+          if(pol){
+            g.addColorStop(0,M.lo);g.addColorStop(.18,M.mid);g.addColorStop(.42,M.hi);
+            g.addColorStop(.66,M.mid);g.addColorStop(1,M.lo);
+          }else{
+            g.addColorStop(0,shade(M.lo,-.12));g.addColorStop(.30,M.mid);
+            g.addColorStop(.55,M.hi);g.addColorStop(.78,M.mid);g.addColorStop(1,shade(M.lo,-.12));
+          }
           c.fillStyle=g;c.fill();
-          c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1;c.stroke();
+          /* brushed top face on the outer links, polished flanks */
+          if(!pol){
+            c.save();c.clip();
+            c.globalAlpha=.10;c.strokeStyle='#000';c.lineWidth=.8;
+            for(let bx=xa;bx<xb;bx+=2.2){c.beginPath();c.moveTo(bx,y0);c.lineTo(bx,y1);c.stroke();}
+            c.restore();
+          }
+          c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=1;c.stroke();
+          /* the bright edge where the link rolls over */
+          c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.9;
+          c.beginPath();c.moveTo(xa+rr*.6,y0);c.lineTo(xb-rr*.6,y0);c.stroke();
           x+=w0*2*cw;x1+=w1*2*cw;
         });
       }
     }
+    clasp();
     return;
   }
   /* flexible straps */
@@ -1323,6 +1564,9 @@ function renderBase(){
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
   const R=Math.min(w,h)*.185*(S.size/38);
   geom={R,dR:0,w,h,profile:S.view==='profile'};
+  /* a zero-sized canvas (hidden tab, collapsed layout) would make every
+     radius-relative step zero — never start drawing into nothing */
+  if(!(R>1))return;
   if(S.view==='profile'){
     X.save();X.translate(w/2,h/2);
     drawProfile(X,R*1.05,fam,M);
@@ -1368,19 +1612,7 @@ function renderBase(){
     X.beginPath();X.arc(0,0,dR*.70,0,TAU);X.stroke();X.globalAlpha=1;}
   drawIndices(X,dR,D,M);
   drawComp(X,dR,INK,M);
-  if(S.logo){
-    /* applied mark, then the wordmark beneath it */
-    X.save();X.translate(0,-dR*.44);
-    drawMark(X,dR*.105,INK,'#c9391b');
-    X.restore();
-    X.fillStyle=INK;X.textAlign='center';X.textBaseline='middle';
-    X.font=`600 ${dR*.085}px ${FONTS.grot}`;
-    X.save();if(X.letterSpacing!==undefined)X.letterSpacing=`${dR*.045}px`;
-    X.fillText('AXIS',0,-dR*.30);X.restore();
-    X.globalAlpha=.55;X.font=`400 ${dR*.042}px ${FONTS.grot}`;
-    X.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIC',0,dR*.80);
-    X.globalAlpha=1;
-  }
+  drawSignature(X,dR,INK);
   X.restore(); /* dial clip */
   X.restore(); /* centre */
 }
@@ -1545,7 +1777,7 @@ function build(){
     add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
     add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v));
     add(chips('Chapter ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v));
-    add(chips('Signature',[{v:true,n:'Printed'},{v:false,n:'Blank dial'}],S.logo,v=>S.logo=v));
+    add(chips('Signature',[{v:'auto',n:'Automatic'},{v:'full',n:'Mark + name'},{v:'mark',n:'Mark only'},{v:'name',n:'Name only'},{v:'none',n:'Unsigned'}],S.sig,v=>S.sig=v));
   }
   else if(tab==='index'){
     add(chips('Index style',Object.keys(LAYOUTS).map(k=>({v:k,n:LAYOUTS[k]})),S.layout,v=>S.layout=v));
@@ -1766,7 +1998,6 @@ function drawProfile(c,R,fam,M){
   c.fillRect(-rIn,yG-R*.008,rIn*2,R*.010);
   c.restore();
   /* ————— caption ————— */
-  const mm=(t*3.4*R)/(R/(S.size/2))*1;   /* case height back to millimetres */
   c.save();
   c.fillStyle='rgba(233,228,216,.45)';c.textAlign='center';
   c.font=`400 ${R*.075}px ${FONTS.grot}`;
@@ -1930,6 +2161,11 @@ function resize(){
   cv.style.width=st.clientWidth+'px';cv.style.height=st.clientHeight+'px';
   paint();
 }
+addEventListener('keydown',e=>{
+  if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.key==='r'||e.key==='R')randomize();
+  if(e.key==='d'||e.key==='D')download();
+});
 addEventListener('resize',resize);
 decode();
 resize();build();
