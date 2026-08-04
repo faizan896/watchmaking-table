@@ -1296,7 +1296,7 @@ function drawCrown(c,R,fam,M){
 function drawCrystal(c,R){
   /* the reflection slides as the watch turns — that is what sells the tilt */
   const ox=(S.tiltY||0)*R*.9, oy=-(S.tiltX||0)*R*.9;
-  const lift=Math.min(1,Math.hypot(S.tiltX||0,S.tiltY||0)/.62);
+  const lift=Math.min(1,Math.hypot(S.tiltX||0,S.tiltY||0)/.95);
   c.save();c.beginPath();c.arc(0,0,R,0,TAU);c.clip();
   const g=c.createLinearGradient(-R+ox,-R+oy,R*.2+ox,R*.4+oy);
   g.addColorStop(0,`rgba(255,255,255,${.26+lift*.22})`);
@@ -1332,8 +1332,8 @@ function renderBase(){
   X.save();X.translate(w/2,h/2);
   /* ————— 2.5D tilt: the disc turns, the flank appears, light slides ————— */
   const tx=S.tiltX||0, ty=S.tiltY||0;
-  const sx=Math.cos(ty), sy=Math.cos(tx);
-  const depth=R*THICK[S.thick].v*3.0;
+  const sx=Math.pow(Math.cos(ty),1.5), sy=Math.pow(Math.cos(tx),1.5);
+  const depth=R*THICK[S.thick].v*4.2;
   if(tx||ty){
     /* the case side wall, revealed on the side turning away */
     X.save();X.scale(sx,sy);
@@ -1898,7 +1898,7 @@ document.querySelectorAll('.bgs').forEach(b=>b.onclick=()=>{S.bg=b.dataset.bg;pa
 /* ————— drag the watch to turn it in the light ————— */
 (function(){
   let drag=false,lx=0,ly=0;
-  const LIM=.62;
+  const LIM=.95;
   cv.style.cursor='grab';
   cv.addEventListener('pointerdown',e=>{
     if(S.view!=='studio')return;
