@@ -144,7 +144,7 @@ const S={
   /* strap */
   strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
   /* meta */
-  name:'', view:'studio', wrist:false, skin:'light',
+  name:'', view:'studio', tiltX:0, tiltY:0,
   /* stage */
   bg:'#121110'
 };
@@ -194,7 +194,28 @@ const PRESETS=[
     hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
   {n:'Field chrono',s:{family:'round',size:40,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'titan',finish:'sand',
     layout:'arabic',dialCol:'green',texture:'matte',track:'railroad',indexMat:'printed',numFont:'cond',comp:'chrono2',date:'none',
-    hands:'syringe',handMat:'steel',lume:true,strap:'canvas',strapCol:'#5a4a30',stitch:'contrast'}}
+    hands:'syringe',handMat:'steel',lume:true,strap:'canvas',strapCol:'#5a4a30',stitch:'contrast'}},
+  {n:'Roland',s:{family:'round',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+    layout:'quarter',dialCol:'silver',texture:'clay',track:'none',indexMat:'applied',comp:'none',date:'none',
+    hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#8a5c34',stitch:'contrast'}},
+  {n:'Centre court',s:{family:'cushion',size:39,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
+    layout:'quarter',dialCol:'silver',texture:'grass',track:'none',indexMat:'applied',comp:'none',date:'none',
+    hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#2f4034',stitch:'tonal'}},
+  {n:'Nuit étoilée',s:{family:'round',size:39,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
+    layout:'dot',dialCol:'blue',texture:'starry',track:'none',indexMat:'applied',comp:'moon',date:'none',
+    hands:'breguet',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
+  {n:'Composition',s:{family:'square',size:37,thick:'slim',lug:'none',bezel:'smooth',bezelW:.08,metal:'steel',finish:'polish',
+    layout:'none',dialCol:'white',texture:'mondrian',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
+  {n:'Terminal',s:{family:'octagon',size:41,thick:'sport',lug:'none',bezel:'screws',bezelW:.12,metal:'black',finish:'sand',
+    layout:'bar',dialCol:'black',texture:'circuit',track:'none',indexMat:'printed',comp:'gmt',date:'none',
+    hands:'syringe',handMat:'steel',lume:true,strap:'oyster'}},
+  {n:'Horizon',s:{family:'tonneau',size:40,thick:'sport',lug:'none',bezel:'smooth',bezelW:.09,metal:'black',finish:'polish',
+    layout:'none',dialCol:'black',texture:'synth',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'baton',handMat:'steel',lume:true,strap:'rubber',strapCol:'#232120'}},
+  {n:'Meteorite',s:{family:'round',size:40,thick:'std',lug:'twisted',bezel:'fluted',bezelW:.10,metal:'white',finish:'polish',
+    layout:'baton',dialCol:'slate',texture:'lava',track:'ticks',indexMat:'applied',comp:'none',date:'3',
+    hands:'dauphine',handMat:'steel',lume:false,strap:'president'}}
 ];
 
 /* ————— materials ————— */
@@ -377,7 +398,20 @@ function brushStrokes(c,R,alpha){
    DIAL TEXTURES
    ============================================================ */
 const TEXTURES={sunray:'Sunray',matte:'Matte',enamel:'Grand feu',guilloche:'Guilloché',
-  sector:'Sector',fume:'Fumé',grain:'Grainé',tapestry:'Tapisserie',linen:'Linen'};
+  sector:'Sector',fume:'Fumé',grain:'Grainé',tapestry:'Tapisserie',linen:'Linen',
+  /* art dials — the dial as a canvas */
+  clay:'Clay court',grass:'Grass court',starry:'Starry night',wave:'Great wave',
+  mondrian:'Composition',klimt:'Gold leaf',circuit:'Circuit',synth:'Grid horizon',
+  nebula:'Nebula',carbon:'Carbon',topo:'Topographic',lava:'Meteorite'};
+/* art dials carry their own palette — the colour chip steps aside */
+const ARTDIAL={
+  clay :{base:'#b4573a',ink:'#f6efe4'}, grass:{base:'#2f5c33',ink:'#f6f4e8'},
+  starry:{base:'#101a3c',ink:'#e9dfae'}, wave:{base:'#12395e',ink:'#f2ece0'},
+  mondrian:{base:'#f4f1e8',ink:'#141414'}, klimt:{base:'#8a6412',ink:'#20180a'},
+  circuit:{base:'#0b1512',ink:'#7ef0c0'}, synth:{base:'#160a24',ink:'#ffd9f2'},
+  nebula:{base:'#150d24',ink:'#e6dcf5'}, carbon:{base:'#191a1c',ink:'#e6e6e6'},
+  topo:{base:'#e6ddc6',ink:'#2f2a20'}, lava:{base:'#2a2724',ink:'#e8e2d4'}
+};
 function dialTexture(c,R,tex,col){
   const D=DIALCOL[col],base=D.base;
   c.save();c.beginPath();c.arc(0,0,R,0,TAU);c.clip();
@@ -441,12 +475,257 @@ function dialTexture(c,R,tex,col){
       c.beginPath();c.moveTo(i,-R);c.lineTo(i,R);c.stroke();
     }
     c.globalAlpha=1;
+  }else if(ARTDIAL[tex]){
+    artDial(c,R,tex);
   }else{ /* matte */
     const g=c.createRadialGradient(-R*.3,-R*.4,R*.05,0,0,R*1.1);
     g.addColorStop(0,shade(base,.10));g.addColorStop(1,shade(base,-.12));
     c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
   }
   c.restore();
+}
+/* ============================================================
+   ART DIALS — the dial treated as a canvas
+   ============================================================ */
+function artDial(c,R,k){
+  const A=ARTDIAL[k];
+  c.fillStyle=A.base;c.fillRect(-R,-R,2*R,2*R);
+  const line='rgba(246,240,228,.92)';
+  if(k==='clay'){
+    /* crushed brick, then the white court lines seen from above */
+    seed(5150);
+    for(let i=0;i<3000;i++){
+      c.fillStyle=rnd()>.5?'rgba(255,190,150,.10)':'rgba(90,30,15,.13)';
+      c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*2.2,0,TAU);c.fill();
+    }
+    const g=c.createRadialGradient(-R*.3,-R*.4,R*.05,0,0,R*1.2);
+    g.addColorStop(0,'rgba(255,200,160,.18)');g.addColorStop(1,'rgba(60,20,10,.30)');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    c.strokeStyle=line;c.lineWidth=R*.030;
+    c.strokeRect(-R*.62,-R*.86,R*1.24,R*1.72);      /* doubles court */
+    c.lineWidth=R*.022;
+    c.strokeRect(-R*.44,-R*.86,R*.88,R*1.72);       /* singles */
+    c.beginPath();c.moveTo(-R*.44,-R*.30);c.lineTo(R*.44,-R*.30);
+    c.moveTo(-R*.44,R*.30);c.lineTo(R*.44,R*.30);
+    c.moveTo(0,-R*.30);c.lineTo(0,R*.30);           /* service boxes */
+    c.moveTo(-R*.62,0);c.lineTo(R*.62,0);           /* the net */
+    c.stroke();
+    c.strokeStyle='rgba(255,255,255,.28)';c.lineWidth=R*.010;
+    for(let y=-R*.03;y<R*.04;y+=R*.014){c.beginPath();c.moveTo(-R*.62,y);c.lineTo(R*.62,y);c.stroke();}
+  }else if(k==='grass'){
+    /* mown stripes, then the same court in white */
+    for(let i=-10;i<10;i++){
+      c.fillStyle=i%2?'rgba(255,255,255,.055)':'rgba(0,0,0,.07)';
+      c.fillRect(-R,i*R*.11,2*R,R*.11);
+    }
+    seed(7712);
+    for(let i=0;i<1800;i++){
+      c.strokeStyle=rnd()>.5?'rgba(190,225,160,.10)':'rgba(10,40,15,.12)';
+      c.lineWidth=1;const px=(rnd()-.5)*2*R,py=(rnd()-.5)*2*R;
+      c.beginPath();c.moveTo(px,py);c.lineTo(px+(rnd()-.5)*4,py-rnd()*5);c.stroke();
+    }
+    c.strokeStyle=line;c.lineWidth=R*.030;
+    c.strokeRect(-R*.62,-R*.86,R*1.24,R*1.72);
+    c.lineWidth=R*.022;
+    c.strokeRect(-R*.44,-R*.86,R*.88,R*1.72);
+    c.beginPath();c.moveTo(-R*.44,-R*.30);c.lineTo(R*.44,-R*.30);
+    c.moveTo(-R*.44,R*.30);c.lineTo(R*.44,R*.30);
+    c.moveTo(0,-R*.30);c.lineTo(0,R*.30);c.stroke();
+    c.strokeStyle='rgba(245,245,240,.85)';c.lineWidth=R*.028;
+    c.beginPath();c.moveTo(-R*.66,0);c.lineTo(R*.66,0);c.stroke();
+  }else if(k==='starry'){
+    const g=c.createRadialGradient(R*.3,-R*.45,R*.02,0,0,R*1.3);
+    g.addColorStop(0,'#2b4a86');g.addColorStop(.5,'#16265a');g.addColorStop(1,'#080d24');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    /* the swirl */
+    c.lineCap='round';
+    for(let s=0;s<3;s++){
+      const cx=[-R*.3,R*.36,-R*.1][s],cy=[-R*.18,R*.32,R*.55][s],rr=[R*.46,R*.3,R*.2][s];
+      for(let i=0;i<9;i++){
+        c.strokeStyle=`rgba(${150+i*8},${180+i*6},${235},${.16+i*.02})`;
+        c.lineWidth=R*.022;
+        c.beginPath();
+        for(let t2=0;t2<Math.PI*2.6;t2+=.12){
+          const r2=rr*(.14+t2*.12)*(1-i*.02);
+          const px=cx+Math.cos(t2+i*.4)*r2, py=cy+Math.sin(t2+i*.4)*r2*.82;
+          t2?c.lineTo(px,py):c.moveTo(px,py);
+        }
+        c.stroke();
+      }
+    }
+    seed(3141);
+    for(let i=0;i<40;i++){
+      const px=(rnd()-.5)*2*R,py=(rnd()-.5)*2*R,rr=rnd()*R*.035+R*.008;
+      const sg=c.createRadialGradient(px,py,0,px,py,rr*3);
+      sg.addColorStop(0,'rgba(255,236,170,.95)');sg.addColorStop(1,'rgba(255,220,140,0)');
+      c.fillStyle=sg;c.beginPath();c.arc(px,py,rr*3,0,TAU);c.fill();
+    }
+  }else if(k==='wave'){
+    const g=c.createLinearGradient(0,-R,0,R);
+    g.addColorStop(0,'#dfe4e0');g.addColorStop(.34,'#4b7ea6');g.addColorStop(1,'#0d2a48');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    /* the crest, curling from the left */
+    for(let i=0;i<5;i++){
+      c.fillStyle=i%2?'rgba(255,255,255,.85)':'rgba(20,70,110,.9)';
+      c.beginPath();
+      const off=i*R*.07;
+      c.moveTo(-R*1.1,R*.30+off);
+      c.bezierCurveTo(-R*.5,-R*.42+off,R*.15,-R*.30+off,R*.55,R*.22+off);
+      c.bezierCurveTo(R*.2,-R*.06+off,-R*.3,-R*.02+off,-R*1.1,R*.52+off);
+      c.closePath();c.fill();
+    }
+    /* foam fingers */
+    c.strokeStyle='rgba(255,255,255,.9)';c.lineCap='round';
+    for(let i=0;i<7;i++){
+      c.lineWidth=R*(.016-i*.001);
+      c.beginPath();
+      c.moveTo(R*.1+i*R*.06,-R*.12+i*R*.03);
+      c.quadraticCurveTo(R*.3+i*R*.05,-R*.34+i*R*.03,R*.16+i*R*.07,-R*.46+i*R*.02);
+      c.stroke();
+    }
+  }else if(k==='mondrian'){
+    c.fillStyle='#f4f1e8';c.fillRect(-R,-R,2*R,2*R);
+    const blocks=[[-R,-R,R*.72,R*.86,'#c0392b'],[R*.30,-R,R*.7,R*.5,'#f4f1e8'],
+      [R*.30,-R*.5,R*.7,R*.62,'#1c53a8'],[-R,R*.52,R*.62,R*.6,'#e3c027'],
+      [-R*.38,R*.52,R*.5,R*.6,'#f4f1e8'],[R*.12,R*.12,R*.4,R*.4,'#f4f1e8']];
+    blocks.forEach(b=>{c.fillStyle=b[4];c.fillRect(b[0],b[1],b[2],b[3]);});
+    c.strokeStyle='#141414';c.lineWidth=R*.055;c.lineCap='butt';
+    [[-R,R*.52,R,R*.52],[R*.30,-R,R*.30,R],[R*.12,-R,R*.12,R*.52],
+     [-R,-R*.14,R*.30,-R*.14],[-R*.38,R*.52,-R*.38,R],[R*.30,-R*.5,R,-R*.5]]
+      .forEach(l=>{c.beginPath();c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3]);c.stroke();});
+  }else if(k==='klimt'){
+    const g=c.createRadialGradient(-R*.25,-R*.3,R*.05,0,0,R*1.25);
+    g.addColorStop(0,'#f0d27a');g.addColorStop(.45,'#c39a2e');g.addColorStop(1,'#6d4c0c');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(1907);
+    for(let i=0;i<70;i++){
+      const px=(rnd()-.5)*1.9*R,py=(rnd()-.5)*1.9*R,s2=R*(.04+rnd()*.09);
+      c.save();c.translate(px,py);c.rotate(rnd()*TAU);
+      if(rnd()>.5){
+        c.fillStyle=rnd()>.5?'rgba(50,35,10,.55)':'rgba(255,240,190,.55)';
+        c.fillRect(-s2/2,-s2/2,s2,s2);
+      }else{
+        c.strokeStyle='rgba(60,40,10,.5)';c.lineWidth=R*.012;
+        c.beginPath();
+        for(let t2=0;t2<Math.PI*3;t2+=.2){const r2=s2*t2*.09;
+          const x2=Math.cos(t2)*r2,y2=Math.sin(t2)*r2;t2?c.lineTo(x2,y2):c.moveTo(x2,y2);}
+        c.stroke();
+      }
+      c.restore();
+    }
+    for(let i=0;i<1200;i++){
+      c.fillStyle=rnd()>.5?'rgba(255,246,210,.20)':'rgba(80,55,10,.16)';
+      c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*1.6,0,TAU);c.fill();
+    }
+  }else if(k==='circuit'){
+    c.fillStyle='#0b1512';c.fillRect(-R,-R,2*R,2*R);
+    seed(4004);
+    c.lineCap='square';
+    for(let i=0;i<46;i++){
+      c.strokeStyle=`rgba(110,240,190,${.18+rnd()*.4})`;
+      c.lineWidth=R*(.006+rnd()*.010);
+      let px=(rnd()-.5)*1.8*R, py=(rnd()-.5)*1.8*R;
+      c.beginPath();c.moveTo(px,py);
+      for(let s2=0;s2<4;s2++){
+        const horiz=rnd()>.5, len=R*(.08+rnd()*.34)*(rnd()>.5?1:-1);
+        horiz?px+=len:py+=len;
+        c.lineTo(px,py);
+      }
+      c.stroke();
+      c.fillStyle='rgba(150,255,215,.65)';
+      c.beginPath();c.arc(px,py,R*.014,0,TAU);c.fill();
+    }
+    for(let i=0;i<10;i++){
+      const px=(rnd()-.5)*1.6*R,py=(rnd()-.5)*1.6*R;
+      c.strokeStyle='rgba(110,240,190,.45)';c.lineWidth=R*.008;
+      c.strokeRect(px,py,R*.10,R*.06);
+    }
+  }else if(k==='synth'){
+    const g=c.createLinearGradient(0,-R,0,R*.1);
+    g.addColorStop(0,'#2a1147');g.addColorStop(1,'#6b1f5e');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,R*1.1);
+    /* the sun */
+    const sg=c.createLinearGradient(0,-R*.55,0,R*.05);
+    sg.addColorStop(0,'#ffd36e');sg.addColorStop(.5,'#ff6f91');sg.addColorStop(1,'#c62f7b');
+    c.save();c.beginPath();c.arc(0,-R*.25,R*.42,0,TAU);c.clip();
+    c.fillStyle=sg;c.fillRect(-R,-R,2*R,2*R);
+    c.fillStyle='#2a1147';
+    for(let i=0;i<5;i++)c.fillRect(-R,-R*.06+i*R*.10,2*R,R*.030+i*.004*R);
+    c.restore();
+    /* the grid running to the horizon */
+    c.fillStyle='#120722';c.fillRect(-R,R*.10,2*R,R);
+    c.strokeStyle='rgba(255,110,200,.75)';c.lineWidth=R*.012;
+    c.beginPath();c.moveTo(-R,R*.10);c.lineTo(R,R*.10);c.stroke();
+    c.strokeStyle='rgba(120,230,255,.55)';c.lineWidth=R*.008;
+    for(let i=-9;i<=9;i++){
+      c.beginPath();c.moveTo(i*R*.055,R*.10);c.lineTo(i*R*.34,R*1.05);c.stroke();
+    }
+    for(let i=1;i<9;i++){
+      const y=R*.10+Math.pow(i/9,2.1)*R*.95;
+      c.beginPath();c.moveTo(-R,y);c.lineTo(R,y);c.stroke();
+    }
+  }else if(k==='nebula'){
+    const g=c.createRadialGradient(-R*.2,-R*.25,R*.03,0,0,R*1.25);
+    g.addColorStop(0,'#6d4fd0');g.addColorStop(.4,'#3b1f6e');g.addColorStop(1,'#0b0716');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(2718);
+    for(let i=0;i<22;i++){
+      const px=(rnd()-.5)*1.7*R,py=(rnd()-.5)*1.7*R,rr=R*(.14+rnd()*.34);
+      const cg=c.createRadialGradient(px,py,0,px,py,rr);
+      const hue=rnd()>.5?'236,120,220':'110,180,255';
+      cg.addColorStop(0,`rgba(${hue},.16)`);cg.addColorStop(1,`rgba(${hue},0)`);
+      c.fillStyle=cg;c.beginPath();c.arc(px,py,rr,0,TAU);c.fill();
+    }
+    for(let i=0;i<220;i++){
+      const px=(rnd()-.5)*2*R,py=(rnd()-.5)*2*R;
+      c.fillStyle=`rgba(255,255,255,${.25+rnd()*.7})`;
+      c.beginPath();c.arc(px,py,rnd()*1.5,0,TAU);c.fill();
+    }
+  }else if(k==='carbon'){
+    const cell=R*.11;
+    for(let y=-R;y<R;y+=cell)for(let x=-R;x<R;x+=cell){
+      const even=(Math.round(x/cell)+Math.round(y/cell))%2===0;
+      const g2=c.createLinearGradient(x,y,x+cell,y+cell);
+      if(even){g2.addColorStop(0,'#2c2e31');g2.addColorStop(.5,'#4a4d52');g2.addColorStop(1,'#1a1b1d');}
+      else{g2.addColorStop(0,'#17181a');g2.addColorStop(.5,'#3c3f43');g2.addColorStop(1,'#242628');}
+      c.fillStyle=g2;c.fillRect(x,y,cell,cell);
+    }
+    const sg=c.createRadialGradient(-R*.3,-R*.4,R*.05,0,0,R*1.2);
+    sg.addColorStop(0,'rgba(255,255,255,.16)');sg.addColorStop(1,'rgba(0,0,0,.28)');
+    c.fillStyle=sg;c.fillRect(-R,-R,2*R,2*R);
+  }else if(k==='topo'){
+    c.fillStyle='#e6ddc6';c.fillRect(-R,-R,2*R,2*R);
+    const peaks=[[-R*.3,-R*.2,1.0],[R*.35,R*.3,.7]];
+    peaks.forEach((pk,pi)=>{
+      for(let i=1;i<15;i++){
+        c.strokeStyle=i%5===0?'rgba(120,95,60,.75)':'rgba(140,115,80,.42)';
+        c.lineWidth=i%5===0?R*.010:R*.005;
+        c.beginPath();
+        for(let a=0;a<=TAU+.1;a+=.14){
+          const wob=Math.sin(a*3+pi*2+i*.5)*R*.03+Math.cos(a*5+i)*R*.018;
+          const rr=(R*.07*i+wob)*pk[2];
+          const px=pk[0]+Math.cos(a)*rr,py=pk[1]+Math.sin(a)*rr*.86;
+          a?c.lineTo(px,py):c.moveTo(px,py);
+        }
+        c.closePath();c.stroke();
+      }
+    });
+  }else if(k==='lava'){
+    /* meteorite: Widmanstätten crystal lattice */
+    const g=c.createRadialGradient(-R*.25,-R*.3,R*.05,0,0,R*1.2);
+    g.addColorStop(0,'#5d5a55');g.addColorStop(.55,'#3a3835');g.addColorStop(1,'#211f1d');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(1492);
+    for(let i=0;i<120;i++){
+      const a=(rnd()>.5?1:-1)*(Math.PI/3+rnd()*.12);
+      const px=(rnd()-.5)*2.2*R, py=(rnd()-.5)*2.2*R;
+      const len=R*(.2+rnd()*.85);
+      c.save();c.translate(px,py);c.rotate(a);
+      c.fillStyle=rnd()>.5?'rgba(225,222,214,.42)':'rgba(20,18,16,.38)';
+      c.fillRect(-len/2,-R*(.006+rnd()*.012),len,R*(.012+rnd()*.020));
+      c.restore();
+    }
+  }
 }
 /* ============================================================
    INDICES & TYPOGRAPHY
@@ -469,8 +748,9 @@ function appliedBar(c,x,y,ang,w,h,M,lume){
   c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=.6;c.strokeRect(-w/2,-h/2,w,h);
   c.restore();
 }
+function dialInk(){return ARTDIAL[S.texture]?ARTDIAL[S.texture].ink:DIALCOL[S.dialCol].ink;}
 function drawIndices(c,R,D,M){
-  const ink=DIALCOL[S.dialCol].ink, lay=S.layout, r=R*.80;
+  const ink=dialInk(), lay=S.layout, r=R*.80;
   const printed=S.indexMat==='printed';
   const skip=[];
   if(S.comp==='small')skip.push(6);
@@ -1014,15 +1294,19 @@ function drawCrown(c,R,fam,M){
   c.restore();
 }
 function drawCrystal(c,R){
+  /* the reflection slides as the watch turns — that is what sells the tilt */
+  const ox=(S.tiltY||0)*R*.9, oy=-(S.tiltX||0)*R*.9;
+  const lift=Math.min(1,Math.hypot(S.tiltX||0,S.tiltY||0)/.62);
   c.save();c.beginPath();c.arc(0,0,R,0,TAU);c.clip();
-  const g=c.createLinearGradient(-R,-R,R*.2,R*.4);
-  g.addColorStop(0,'rgba(255,255,255,.26)');g.addColorStop(.34,'rgba(255,255,255,.05)');
+  const g=c.createLinearGradient(-R+ox,-R+oy,R*.2+ox,R*.4+oy);
+  g.addColorStop(0,`rgba(255,255,255,${.26+lift*.22})`);
+  g.addColorStop(.34,'rgba(255,255,255,.05)');
   g.addColorStop(1,'rgba(255,255,255,0)');
   c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
-  c.globalAlpha=.10;c.fillStyle='#fff';
-  c.beginPath();c.ellipse(-R*.40,-R*.46,R*.36,R*.11,-.72,0,TAU);c.fill();
-  c.globalAlpha=.05;
-  c.beginPath();c.ellipse(R*.40,R*.48,R*.24,R*.07,-.7,0,TAU);c.fill();
+  c.globalAlpha=.10+lift*.14;c.fillStyle='#fff';
+  c.beginPath();c.ellipse(-R*.40+ox,-R*.46+oy,R*(.36+lift*.14),R*.11,-.72,0,TAU);c.fill();
+  c.globalAlpha=.05+lift*.06;
+  c.beginPath();c.ellipse(R*.40+ox*.6,R*.48+oy*.6,R*.24,R*.07,-.7,0,TAU);c.fill();
   c.globalAlpha=1;c.restore();
 }
 /* ————— static layers are cached; only the hands move ————— */
@@ -1037,7 +1321,7 @@ function renderBase(){
   X.clearRect(0,0,w,h);
   X.fillStyle=S.bg;X.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
-  const R=Math.min(w,h)*.185*(S.size/38)*(S.wrist?.82:1);
+  const R=Math.min(w,h)*.185*(S.size/38);
   geom={R,dR:0,w,h,profile:S.view==='profile'};
   if(S.view==='profile'){
     X.save();X.translate(w/2,h/2);
@@ -1046,27 +1330,26 @@ function renderBase(){
     return;
   }
   X.save();X.translate(w/2,h/2);
-  if(S.wrist){
-    drawWrist(X,R,w,h);
-    /* strap wraps the arm and vanishes at its edges */
-    X.save();clipArm(X,R,h);
-    drawStrap(X,R,fam);
-    /* the strap presses into the skin */
-    X.globalCompositeOperation='multiply';
-    const cs=X.createLinearGradient(-R*1.6,0,R*1.6,0);
-    cs.addColorStop(0,'rgba(0,0,0,.45)');cs.addColorStop(.5,'rgba(0,0,0,0)');
-    cs.addColorStop(1,'rgba(0,0,0,.45)');
-    X.fillStyle=cs;X.fillRect(-R*1.6,-h,R*3.2,2*h);
+  /* ————— 2.5D tilt: the disc turns, the flank appears, light slides ————— */
+  const tx=S.tiltX||0, ty=S.tiltY||0;
+  const sx=Math.cos(ty), sy=Math.cos(tx);
+  const depth=R*THICK[S.thick].v*3.0;
+  if(tx||ty){
+    /* the case side wall, revealed on the side turning away */
+    X.save();X.scale(sx,sy);
+    const steps=14;
+    for(let i=steps;i>=1;i--){
+      const k=i/steps;
+      X.save();
+      X.translate(-Math.sin(ty)*depth*k/sx*1.0, Math.sin(tx)*depth*k/sy*1.0);
+      fam.path(X,R*(1-.004*k));
+      X.fillStyle=shade(M.lo,-.34+.26*(1-k));
+      X.fill();X.restore();
+    }
     X.restore();
-    /* contact shadow under the case */
-    X.save();
-    try{X.filter='blur(16px)';}catch(e){}
-    X.globalAlpha=.55;X.fillStyle='#000';
-    X.beginPath();X.ellipse(R*.10,R*.16,R*1.05,R*1.02,0,0,TAU);X.fill();
-    X.restore();
-  }else{
-    drawStrap(X,R,fam);
   }
+  X.scale(sx,sy);
+  drawStrap(X,R,fam);
   drawLugs(X,R,fam,M);
   drawCrown(X,R,fam,M);
   drawPushers(X,R,fam,M);
@@ -1076,19 +1359,21 @@ function renderBase(){
   const dR=R*fam.ap*(1-S.bezelW)-R*.006;
   geom={R,dR,w,h};
   X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
-  X.fillStyle=D.base;X.fillRect(-dR,-dR,dR*2,dR*2);
+  const INK=dialInk();
+  X.fillStyle=ARTDIAL[S.texture]?ARTDIAL[S.texture].base:D.base;
+  X.fillRect(-dR,-dR,dR*2,dR*2);
   dialTexture(X,dR,S.texture,S.dialCol);
-  drawTrack(X,dR,D.ink);
-  if(S.chapter){X.strokeStyle=D.ink;X.globalAlpha=.35;X.lineWidth=1;
+  drawTrack(X,dR,INK);
+  if(S.chapter){X.strokeStyle=INK;X.globalAlpha=.35;X.lineWidth=1;
     X.beginPath();X.arc(0,0,dR*.70,0,TAU);X.stroke();X.globalAlpha=1;}
   drawIndices(X,dR,D,M);
-  drawComp(X,dR,D.ink,M);
+  drawComp(X,dR,INK,M);
   if(S.logo){
     /* applied mark, then the wordmark beneath it */
     X.save();X.translate(0,-dR*.44);
-    drawMark(X,dR*.105,D.ink,'#c9391b');
+    drawMark(X,dR*.105,INK,'#c9391b');
     X.restore();
-    X.fillStyle=D.ink;X.textAlign='center';X.textBaseline='middle';
+    X.fillStyle=INK;X.textAlign='center';X.textBaseline='middle';
     X.font=`600 ${dR*.085}px ${FONTS.grot}`;
     X.save();if(X.letterSpacing!==undefined)X.letterSpacing=`${dR*.045}px`;
     X.fillText('AXIS',0,-dR*.30);X.restore();
@@ -1207,9 +1492,13 @@ function build(){
       thumb(cvs,p.s);
     });
     g.appendChild(box);add(g);
-    add(chips('View',[{v:'studio',n:'Studio'},{v:'wrist',n:'On the wrist'},{v:'profile',n:'Profile'}],
-      S.view,v=>{S.view=v;S.wrist=(v==='wrist');}));
-    if(S.view==='wrist')add(chips('Skin tone',Object.keys(SKIN).map(k=>({v:k,n:SKIN[k].n,c:SKIN[k].mid})),S.skin,v=>S.skin=v,true));
+    add(chips('View',[{v:'studio',n:'Studio'},{v:'profile',n:'Profile'}],
+      S.view,v=>{S.view=v;if(v!=='studio'){S.tiltX=0;S.tiltY=0;}}));
+    if(S.view==='studio'){
+      const t=document.createElement('div');t.className='grp';
+      t.innerHTML='<h4>Tilt</h4><p class="note">Drag the watch to turn it in the light. Double-click to lay it flat.</p>';
+      add(t);
+    }
     const nm=document.createElement('div');nm.className='grp';
     nm.innerHTML='<h4>Name your design</h4>';
     const inp=document.createElement('input');inp.className='tin';
@@ -1248,8 +1537,12 @@ function build(){
     add(slider('Bezel width',5,20,1,Math.round(S.bezelW*100),' %',v=>S.bezelW=v/100));
   }
   else if(tab==='dial'){
-    add(chips('Colour',Object.keys(DIALCOL).map(k=>({v:k,n:DIALCOL[k].name,c:DIALCOL[k].base})),S.dialCol,v=>S.dialCol=v,true));
-    add(chips('Texture',Object.keys(TEXTURES).map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
+    const plain=Object.keys(TEXTURES).filter(k=>!ARTDIAL[k]);
+    const art=Object.keys(TEXTURES).filter(k=>ARTDIAL[k]);
+    if(!ARTDIAL[S.texture])
+      add(chips('Colour',Object.keys(DIALCOL).map(k=>({v:k,n:DIALCOL[k].name,c:DIALCOL[k].base})),S.dialCol,v=>S.dialCol=v,true));
+    add(chips('Finish',plain.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
+    add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
     add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v));
     add(chips('Chapter ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v));
     add(chips('Signature',[{v:true,n:'Printed'},{v:false,n:'Blank dial'}],S.logo,v=>S.logo=v));
@@ -1309,7 +1602,7 @@ function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
 /* ————— preset thumbnails: same engine, tiny canvas ————— */
 function thumb(cvs,spec){
   const keep=JSON.parse(JSON.stringify(S));
-  Object.assign(S,spec);S.wrist=false;
+  Object.assign(S,spec);S.tiltX=0;S.tiltY=0;
   const c=cvs.getContext('2d');
   const w=cvs.width,h=cvs.height;
   c.fillStyle='#1a1917';c.fillRect(0,0,w,h);
@@ -1321,9 +1614,9 @@ function thumb(cvs,spec){
   drawBezel(c,R,fam,M);
   const dR=R*fam.ap*(1-S.bezelW)-R*.006;
   c.save();c.beginPath();c.arc(0,0,dR,0,TAU);c.clip();
-  c.fillStyle=D.base;c.fillRect(-dR,-dR,dR*2,dR*2);
+  c.fillStyle=ARTDIAL[S.texture]?ARTDIAL[S.texture].base:D.base;c.fillRect(-dR,-dR,dR*2,dR*2);
   dialTexture(c,dR,S.texture,S.dialCol);
-  drawTrack(c,dR,D.ink);
+  drawTrack(c,dR,dialInk());
   drawIndices(c,dR,D,M);
   drawComp(c,dR,D.ink,M);
   const blue=S.handMat==='blued';
@@ -1334,77 +1627,6 @@ function thumb(cvs,spec){
   c.restore();
   Object.assign(S,keep);
 }
-/* ————— the wrist ————— */
-const SKIN={
-  fair  :{n:'Fair',   hi:'#f0cdb2',mid:'#dfae8d',lo:'#a97a5c',deep:'#7a5340'},
-  light :{n:'Light',  hi:'#e6bd9a',mid:'#cf9d76',lo:'#9a6b4a',deep:'#6d4831'},
-  olive :{n:'Olive',  hi:'#d8ab7c',mid:'#bd8a58',lo:'#8a5f38',deep:'#5d3f26'},
-  brown :{n:'Brown',  hi:'#a9714a',mid:'#8a5733',lo:'#5f3a21',deep:'#3f2616'},
-  deep  :{n:'Deep',   hi:'#7c4f31',mid:'#5f3a22',lo:'#402614',deep:'#28170c'}
-};
-/* the forearm silhouette: narrow at the hand, wider toward the elbow, with the ulna bump */
-function armPath(c,R,h){
-  const wTop=R*2.35, wBot=R*3.15;
-  c.beginPath();
-  c.moveTo(-wTop/2,-h*1.1);
-  c.bezierCurveTo(-wTop/2-R*.06,-h*.34, -wTop*.60,-R*.15, -wTop*.545,R*.30);
-  c.bezierCurveTo(-wBot*.52,h*.45, -wBot/2,h*.8, -wBot/2,h*1.1);
-  c.lineTo(wBot/2,h*1.1);
-  c.bezierCurveTo(wBot/2,h*.8, wBot*.52,h*.45, wTop*.545,R*.30);
-  c.bezierCurveTo(wTop*.60,-R*.15, wTop/2+R*.06,-h*.34, wTop/2,-h*1.1);
-  c.closePath();
-}
-const ARM_TILT=-8*Math.PI/180;   /* nobody photographs a wrist perfectly upright */
-function drawWrist(c,R,w,h){
-  const T=SKIN[S.skin]||SKIN.light, wBot=R*3.15;
-  c.save();
-  /* out-of-focus room behind the arm */
-  const bg=c.createRadialGradient(0,-h*.2,R*.5,0,0,h*1.6);
-  bg.addColorStop(0,shade(S.bg,.06));bg.addColorStop(1,shade(S.bg,-.30));
-  c.fillStyle=bg;c.fillRect(-w,-h,w*2,h*2);
-  c.rotate(ARM_TILT);
-  /* soft body shadow thrown on the surface */
-  c.save();
-  try{c.filter='blur(26px)';}catch(e){}
-  c.globalAlpha=.5;c.fillStyle='#000';
-  c.save();c.translate(R*.16,R*.2);armPath(c,R*1.02,h);c.fill();c.restore();
-  c.restore();
-  /* the arm, with a blurred silhouette edge so skin never looks die-cut */
-  c.save();
-  try{c.filter='blur(3.5px)';}catch(e){}
-  armPath(c,R,h);
-  const g=c.createLinearGradient(-wBot/2,0,wBot/2,0);
-  g.addColorStop(0,T.deep);g.addColorStop(.10,T.lo);g.addColorStop(.30,T.mid);
-  g.addColorStop(.46,T.hi);g.addColorStop(.62,T.mid);g.addColorStop(.88,T.lo);
-  g.addColorStop(1,T.deep);
-  c.fillStyle=g;c.fill();
-  c.restore();
-  /* skin: pores, and the faint blue of a vein */
-  c.save();armPath(c,R,h);c.clip();
-  seed(88117);
-  for(let i=0;i<2600;i++){
-    const px=(rnd()-.5)*wBot, py=(rnd()-.5)*2*h;
-    c.fillStyle=rnd()>.5?'rgba(255,255,255,.028)':'rgba(0,0,0,.045)';
-    c.beginPath();c.arc(px,py,rnd()*2.1+.3,0,TAU);c.fill();
-  }
-  c.strokeStyle='rgba(80,110,150,.10)';c.lineWidth=R*.05;
-  c.beginPath();
-  c.moveTo(-R*.9,-h);c.bezierCurveTo(-R*.5,-h*.3,-R*1.0,h*.2,-R*.5,h);c.stroke();
-  c.beginPath();
-  c.moveTo(R*.75,-h);c.bezierCurveTo(R*1.05,-h*.4,R*.6,h*.1,R*.95,h);c.stroke();
-  /* tendon highlight down the centre, then the ulna bump catching light */
-  const tg=c.createLinearGradient(0,-h,0,h);
-  tg.addColorStop(0,'rgba(255,255,255,0)');tg.addColorStop(.5,'rgba(255,255,255,.05)');
-  tg.addColorStop(1,'rgba(255,255,255,0)');
-  c.fillStyle=tg;c.fillRect(-R*.4,-h,R*.8,2*h);
-  const ug=c.createRadialGradient(-R*1.02,-R*.1,R*.05,-R*1.02,-R*.1,R*.55);
-  ug.addColorStop(0,'rgba(255,255,255,.13)');ug.addColorStop(1,'rgba(255,255,255,0)');
-  c.fillStyle=ug;c.fillRect(-wBot,-h,wBot,2*h);
-  c.restore();
-  c.restore();
-}
-/* the strap must disappear behind the arm, not float over the room */
-function clipArm(c,R,h){c.rotate(ARM_TILT);armPath(c,R,h);c.rotate(-ARM_TILT);c.clip();}
 
 /* ============================================================
    PROFILE — the elevation. Where thickness, crystal and lug
@@ -1573,10 +1795,10 @@ function certificate(){
   x.fillStyle='#8d867a';x.font='400 17px "Archivo Narrow"';
   x.fillText('INSTRUMENTS OF ROTATION',W/2,352);
   /* the watch */
-  const keepBg=S.bg,keepWrist=S.wrist;S.bg='#f2ede2';S.wrist=false;
+  const keepBg=S.bg,kx=S.tiltX,ky=S.tiltY;S.bg='#f2ede2';S.tiltX=0;S.tiltY=0;
   const prev=cv.width;renderBase();
   x.drawImage(base,(W-1000)/2,400,1000,1000*(base.height/base.width));
-  S.bg=keepBg;S.wrist=keepWrist;baseDirty=true;
+  S.bg=keepBg;S.tiltX=kx;S.tiltY=ky;baseDirty=true;
   /* text block */
   let y=H-620;
   x.textAlign='center';x.fillStyle='#211d16';
@@ -1630,7 +1852,8 @@ function randomize(){
   S.bezel=pick(Object.keys(BEZELS));
   S.bezelW=(6+Math.round(Math.random()*12))/100;
   S.dialCol=pick(Object.keys(DIALCOL));
-  S.texture=pick(Object.keys(TEXTURES));
+  /* art dials are a treat, not the default */
+  S.texture=Math.random()<.22?pick(Object.keys(ARTDIAL)):pick(Object.keys(TEXTURES).filter(k=>!ARTDIAL[k]));
   S.layout=pick(Object.keys(LAYOUTS));
   S.indexMat=pick(['applied','printed']);
   S.numFont=pick(['grot','cond','serif']);
@@ -1671,6 +1894,26 @@ document.getElementById('bSave').onclick=()=>{
 };
 document.getElementById('bReset').onclick=()=>{Object.assign(S,DEFAULTS);build();paint();};
 document.querySelectorAll('.bgs').forEach(b=>b.onclick=()=>{S.bg=b.dataset.bg;paint();});
+
+/* ————— drag the watch to turn it in the light ————— */
+(function(){
+  let drag=false,lx=0,ly=0;
+  const LIM=.62;
+  cv.style.cursor='grab';
+  cv.addEventListener('pointerdown',e=>{
+    if(S.view!=='studio')return;
+    drag=true;lx=e.clientX;ly=e.clientY;cv.style.cursor='grabbing';
+    cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);
+  });
+  addEventListener('pointermove',e=>{
+    if(!drag)return;
+    S.tiltY=Math.max(-LIM,Math.min(LIM,(S.tiltY||0)+(e.clientX-lx)*.006));
+    S.tiltX=Math.max(-LIM,Math.min(LIM,(S.tiltX||0)-(e.clientY-ly)*.006));
+    lx=e.clientX;ly=e.clientY;paint();
+  });
+  addEventListener('pointerup',()=>{drag=false;cv.style.cursor='grab';});
+  cv.addEventListener('dblclick',()=>{S.tiltX=0;S.tiltY=0;paint();});
+})();
 
 /* ————— loop: base cached, hands live ————— */
 let dirty=true,baseDirty=true;
