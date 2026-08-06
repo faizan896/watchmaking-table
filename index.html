@@ -21,12 +21,8 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   background:radial-gradient(120% 100% at 50% 38%,#16150f 0%,#0b0b0a 68%)}
 #cv{max-width:100%;max-height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;will-change:transform}
-#brand{position:absolute;top:34px;left:44px;pointer-events:none;display:flex;align-items:center;gap:15px}
-#logo{width:50px;height:29px;flex:none}
-#logo path{fill:var(--cream)}
-#logo circle{fill:var(--verm)}
+#brand{position:absolute;top:32px;left:44px;pointer-events:none;display:flex;align-items:center;gap:13px}
 #kanjiLogo{font-family:'Yuji Syuku',serif;font-size:40px;line-height:1;color:var(--cream);display:none}
-#brand.k #logo{display:none}
 #brand.k #kanjiLogo{display:block}
 #brand b{font-family:'Pinyon Script',var(--serif);font-size:40px;display:block;line-height:.9;
   letter-spacing:.01em;font-weight:400;color:var(--cream);text-transform:none}
@@ -34,7 +30,6 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 /* the stage adapts: on a pale backdrop the maison turns to ink */
 #stage.light #brand b,#stage.light #kanjiLogo{color:#1b1a16}
 #stage.light #brand span{color:#6f6a5e}
-#stage.light #logo path{fill:#1b1a16}
 #stage.light #specName{color:#1b1a16}
 #stage.light #specRule{background:rgba(27,26,22,.34)}
 #stage.light #specText{color:#5f5a4f}
@@ -130,9 +125,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #guide .gcard{transform:translateY(12px) scale(.99);transition:transform .6s var(--ease)}
 #guide.on .gcard{transform:none}
 .gcard{max-width:470px;background:var(--paper);padding:46px 46px 26px;text-align:center}
-.gmark{height:40px;margin-bottom:22px}
-.gmark svg{height:40px}
-.gmark path{fill:var(--ink)}.gmark circle{fill:var(--verm)}
+.gmark{display:none}
 .gcard h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:31px;margin-bottom:16px;color:var(--ink);line-height:1.1}
 .gcard p{font-size:13.5px;line-height:1.95;color:var(--ink2);margin-bottom:30px}
 .gcard p b{color:var(--ink);font-weight:500}
@@ -163,7 +156,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   #app{grid-template-columns:1fr;grid-template-rows:1fr 54%}
   #panel{grid-template-columns:60px 1fr}
   #panel:before{display:none}
-  #brand{top:18px;left:20px;gap:11px}#logo{width:40px}#kanjiLogo{font-size:31px}
+  #brand{top:18px;left:20px;gap:11px}#kanjiLogo{font-size:31px}
   #brand b{font-size:15px;letter-spacing:.38em}#brand span{font-size:6.5px}
   #specline{bottom:16px;left:20px}#specName{font-size:17px;margin-bottom:8px}
   #specText{font-size:8.5px;line-height:1.95}
@@ -188,10 +181,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   mix-blend-mode:multiply}
 #lwrap{position:relative;max-width:1180px;margin:0 auto;padding:54px 56px 70px;
   display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:auto 1fr auto;gap:0 62px;min-height:100%}
-#lbrand{grid-column:1/-1;display:flex;align-items:center;gap:16px;margin-bottom:16px}
-#lmark{width:54px;height:31px;flex:none}
-#lmark path{fill:#22201a}
-#lmark circle{fill:var(--verm)}
+#lbrand{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-bottom:16px}
 #lbrand b{font-family:'Pinyon Script',var(--serif);font-size:46px;line-height:.85;color:#22201a;display:block;font-weight:400}
 #lbrand span{font-size:7.5px;letter-spacing:.44em;text-transform:uppercase;color:#8b8271;display:block;margin-top:5px}
 #sketch{width:100%;height:auto;align-self:center;grid-row:2}
@@ -242,7 +232,6 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   <div id="paper"></div>
   <div id="lwrap">
     <div id="lbrand">
-      <svg id="lmark" viewBox="-60 -34 120 68"><g id="landMark"></g></svg>
       <div><b>Semi</b><span>Watch design studio</span></div>
     </div>
     <svg id="sketch" viewBox="0 0 1000 620" aria-label="A boy assembling a watch beneath a tree">
@@ -287,9 +276,6 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   <div id="stage">
     <canvas id="cv"></canvas>
     <div id="brand">
-      <svg id="logo" viewBox="-60 -34 120 68" aria-label="Semi">
-        <g id="logoMark"></g>
-      </svg>
       <div id="kanjiLogo">蝉</div>
       <div><b>Semi</b><span>Instruments of rotation</span></div>
     </div>
@@ -331,7 +317,6 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 <!-- ————— guide: for anyone who loves watches but has never designed one ————— -->
 <div id="guide">
   <div class="gcard">
-    <div class="gmark"><svg viewBox="-60 -34 120 68"><g id="guideMark"></g></svg></div>
     <h2 id="gTitle"></h2>
     <p id="gBody"></p>
     <div class="gnav">
@@ -525,15 +510,6 @@ function drawMark(c,scale,col,pivotCol){
   if(pivotCol){c.fillStyle=pivotCol;c.beginPath();c.arc(0,0,scale*.085,0,TAU);c.fill();}
   c.restore();
 }
-/* header mark */
-(function(){
-  const g=document.getElementById('logoMark');
-  if(!g)return;
-  const [r1,r2]=markPts(30);
-  g.innerHTML=`<path d="${ptsToPath(r1)}" fill-rule="evenodd"/>`+
-    `<path d="${ptsToPath(r2)}" fill-rule="evenodd"/>`+
-    `<circle cx="0" cy="0" r="2.6"/>`;
-})();
 
 function lerpHex(a,b,t){
   const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),pb=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
@@ -1134,18 +1110,14 @@ function sigPlan(){
 }
 /* the emblem: two orbits, or 蝉 — semi, the cicada that keeps a calendar */
 function drawEmblem(c,size,ink){
-  if(S.brand==='kanji'||S.brand==='both'){
-    c.save();
-    c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
-    c.font=`400 ${size*2.05}px "Yuji Syuku", "Cormorant Garamond", serif`;
-    c.fillText('蝉',0,size*.06);
-    c.restore();
-    if(S.brand==='both'){
-      c.save();c.translate(0,size*1.55);drawMark(c,size*.62,ink,'#c9391b');c.restore();
-    }
-    return;
-  }
-  drawMark(c,size,ink,'#c9391b');
+  /* the house has no device — only its name, and sometimes its character */
+  if(S.brand!=='kanji')return false;
+  c.save();
+  c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
+  c.font=`400 ${size*2.05}px "Yuji Syuku", "Cormorant Garamond", serif`;
+  c.fillText('蝉',0,size*.06);
+  c.restore();
+  return true;
 }
 function drawSignature(c,dR,ink){
   if(S.sig==='none')return;
@@ -1155,14 +1127,14 @@ function drawSignature(c,dR,ink){
   /* on a painted dial the signature needs its own separation from the art */
   if(art){c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=dR*.05;}
   const yTop=dR*p.y, s=p.scale;
-  if(p.variant==='mark'){
+  if(p.variant==='mark'&&S.brand==='kanji'){
     c.save();c.translate(0,yTop+dR*.045);drawEmblem(c,dR*.115*s,ink);c.restore();
-  }else if(p.variant==='name'){
+  }else if(p.variant==='name'||p.variant==='mark'){
     c.fillStyle=ink;c.font=`400 ${dR*.20*s}px "Pinyon Script", ${FONTS.serif}`;
     c.fillText('Semi',0,yTop+dR*.05);
-  }else{ /* full lockup: emblem above, wordmark below */
+  }else{ /* the character above, the name beneath */
     const kan=(S.brand==='kanji');
-    c.save();c.translate(0,yTop);drawEmblem(c,dR*.092*s,ink);c.restore();
+    if(kan){c.save();c.translate(0,yTop);drawEmblem(c,dR*.092*s,ink);c.restore();}
     c.fillStyle=ink;c.font=`400 ${dR*.165*s}px "Pinyon Script", ${FONTS.serif}`;
     c.fillText('Semi',0,yTop+dR*(kan?.185:.145)*s);
   }
@@ -1476,7 +1448,6 @@ function drawStrap(c,R,fam){
       c.beginPath();c.moveTo(-cw*.24,cy+halfW*.30);c.lineTo(-cw*.24,cy+halfW*.16);
       c.lineTo(cw*.24,cy+halfW*.16);c.lineTo(cw*.24,cy+halfW*.30);c.stroke();
       /* the mark, stamped small */
-      c.save();c.translate(0,cy);drawMark(c,halfW*.17,'rgba(0,0,0,.42)',null);c.restore();
     };
     for(const dir of [-1,1]){
       if(k==='mesh'){
@@ -2040,7 +2011,7 @@ function build(){
     add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
     add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v));
     add(chips('Chapter ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v));
-    add(chips('Emblem',[{v:'orbit',n:'Orbit mark'},{v:'kanji',n:'蝉 Semi'},{v:'both',n:'Both'}],S.brand,v=>S.brand=v));
+    add(chips('Emblem',[{v:'orbit',n:'Name only'},{v:'kanji',n:'蝉 above the name'}],S.brand,v=>S.brand=v));
     add(chips('Signature',[{v:'auto',n:'Automatic'},{v:'full',n:'Mark + name'},{v:'mark',n:'Mark only'},{v:'name',n:'Name only'},{v:'none',n:'Unsigned'}],S.sig,v=>S.sig=v));
   }
   else if(tab==='index'){
@@ -2345,7 +2316,6 @@ function certificate(){
   x.strokeStyle='#c3bba6';x.lineWidth=2;x.strokeRect(56,56,W-112,H-112);
   x.strokeStyle='#e0d9c6';x.lineWidth=1;x.strokeRect(70,70,W-140,H-140);
   /* mark */
-  x.save();x.translate(W/2,196);drawMark(x,86,'#211d16','#c9391b');x.restore();
   x.fillStyle='#211d16';x.textAlign='center';
   x.font='400 92px "Pinyon Script", "Cormorant Garamond", serif';
   x.fillText('Semi',W/2,328);
@@ -2500,11 +2470,6 @@ document.getElementById('guide').onclick=e=>{if(e.target.id==='guide')closeGuide
 document.getElementById('bHelp').onclick=()=>showGuide(0);
 document.getElementById('glossX').onclick=()=>{const gx=document.getElementById('gloss');gx.classList.remove('on');setTimeout(()=>{if(!gx.classList.contains('on'))gx.style.display='';},450);};
 document.getElementById('gloss').onclick=e=>{if(e.target.id==='gloss')e.currentTarget.classList.remove('on');};
-(function(){
-  const [r1,r2]=markPts(30);
-  const g=document.getElementById('guideMark');
-  if(g)g.innerHTML=`<path d="${ptsToPath(r1)}" fill-rule="evenodd"/><path d="${ptsToPath(r2)}" fill-rule="evenodd"/><circle cx="0" cy="0" r="2.6"/>`;
-})();
 addEventListener('keydown',e=>{
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
   if(e.key==='Escape'){closeGuide();document.getElementById('gloss').classList.remove('on');}
@@ -2661,10 +2626,6 @@ function enterStudio(){
     try{if(!localStorage.getItem('semi.seen'))setTimeout(()=>showGuide(0),1000);}catch(e){}
   },260);
 }
-(function(){const g=document.getElementById('landMark');if(!g)return;
-  const p=markPts(30);
-  g.innerHTML='<path d="'+ptsToPath(p[0])+'" fill-rule="evenodd"/><path d="'+ptsToPath(p[1])+'" fill-rule="evenodd"/><circle cx="0" cy="0" r="2.6"/>';
-})();
 /* a shared link goes straight to the watch */
 (function(){const L=document.getElementById('landing');
   if(typeof fromLink!=='undefined'&&fromLink){L.classList.add('gone');L.style.display='none';}
