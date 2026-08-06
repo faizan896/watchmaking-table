@@ -3,173 +3,397 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SEMI — Watch Design Studio</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Cg transform='translate(32 32)' fill='none' stroke='%23e9e4d8'%3E%3Cellipse rx='24' ry='11' transform='rotate(-32)' stroke-width='5'/%3E%3Cellipse rx='24' ry='11' transform='rotate(32)' stroke-width='5'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='3.4' fill='%23c9391b'/%3E%3C/svg%3E">
+<title>Semi — design a mechanical watch, movement first</title>
+<meta name="description" content="Semi is a watch design studio. Specify a mechanical watch the way a maison does — calibre and finishing, case and bezel, dial and indices, hands and strap — with every combination checked against how watches are actually built.">
+<meta name="theme-color" content="#0d0d0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Semi">
+<meta property="og:title" content="Semi — design a mechanical watch, movement first">
+<meta property="og:description" content="Nine chapters, from the calibre to the strap. Every control is a real decision a watchmaker makes.">
+<meta property="og:image" content="https://watchmaking-table.vercel.app/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='%23e9e4d8' stroke-width='3'/%3E%3Cpath d='M32 18v14l9 5' fill='none' stroke='%23e9e4d8' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Archivo+Narrow:wght@400;500;600&family=Barlow+Condensed:wght@300;400;500;600&family=Yuji+Syuku&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500;1,600&family=Archivo+Narrow:wght@400;600&family=Barlow+Condensed:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&text=SemiFaizan&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E8%9D%89%C2%B7semi&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   SEMI — interface in the language of the maison:
+   a dark display case, an ivory catalogue beside it.
+   Hairlines, not boxes. Space, not decoration.
+   ============================================================ */
 :root{
-  --stage:#0d0d0c;--paper:#f2efe8;--paper2:#e9e5db;--ink:#181713;--ink2:#5c574c;--ink3:#918a7c;
-  --rule:rgba(24,23,19,.14);--rule2:rgba(24,23,19,.07);--gold:#9a7b3f;--verm:#c9391b;--cream:#efe9dc;
-  --serif:'Cormorant Garamond',Georgia,serif;--grot:'Archivo Narrow',sans-serif;
+  --stage:#0d0d0c;        /* the vitrine */
+  --paper:#f2efe8;        /* the catalogue page */
+  --paper2:#e9e5db;
+  --ink:#181713;          /* type on paper */
+  --ink2:#5c574c;
+  --ink3:#918a7c;
+  --rule:rgba(24,23,19,.16);
+  --rule2:rgba(24,23,19,.08);
+  --gold:#8a6c32;         /* the only accent in the interface */
+  --verm:#c9391b;         /* reserved for the watch itself */
+  --cream:#efe9dc;        /* type on the stage */
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --grot:'Archivo Narrow',sans-serif;
   --ease:cubic-bezier(.22,.61,.36,1);
+
+  /* ——— type scale: one ratio (1.25), seven steps, nothing in between ———
+     every font-size in this document is one of these. */
+  --fs0:10px;   /* eyebrows, micro labels — never smaller than this */
+  --fs1:12px;   /* captions, chip text */
+  --fs2:15px;   /* body */
+  --fs3:19px;   /* sub-heads */
+  --fs4:23px;   /* section titles */
+  --fs5:29px;   /* page titles */
+  --fs6:37px;   /* display */
+  --fs7:46px;   /* wordmark */
+  /* ——— spacing: 4px base ——— */
+  --s1:4px; --s2:8px; --s3:14px; --s4:22px; --s5:34px; --s6:54px;
+  /* ——— tracking ——— */
+  --tr-eyebrow:.30em;
+  /* ——— motion: one duration set, disabled wholesale under reduced-motion ——— */
+  --dur1:.18s; --dur2:.4s; --dur3:.9s;
+  --focus:#c9a24a;
 }
+/* honour the system setting: no transitions, no sweeps, no parallax */
+@media(prefers-reduced-motion:reduce){
+  :root{--dur1:0s;--dur2:0s;--dur3:0s}
+  *,*:before,*:after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+/* one focus treatment for the whole interface */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skiplink{position:absolute;left:-9999px;top:0;z-index:200;background:var(--paper);color:var(--ink);
+  padding:12px 18px;font-size:var(--fs1);letter-spacing:.16em;text-transform:uppercase}
+.skiplink:focus{left:12px;top:12px}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(--grot);overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(--grot);overflow:hidden;
+  -webkit-font-smoothing:antialiased}
 #app{display:grid;grid-template-columns:1fr 392px;height:100%}
+
+/* ————————————————————— the stage ————————————————————— */
 #stage{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:radial-gradient(120% 100% at 50% 38%,#16150f 0%,#0b0b0a 68%)}
 #cv{max-width:100%;max-height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;will-change:transform}
+
 #brand{position:absolute;top:32px;left:44px;pointer-events:none;display:flex;align-items:center;gap:13px}
-#kanjiLogo{font-family:'Yuji Syuku',serif;font-size:40px;line-height:1;color:var(--cream);display:none}
+#kanjiLogo{font-family:'Yuji Syuku',serif;font-size:var(--fs6);line-height:1;color:var(--cream);display:none}
 #brand.k #kanjiLogo{display:block}
-#brand b{font-family:'Pinyon Script',var(--serif);font-size:40px;display:block;line-height:.9;
+#brand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs6);display:block;line-height:.9;
   letter-spacing:.01em;font-weight:400;color:var(--cream);text-transform:none}
-#brand span{font-size:7px;letter-spacing:.42em;color:#7d7568;text-transform:uppercase;display:block;margin-top:6px}
+#brand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:#a49b89;
+  text-transform:uppercase;display:block;margin-top:6px}
 /* the stage adapts: on a pale backdrop the maison turns to ink */
-#stage.light #brand b,#stage.light #kanjiLogo{color:#1b1a16}
-#stage.light #brand span{color:#6f6a5e}
-#stage.light #specName{color:#1b1a16}
-#stage.light #specRule{background:rgba(27,26,22,.34)}
-#stage.light #specText{color:#5f5a4f}
+#stage.light #brand b,#stage.light #kanjiLogo,#stage.light #specName{color:#1b1a16}
+#stage.light #brand span{color:#5c5749}
+#stage.light #specRule{background:rgba(27,26,22,.38)}
+#stage.light #specText{color:#4f4b42}
 #stage.light #specText b{color:#26241e}
-#stage.light .gbtn{color:#5f5a4f}
+#stage.light .gbtn{color:#4f4b42}
 #stage.light .gbtn:hover{color:#1b1a16}
-#stage.light #bgRow em{color:#7a7365}
-#stage.light .bgs{border-color:rgba(27,26,22,.3)}
-#stage.light .bgs:hover{border-color:rgba(27,26,22,.7)}
-#specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:430px}
-#specName{font-family:var(--serif);font-style:italic;font-size:23px;color:var(--cream);line-height:1;margin-bottom:12px;display:none}
+#stage.light #bgRow em{color:#5c5749}
+#stage.light .bgs{border-color:rgba(27,26,22,.34)}
+#stage.light .bgs:hover{border-color:rgba(27,26,22,.75)}
+
+/* the specification, set as a caption under a hairline */
+#specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:440px}
+#specName{font-family:var(--serif);font-style:italic;font-size:var(--fs4);color:var(--cream);
+  line-height:1;margin-bottom:12px;display:none}
 #specName.on{display:block}
-#specRule{width:34px;height:1px;background:rgba(239,233,220,.32);margin-bottom:12px}
-#specText{font-size:9.5px;letter-spacing:.20em;color:#8b8477;text-transform:uppercase;line-height:2.15}
-#specText b{color:#c3bcab;font-weight:400}
+#specRule{width:34px;height:1px;background:rgba(239,233,220,.36);margin-bottom:12px}
+#specText{font-size:var(--fs0);letter-spacing:.18em;color:#a8a193;text-transform:uppercase;line-height:2.1}
+#specText b{color:#ddd6c6;font-weight:400}
+
 #stageBtns{position:absolute;top:36px;right:44px;display:flex;gap:26px}
-.gbtn{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:#8b8477;cursor:pointer;user-select:none;
-  padding-bottom:5px;border-bottom:1px solid transparent;transition:color .4s var(--ease),border-color .4s var(--ease)}
+.gbtn{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;color:#a8a193;
+  background:none;border:0;font-family:inherit;
+  cursor:pointer;user-select:none;padding:4px 0 5px;border-bottom:1px solid transparent;
+  transition:color var(--dur2) var(--ease),border-color var(--dur2) var(--ease)}
 .gbtn:hover{color:var(--cream);border-bottom-color:var(--gold)}
+
 #bgRow{position:absolute;bottom:38px;right:44px;display:flex;gap:10px;align-items:center}
-#bgRow em{font-style:normal;font-size:8px;letter-spacing:.26em;color:#6d675c;text-transform:uppercase;margin-right:4px}
-.bgs{width:13px;height:13px;border-radius:50%;border:1px solid rgba(239,233,220,.28);cursor:pointer;
-  transition:transform .35s var(--ease),border-color .35s var(--ease)}
-.bgs:hover{transform:scale(1.25);border-color:rgba(239,233,220,.7)}
-.bgs.on{border-color:var(--gold);transform:scale(1.25)}
+#bgRow em{font-style:normal;font-size:var(--fs0);letter-spacing:.24em;color:#8b8477;
+  text-transform:uppercase;margin-right:4px}
+.bgs{width:26px;height:26px;padding:0;border-radius:50%;background:none;border:0;cursor:pointer;
+  display:grid;place-items:center;
+  transition:transform var(--dur2) var(--ease)}
+.bgs i{display:block;width:13px;height:13px;border-radius:50%;border:1px solid rgba(239,233,220,.32);
+  background:var(--sw,#000);transition:border-color var(--dur2) var(--ease)}
+.bgs:hover{transform:scale(1.2)}
+.bgs:hover i{border-color:rgba(239,233,220,.75)}
+.bgs[aria-pressed=true] i{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,74,.28)}
+#stage.light .bgs i{border-color:rgba(27,26,22,.34)}
+
+/* ————————————————————— the catalogue ————————————————————— */
 #panel{background:var(--paper);display:grid;grid-template-columns:74px 1fr;min-height:0;position:relative}
 #panel:before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:rgba(0,0,0,.5)}
+
+/* numbered index, the way a chapter list reads */
 #rail{border-right:1px solid var(--rule);padding:34px 0;overflow-y:auto;overscroll-behavior:contain}
 #rail::-webkit-scrollbar{width:0}
-.rl{padding:11px 0;text-align:center;cursor:pointer;user-select:none;position:relative;
-  font-size:10px;letter-spacing:.12em;color:var(--ink3);font-variant-numeric:tabular-nums;transition:color .4s var(--ease)}
+.rl{display:block;width:100%;padding:11px 0;text-align:center;cursor:pointer;user-select:none;position:relative;
+  background:none;border:0;font-family:inherit;
+  font-size:var(--fs0);letter-spacing:.12em;color:var(--ink3);font-variant-numeric:tabular-nums;
+  transition:color var(--dur2) var(--ease)}
 .rl:hover{color:var(--ink)}
-.rl.on{color:var(--ink)}
-.rl.on:after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:1px;height:20px;background:var(--gold)}
-.rl b{display:block;font-weight:400;font-size:10px}
+.rl[aria-selected=true]{color:var(--ink)}
+.rl[aria-selected=true]:after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  width:1px;height:20px;background:var(--gold)}
+.rl b{display:block;font-weight:400;font-size:var(--fs0)}
+
 #panelMain{display:flex;flex-direction:column;min-height:0}
-#secHead{padding:34px 34px 20px;border-bottom:1px solid var(--rule2);flex:none}
-#secNum{font-size:8.5px;letter-spacing:.34em;color:var(--gold);text-transform:uppercase;margin-bottom:11px}
-#secTitle{font-family:var(--serif);font-style:italic;font-weight:500;font-size:30px;line-height:1;color:var(--ink);margin-bottom:13px}
-#secHelp{font-size:12px;line-height:1.8;color:var(--ink2);max-width:33ch}
+#secHead{padding:32px 34px 20px;border-bottom:1px solid var(--rule2);flex:none}
+#secNum{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:var(--gold);text-transform:uppercase;margin-bottom:11px}
+#secTitle{font-family:var(--serif);font-style:italic;font-weight:600;font-size:var(--fs5);line-height:1;
+  color:var(--ink);margin-bottom:13px}
+#secHelp{font-size:var(--fs1);line-height:1.8;color:var(--ink2);max-width:34ch}
+
 #body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;padding:26px 34px 34px}
+  scroll-behavior:smooth;padding:var(--s4) 34px var(--s5)}
 #body::-webkit-scrollbar{width:3px}
 #body::-webkit-scrollbar-thumb{background:var(--rule)}
-.grp{margin-bottom:30px}
+
+.grp{margin-bottom:var(--s5)}
 .grp h4{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
-  font-size:8.5px;letter-spacing:.30em;color:var(--ink3);text-transform:uppercase;font-weight:400;
+  font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:var(--ink3);text-transform:uppercase;font-weight:400;
   margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--rule2)}
-.grp h4 em{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink);letter-spacing:0;text-transform:none;white-space:nowrap}
+.grp h4 em{font-family:var(--serif);font-style:italic;font-size:var(--fs2);color:var(--ink);
+  letter-spacing:0;text-transform:none;white-space:nowrap}
+
+/* options: hairline outlines, filled only when chosen */
 .chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{border:1px solid var(--rule);background:transparent;color:var(--ink2);padding:8px 13px;cursor:pointer;
-  user-select:none;font-size:12px;line-height:1.3;transition:border-color .4s var(--ease),color .4s var(--ease),background .4s var(--ease)}
-.chip:hover{border-color:rgba(24,23,19,.4);color:var(--ink)}
-.chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
-.sw{width:24px;height:24px;padding:0;border-radius:50%;border:1px solid var(--rule)}
+.chip{border:1px solid var(--rule);background:transparent;color:var(--ink2);font-family:inherit;
+  padding:9px 13px;min-height:34px;cursor:pointer;user-select:none;font-size:var(--fs1);line-height:1.3;
+  transition:border-color var(--dur2) var(--ease),color var(--dur2) var(--ease),background var(--dur2) var(--ease)}
+.chip:hover{border-color:rgba(24,23,19,.42);color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip[disabled]{opacity:.34;cursor:not-allowed}
+.chip[disabled]:hover{border-color:var(--rule);color:var(--ink2)}
+.sw{width:28px;height:28px;padding:0;border-radius:50%;border:1px solid var(--rule);min-height:0}
 .sw:hover{transform:scale(1.12)}
-.sw.on{background:none;outline:1px solid var(--gold);outline-offset:2px;border-color:transparent}
+.sw[aria-pressed=true]{background:var(--swc);outline:1px solid var(--gold);outline-offset:2px;border-color:transparent}
+
+/* the size slider, drawn as an instrument scale */
 .row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.row label{font-size:8.5px;letter-spacing:.26em;color:var(--ink3);text-transform:uppercase;width:74px;flex:none}
-.row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:1px;background:var(--rule);outline:none}
-.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;
-  background:var(--ink);cursor:pointer;transition:transform .3s var(--ease)}
+.row label{font-size:var(--fs0);letter-spacing:.24em;color:var(--ink3);text-transform:uppercase;width:88px;flex:none}
+.row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:20px;background:none;outline:none;cursor:pointer}
+.row input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rule)}
+.row input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
+.row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  margin-top:-5.5px;background:var(--ink);cursor:pointer;transition:transform var(--dur1) var(--ease)}
 .row input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.3)}
-.row input[type=range]::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--ink);cursor:pointer}
-.row output{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);width:56px;text-align:right;font-variant-numeric:tabular-nums}
+.row input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--ink);cursor:pointer}
+.row output{font-family:var(--serif);font-style:italic;font-size:var(--fs2);color:var(--ink);
+  width:64px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* the reference designs, as catalogue plates */
 .presets{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.pcard{cursor:pointer;text-align:center;transition:transform .45s var(--ease)}
+.pcard{cursor:pointer;text-align:center;background:none;border:0;padding:0;font-family:inherit;
+  transition:transform var(--dur2) var(--ease)}
 .pcard:hover{transform:translateY(-3px)}
 .pcard canvas{width:100%;height:auto;display:block;background:#161513}
-.pcard span{display:block;font-size:8.5px;letter-spacing:.22em;color:var(--ink3);text-transform:uppercase;margin-top:9px;transition:color .4s var(--ease)}
-.pcard:hover span{color:var(--ink)}
+.pcard span{display:block;font-size:var(--fs0);letter-spacing:.2em;color:var(--ink3);
+  text-transform:uppercase;margin-top:9px;transition:color var(--dur2) var(--ease)}
+.pcard em{display:block;font-style:normal;font-size:var(--fs1);color:var(--ink3);
+  opacity:0;line-height:1.5;margin-top:4px;transition:opacity var(--dur2) var(--ease)}
+.pcard:hover span,.pcard:focus-visible span{color:var(--ink)}
+.pcard:hover em,.pcard:focus-visible em{opacity:.9}
+
 .tin{width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);color:var(--ink);
-  padding:9px 0;font-family:var(--serif);font-style:italic;font-size:21px;outline:none}
-.tin::placeholder{color:#b8b1a2}
+  padding:9px 0;font-family:var(--serif);font-style:italic;font-size:var(--fs3);outline:none}
+.tin::placeholder{color:#a49c8b}
 .tin:focus{border-bottom-color:var(--gold)}
-.note{font-size:12px;color:var(--ink2);line-height:1.8;margin-top:-4px}
-.bigbtn{font-size:9px;letter-spacing:.26em;text-transform:uppercase;padding:15px 0;margin-bottom:2px;cursor:pointer;
-  user-select:none;border-bottom:1px solid var(--rule);color:var(--ink);display:flex;justify-content:space-between;
-  transition:color .4s var(--ease),border-color .4s var(--ease)}
-.bigbtn:after{content:'\2192';opacity:.35;transition:transform .4s var(--ease),opacity .4s var(--ease)}
+.note{font-size:var(--fs1);color:var(--ink2);line-height:1.8;margin-top:-4px}
+.note b{color:var(--ink);font-weight:600}
+
+/* a quiet correction: shown when a choice is not how watches are built */
+.advice{display:flex;gap:11px;align-items:flex-start;margin:-6px 0 var(--s4);
+  padding:12px 14px;background:rgba(138,108,50,.07);border-left:2px solid var(--gold)}
+.advice b{flex:none;font-size:var(--fs0);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);font-weight:400;padding-top:2px}
+.advice span{font-size:var(--fs1);line-height:1.75;color:var(--ink2)}
+.advice button{background:none;border:0;font-family:inherit;font-size:var(--fs1);color:var(--ink);
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0;margin-left:4px}
+
+/* a term you can ask about, inline in a label */
+.term{border-bottom:1px dotted rgba(24,23,19,.42);cursor:help;background:none;border-left:0;border-right:0;
+  border-top:0;font:inherit;color:inherit;padding:0}
+.term:hover{border-bottom-color:var(--gold)}
+
+/* actions read as printed lines, not buttons */
+.bigbtn{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;width:100%;
+  padding:15px 0;margin-bottom:2px;cursor:pointer;user-select:none;background:none;font-family:inherit;
+  border:0;border-bottom:1px solid var(--rule);color:var(--ink);display:flex;justify-content:space-between;
+  transition:color var(--dur2) var(--ease),border-color var(--dur2) var(--ease)}
+.bigbtn:after{content:'→';opacity:.35;transition:transform var(--dur2) var(--ease),opacity var(--dur2) var(--ease)}
 .bigbtn:hover{border-bottom-color:var(--gold)}
 .bigbtn:hover:after{transform:translateX(4px);opacity:1}
 .bigbtn.ghost{color:var(--ink2)}
 .bigbtn.ghost:hover{color:var(--ink)}
-#foot{border-top:1px solid var(--rule);padding:0 34px;display:flex;gap:28px;flex:none;align-items:center}
-#foot div{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;padding:19px 0;cursor:pointer;
-  user-select:none;color:var(--ink3);transition:color .4s var(--ease)}
-#foot div:hover{color:var(--ink)}
-#foot .prime{margin-left:auto;color:var(--ink);font-weight:500}
-#foot .prime:hover{color:var(--gold)}
-#guide{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,.90);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .45s var(--ease)}
+
+/* the shelf of saved designs */
+.shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.shelf figure{position:relative}
+.shelf canvas{width:100%;height:auto;display:block;background:#161513;cursor:pointer}
+.shelf figcaption{font-size:var(--fs0);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);
+  margin-top:6px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shelf .del{position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;cursor:pointer;
+  background:rgba(12,12,11,.72);color:#e9e4d8;font-size:var(--fs1);line-height:1;opacity:0;
+  transition:opacity var(--dur1) var(--ease)}
+.shelf figure:hover .del,.shelf .del:focus-visible{opacity:1}
+
+#foot{border-top:1px solid var(--rule);padding:0 34px;display:flex;gap:26px;flex:none;align-items:center}
+#foot button{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;font-family:inherit;
+  padding:19px 0;cursor:pointer;user-select:none;color:var(--ink3);background:none;border:0;
+  transition:color var(--dur2) var(--ease)}
+#foot button:hover{color:var(--ink)}
+#foot button[disabled]{opacity:.34;cursor:not-allowed}
+#foot .prime{margin-left:auto;color:var(--ink) !important;font-weight:600}
+#foot .prime:hover{color:var(--gold) !important}
+
+/* ————————————————————— guide ————————————————————— */
+#guide{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,.90);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  opacity:0;transition:opacity .45s var(--ease)}
 #guide.on{display:flex;opacity:1}
 #guide .gcard{transform:translateY(12px) scale(.99);transition:transform .6s var(--ease)}
 #guide.on .gcard{transform:none}
-.gcard{max-width:470px;background:var(--paper);padding:46px 46px 26px;text-align:center}
+
+.gcard{max-width:490px;background:var(--paper);padding:46px 46px 26px;text-align:center}
 .gmark{display:none}
-.gcard h2{font-family:var(--serif);font-style:italic;font-weight:500;font-size:31px;margin-bottom:16px;color:var(--ink);line-height:1.1}
-.gcard p{font-size:13.5px;line-height:1.95;color:var(--ink2);margin-bottom:30px}
-.gcard p b{color:var(--ink);font-weight:500}
-.gnav{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);padding-top:18px}
-.gnav span{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;cursor:pointer;color:var(--ink3);user-select:none;transition:color .4s var(--ease)}
-.gnav span:hover{color:var(--ink)}
-.gprime{color:var(--ink) !important;font-weight:500;border-bottom:1px solid var(--gold);padding-bottom:4px}
+.gcard h2{font-family:var(--serif);font-style:italic;font-weight:600;font-size:var(--fs5);
+  margin-bottom:16px;color:var(--ink);line-height:1.1}
+.gcard p{font-size:var(--fs2);line-height:1.9;color:var(--ink2);margin-bottom:var(--s5)}
+.gcard p b{color:var(--ink);font-weight:600}
+.gnav{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  border-top:1px solid var(--rule);padding-top:18px}
+.gnav button{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;cursor:pointer;
+  background:none;border:0;font-family:inherit;padding:8px 0;
+  color:var(--ink3);user-select:none;transition:color var(--dur2) var(--ease)}
+.gnav button:hover{color:var(--ink)}
+.gprime{color:var(--ink) !important;font-weight:600;border-bottom:1px solid var(--gold) !important;padding-bottom:4px}
 .gdots{display:flex;gap:7px}
-.gdots i{width:4px;height:4px;border-radius:50%;background:rgba(24,23,19,.18);transition:background .4s var(--ease)}
+.gdots i{width:5px;height:5px;border-radius:50%;background:rgba(24,23,19,.2);transition:background var(--dur2) var(--ease)}
 .gdots i.on{background:var(--gold)}
-#gloss{position:fixed;inset:0;z-index:61;background:rgba(8,8,7,.92);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .4s var(--ease)}
+
+/* ————————————————————— glossary ————————————————————— */
+#gloss{position:fixed;inset:0;z-index:61;background:rgba(8,8,7,.92);
+  display:none;align-items:center;justify-content:center;padding:24px;
+  opacity:0;transition:opacity .4s var(--ease)}
 #gloss.on{display:flex;opacity:1}
 #gloss .glossbox{transform:translateY(12px);transition:transform .55s var(--ease)}
 #gloss.on .glossbox{transform:none}
-.glossbox{max-width:600px;max-height:82vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--paper);padding:40px 46px 46px}
-.glossbox h3{font-family:var(--serif);font-style:italic;font-size:29px;color:var(--ink);margin-bottom:6px;
-  display:flex;justify-content:space-between;align-items:baseline}
-.glossbox h3 span{cursor:pointer;font-family:var(--grot);font-style:normal;font-size:13px;color:var(--ink3)}
-.glossbox h3 span:hover{color:var(--ink)}
-.glosssub{font-size:9px;letter-spacing:.26em;color:var(--ink3);text-transform:uppercase;margin-bottom:26px}
-.gitem{border-top:1px solid var(--rule2);padding:16px 0}
-.gitem b{display:block;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;font-weight:400}
-.gitem span{font-size:13px;line-height:1.85;color:var(--ink2)}
-#load{position:fixed;inset:0;background:var(--stage);z-index:70;display:flex;align-items:center;justify-content:center;
-  color:#6d675c;font-family:var(--serif);font-style:italic;font-size:19px;transition:opacity .9s var(--ease)}
-#load.off{opacity:0;pointer-events:none}
+
+.glossbox{max-width:620px;max-height:82vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--paper);padding:40px 46px 46px}
+.glossbox h3{font-family:var(--serif);font-style:italic;font-size:var(--fs5);color:var(--ink);margin-bottom:6px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.glossbox h3 button{cursor:pointer;font-family:var(--grot);font-style:normal;font-size:var(--fs1);
+  color:var(--ink3);background:none;border:0;padding:4px}
+.glossbox h3 button:hover{color:var(--ink)}
+.glosssub{font-size:var(--fs0);letter-spacing:.24em;color:var(--ink3);text-transform:uppercase;margin-bottom:26px}
+.gitem{border-top:1px solid var(--rule2);padding:16px 0;scroll-margin-top:12px}
+.gitem.hit{background:rgba(138,108,50,.09)}
+.gitem b{display:block;font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:7px;font-weight:400}
+.gitem span{font-size:var(--fs2);line-height:1.8;color:var(--ink2)}
+
+/* the A/B plate */
+#cmp{position:absolute;inset:0;display:none;pointer-events:none}
+#cmp.on{display:block}
+#cmpCv{position:absolute;left:0;top:0;width:50%;height:100%;object-fit:cover;object-position:right center}
+#cmpLine{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(239,233,220,.4)}
+#cmpTag{position:absolute;left:22px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left center;
+  font-size:var(--fs0);letter-spacing:.28em;text-transform:uppercase;color:#a8a193}
+
+
+/* ————— tablet: the catalogue slides under the vitrine ————— */
 @media(max-width:980px){
-  #app{grid-template-columns:1fr;grid-template-rows:1fr 54%}
-  #panel{grid-template-columns:60px 1fr}
+  #app{grid-template-columns:1fr;grid-template-rows:minmax(0,58%) minmax(0,42%)}
+  #panel{grid-template-columns:56px 1fr}
   #panel:before{display:none}
-  #brand{top:18px;left:20px;gap:11px}#kanjiLogo{font-size:31px}
-  #brand b{font-size:15px;letter-spacing:.38em}#brand span{font-size:6.5px}
-  #specline{bottom:16px;left:20px}#specName{font-size:17px;margin-bottom:8px}
-  #specText{font-size:8.5px;line-height:1.95}
+  #brand{top:18px;left:20px;gap:11px}#kanjiLogo{font-size:var(--fs4)}
+  #brand b{font-size:var(--fs4)}
+  #specline{bottom:16px;left:20px;max-width:56vw}#specName{font-size:var(--fs3);margin-bottom:8px}
+  #specText{line-height:1.9}
   #stageBtns{top:18px;right:20px;gap:18px}
-  #bgRow{bottom:16px;right:20px}
-  #secHead{padding:22px 22px 16px}#secTitle{font-size:24px}
-  #body{padding:20px 22px 26px}
+  #bgRow{bottom:14px;right:16px;gap:6px}
+  #secHead{padding:20px 22px 14px}#secTitle{font-size:var(--fs4)}
+  #secHelp{max-width:none}
+  #body{padding:18px 22px 26px}
   #foot{padding:0 22px;gap:20px}
-  .chip{padding:10px 14px;font-size:13px}
   .presets{grid-template-columns:1fr 1fr}
 }
-
-/* ————— THE FRONT PAGE ————— */
+/* ————— phone: the watch on top, the controls as a sheet beneath ————— */
+@media(max-width:720px){
+  :root{--fs0:11px;--fs1:13px;--fs2:15px}
+  #app{grid-template-rows:minmax(0,56vh) minmax(0,44vh)}
+  #panel{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);
+    border-top-left-radius:14px;border-top-right-radius:14px;overflow:hidden;
+    box-shadow:0 -14px 40px rgba(0,0,0,.5)}
+  /* the chapter list turns on its side and scrolls */
+  #rail{display:flex;gap:0;border-right:0;border-bottom:1px solid var(--rule2);
+    padding:0 14px;overflow-x:auto;overflow-y:hidden;flex:none;scrollbar-width:none}
+  .rl{width:auto;flex:none;padding:14px 13px;white-space:nowrap;font-size:var(--fs0)}
+  .rl b{display:inline;margin-right:7px;color:var(--ink3)}
+  .rl i{font-style:normal;letter-spacing:.14em;text-transform:uppercase}
+  .rl[aria-selected=true] b{color:var(--gold)}
+  .rl[aria-selected=true]:after{right:auto;left:13px;top:auto;bottom:0;transform:none;
+    width:calc(100% - 26px);height:1px}
+  #secHead{padding:16px 20px 12px}
+  #secTitle{font-size:var(--fs3);margin-bottom:8px}
+  #secHelp{font-size:var(--fs1);line-height:1.7}
+  #body{padding:16px 20px 22px}
+  /* every target reaches the 44px comfort floor */
+  .chip{padding:12px 15px;min-height:44px;display:flex;align-items:center}
+  .sw{width:40px;height:40px}
+  .bigbtn{padding:17px 0}
+  .row{gap:10px}
+  .row label{width:74px}
+  .row input[type=range]{height:44px}
+  .row input[type=range]::-webkit-slider-thumb{width:18px;height:18px;margin-top:-8.5px}
+  #foot{padding:0 20px;gap:18px}
+  #foot button{padding:17px 0}
+  #brand{top:14px;left:16px}
+  #brand b{font-size:var(--fs3)}
+  #brand span{letter-spacing:.24em}
+  #specline{bottom:12px;left:16px;max-width:62vw}
+  #specName{font-size:var(--fs2)}
+  #specText{letter-spacing:.12em;line-height:1.8}
+  #stageBtns{top:14px;right:16px;gap:14px}
+  #bgRow{bottom:10px;right:12px}
+  #bgRow em{display:none}
+  .gcard{padding:34px 26px 20px}
+  .glossbox{padding:30px 24px 30px}
+  .shelf{grid-template-columns:1fr 1fr}
+}
+@media(max-width:460px){
+  #app{grid-template-rows:minmax(0,50vh) minmax(0,50vh)}
+  .presets{grid-template-columns:1fr 1fr;gap:10px}
+  #specText{display:none}
+  #specline{max-width:70vw}
+}
+/* a short landscape phone: give the sheet the room instead */
+@media(max-height:520px) and (orientation:landscape){
+  #app{grid-template-columns:1fr 340px;grid-template-rows:minmax(0,1fr)}
+  #panel{grid-template-columns:56px minmax(0,1fr);grid-template-rows:minmax(0,1fr);border-radius:0}
+  #rail{flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:14px 0;
+    border-right:1px solid var(--rule);border-bottom:0}
+  .rl{width:100%;padding:11px 0}
+  .rl i{display:none}
+  .rl b{margin:0}
+  .rl[aria-selected=true]:after{right:-1px;left:auto;top:50%;bottom:auto;transform:translateY(-50%);
+    width:1px;height:20px}
+}
+/* ————————————————————————————————————————————————
+   THE FRONT PAGE
+   ———————————————————————————————————————————————— */
 #landing{position:fixed;inset:0;z-index:80;background:#efe9dc;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
 #landing.gone{opacity:0;transform:translateY(-3vh) scale(.985);pointer-events:none}
@@ -180,60 +404,88 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   mix-blend-mode:multiply}
 #lwrap{position:relative;max-width:1180px;margin:0 auto;padding:54px 56px 70px;
-  display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:auto 1fr auto;gap:0 62px;min-height:100%}
+  display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:auto 1fr auto;
+  gap:0 62px;min-height:100%}
+
 #lbrand{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-bottom:16px}
-#lbrand b{font-family:'Pinyon Script',var(--serif);font-size:46px;line-height:.85;color:#22201a;display:block;font-weight:400}
-#lbrand span{font-size:7.5px;letter-spacing:.44em;text-transform:uppercase;color:#8b8271;display:block;margin-top:5px}
+#lbrand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs7);line-height:.85;color:#22201a;display:block;font-weight:400}
+#lbrand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#655e4e;display:block;margin-top:6px}
+
 #sketch{width:100%;height:auto;align-self:center;grid-row:2}
-#sk path,#sk line,#sk circle,#sk ellipse{fill:none;stroke:#2b2823;stroke-linecap:round;stroke-linejoin:round}
-#skFine path,#skFine line,#skFine circle{fill:none;stroke:#4d4740;stroke-linecap:round}
+#sk path,#sk line,#sk circle,#sk ellipse,#sk polyline{fill:none;stroke:#2b2823;stroke-linecap:round;stroke-linejoin:round}
+#skFine path,#skFine line,#skFine circle,#skFine polyline{fill:none;stroke:#4d4740;stroke-linecap:round}
+
 #story{grid-row:2;align-self:center;max-width:460px;padding-bottom:10px}
-.skey{font-size:8px;letter-spacing:.42em;text-transform:uppercase;color:#a0977f;margin-bottom:22px}
-#story h1{font-family:var(--serif);font-style:italic;font-weight:500;font-size:40px;line-height:1.16;
+.skey{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#726a58;margin-bottom:22px}
+#story h1{font-family:var(--serif);font-style:italic;font-weight:600;font-size:var(--fs6);line-height:1.16;
   color:#22201a;margin-bottom:26px;letter-spacing:-.005em}
-#story p{font-size:14px;line-height:1.95;color:#5b544a;margin-bottom:15px;max-width:44ch}
-.ssign{font-family:'Pinyon Script',var(--serif);font-size:34px;color:#22201a;margin-top:24px !important;line-height:1}
-.snote{margin-top:30px;padding-top:18px;border-top:1px solid rgba(34,32,26,.14);display:flex;gap:16px;align-items:flex-start}
-.snote b{font-family:'Yuji Syuku',serif;font-size:22px;color:#22201a;font-weight:400;white-space:nowrap;line-height:1.1}
-.snote span{font-size:11.5px;line-height:1.85;color:#7b7364;max-width:38ch}
+#story p{font-size:var(--fs2);line-height:1.9;color:#514b41;margin-bottom:15px;max-width:44ch}
+.ssign{font-family:'Pinyon Script',var(--serif);font-size:var(--fs5);color:#22201a;margin-top:24px !important;line-height:1}
+.snote{margin-top:30px;padding-top:18px;border-top:1px solid rgba(34,32,26,.16);display:flex;gap:16px;align-items:flex-start}
+.snote b{font-family:'Yuji Syuku',serif;font-size:var(--fs4);color:#22201a;font-weight:400;white-space:nowrap;line-height:1.1}
+.snote span{font-size:var(--fs1);line-height:1.8;color:#5f5849;max-width:38ch}
+
 #enter{grid-column:1/-1;grid-row:3;margin-top:44px;display:flex;flex-direction:column;align-items:center;gap:14px}
-#enterLabel{font-size:8.5px;letter-spacing:.34em;text-transform:uppercase;color:#8b8271}
-#track{position:relative;width:min(420px,80vw);height:62px;border:1px solid rgba(34,32,26,.20);
+#enterLabel{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#655e4e}
+#track{position:relative;width:min(420px,80vw);height:62px;border:1px solid rgba(34,32,26,.22);
   border-radius:34px;background:rgba(255,255,255,.28);cursor:grab;user-select:none;touch-action:none;
-  transition:border-color .5s var(--ease),background .5s var(--ease)}
-#track:hover{border-color:rgba(34,32,26,.42)}
+  transition:border-color var(--dur2) var(--ease),background var(--dur2) var(--ease)}
+#track:hover{border-color:rgba(34,32,26,.44)}
 #track.drag{cursor:grabbing}
-#trackFill{position:absolute;inset:1px;width:0;border-radius:34px;background:rgba(34,32,26,.055);transition:width .05s linear}
+#trackFill{position:absolute;inset:1px;width:0;border-radius:34px;background:rgba(34,32,26,.055);
+  transition:width .05s linear}
 #ghostPart{position:absolute;right:11px;top:11px;width:40px;height:40px;border-radius:50%;
   border:1px dashed rgba(34,32,26,.32);transition:border-color .5s var(--ease),transform .5s var(--ease)}
 #track.near #ghostPart{border-color:var(--verm);transform:scale(1.1)}
 #part{position:absolute;left:11px;top:11px;width:40px;height:40px;
-  transition:transform .55s var(--ease);will-change:transform}
+  transition:transform .55s var(--ease),filter .5s var(--ease);will-change:transform}
 #partSvg{width:40px;height:40px;display:block}
 #trackHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:8.5px;letter-spacing:.34em;text-transform:uppercase;color:#a0977f;pointer-events:none;
-  transition:opacity .4s var(--ease)}
+  font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#726a58;pointer-events:none;
+  transition:opacity var(--dur2) var(--ease)}
 #track.drag #trackHint{opacity:0}
-#enterSkip{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#a89f8b;cursor:pointer;transition:color .4s var(--ease)}
+#enterSkip{font-size:var(--fs0);letter-spacing:.26em;text-transform:uppercase;color:#655e4e;cursor:pointer;
+  background:none;border:0;font-family:inherit;padding:8px 12px;
+  transition:color var(--dur2) var(--ease)}
 #enterSkip:hover{color:#22201a}
+
 @media(max-width:980px){
   #lwrap{grid-template-columns:1fr;gap:0;padding:34px 24px 46px}
   #sketch{grid-row:auto;margin-bottom:26px}
   #story{grid-row:auto;max-width:none}
-  #story h1{font-size:29px}
+  #story h1{font-size:var(--fs5)}
   #enter{grid-row:auto;margin-top:34px}
-  #lbrand b{font-size:37px}
+  #lbrand b{font-size:var(--fs6)}
 }
+@media(max-width:720px){
+  #landing{-webkit-text-size-adjust:100%}
+  #lwrap{padding:26px 20px 40px}
+  #story h1{font-size:var(--fs4);margin-bottom:20px}
+  #story p{margin-bottom:13px}
+  #sketch{margin-bottom:18px}
+  #track{height:66px}
+  .snote{flex-direction:column;gap:10px}
+}
+
 </style>
 </head>
 <body>
-<!-- ————— THE FRONT PAGE: a page from a sketchbook ————— -->
+<!-- ————————————————————————————————————————————————
+     THE FRONT PAGE — a page from a sketchbook
+     ———————————————————————————————————————————————— -->
 <div id="landing">
   <div id="paper"></div>
   <div id="lwrap">
+
+    <a class="skiplink" href="#enter">Skip to the studio</a>
     <div id="lbrand">
-      <div><b>Semi</b><span>Watch design studio</span></div>
+      <div>
+        <b>Semi</b>
+        <span>Watch design studio · est. 2025, Lahore</span>
+      </div>
     </div>
+
+    <!-- the drawing -->
     <svg id="sketch" viewBox="0 0 1000 620" aria-label="A boy assembling a watch beneath a tree">
       <defs>
         <filter id="pencil" x="-12%" y="-12%" width="124%" height="124%">
@@ -248,6 +500,8 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <g id="sk" filter="url(#pencil)"></g>
       <g id="skFine" filter="url(#pencilSoft)"></g>
     </svg>
+
+    <!-- the story -->
     <div id="story">
       <div class="skey">The reason this exists</div>
       <h1>I loved watches long before<br>I could make anything.</h1>
@@ -260,76 +514,86 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
         <span>The cicada waits underground for years and comes out exactly on time. Of every creature, it is the one that keeps a calendar.</span>
       </div>
     </div>
+
+    <!-- swap the component to enter -->
     <div id="enter">
-      <div id="enterLabel">Swap the component to enter the studio</div>
-      <div id="track">
+      <div id="enterLabel" aria-hidden="true">Swap the component to enter the studio</div>
+      <div id="track" role="slider" tabindex="0" aria-label="Slide the balance wheel across to enter the studio"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="closed">
         <div id="trackFill"></div>
         <div id="ghostPart"></div>
-        <div id="part"><svg viewBox="-50 -50 100 100" id="partSvg"></svg></div>
-        <div id="trackHint">Drag →</div>
+        <div id="part">
+          <svg viewBox="-50 -50 100 100" id="partSvg" aria-hidden="true" focusable="false"></svg>
+        </div>
+        <div id="trackHint" aria-hidden="true">Drag →</div>
       </div>
-      <div id="enterSkip">or press enter</div>
+      <button id="enterSkip" type="button">or press enter</button>
     </div>
-  </div>
-</div>
-<div id="app">
-  <div id="stage">
-    <canvas id="cv"></canvas>
-    <div id="brand">
-      <div id="kanjiLogo">蝉</div>
-      <div><b>Semi</b><span>Instruments of rotation</span></div>
-    </div>
-    <div id="specline">
-      <div id="specName"></div>
-      <div id="specRule"></div>
-      <div id="specText"></div>
-    </div>
-    <div id="stageBtns">
-      <div class="gbtn" id="bRand">Surprise me</div>
-      <div class="gbtn" id="bPng">Download</div>
-    </div>
-    <div id="bgRow">
-      <em>Backdrop</em>
-      <div class="bgs" data-bg="#121110" style="background:#121110"></div>
-      <div class="bgs" data-bg="#e7e2d6" style="background:#e7e2d6"></div>
-      <div class="bgs" data-bg="#2a2119" style="background:#2a2119"></div>
-      <div class="bgs" data-bg="#5d5a54" style="background:#5d5a54"></div>
-    </div>
-  </div>
-  <div id="panel">
-    <div id="rail"></div>
-    <div id="panelMain">
-      <div id="secHead">
-        <div id="secNum"></div>
-        <div id="secTitle"></div>
-        <div id="secHelp"></div>
-      </div>
-      <div id="body"></div>
-      <div id="foot">
-        <div id="bReset">Reset</div>
-        <div id="bHelp">Guide</div>
-        <div class="prime" id="bSave">Share</div>
-      </div>
-    </div>
+
   </div>
 </div>
 
+<div id="app">
+  <main id="stage" aria-label="The watch">
+    <canvas id="cv" role="img" aria-label="Watch design preview"></canvas>
+    <div id="cmp" aria-hidden="true">
+      <canvas id="cmpCv"></canvas>
+      <div id="cmpLine"></div>
+      <div id="cmpTag">Saved</div>
+    </div>
+    <div id="brand" aria-hidden="true">
+      <div id="kanjiLogo">蝉</div>
+      <div><b>Semi</b><span>Watch design studio</span></div>
+    </div>
+    <div id="specline">
+      <div id="specName"></div>
+      <div id="specRule" aria-hidden="true"></div>
+      <div id="specText"></div>
+    </div>
+    <div id="stageBtns">
+      <button class="gbtn" id="bRand" type="button">Surprise me</button>
+      <button class="gbtn" id="bPng" type="button">Download</button>
+    </div>
+    <div id="bgRow" role="group" aria-label="Lighting">
+      <em aria-hidden="true">Light</em>
+    </div>
+  </main>
+  <nav id="panel" aria-label="Design controls">
+    <div id="rail" role="tablist" aria-orientation="vertical" aria-label="Chapters"></div>
+    <div id="panelMain">
+      <div id="secHead">
+        <div id="secNum"></div>
+        <h2 id="secTitle"></h2>
+        <p id="secHelp"></p>
+      </div>
+      <div id="body" role="tabpanel" tabindex="0" aria-labelledby="secTitle"></div>
+      <div id="foot">
+        <button id="bUndo" type="button" title="Undo (⌘Z)">Undo</button>
+        <button id="bReset" type="button">Reset</button>
+        <button id="bHelp" type="button">Guide</button>
+        <button class="prime" id="bSave" type="button">Share</button>
+      </div>
+    </div>
+  </nav>
+</div>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+
 <!-- ————— guide: for anyone who loves watches but has never designed one ————— -->
-<div id="guide">
+<div id="guide" role="dialog" aria-modal="true" aria-labelledby="gTitle">
   <div class="gcard">
     <h2 id="gTitle"></h2>
     <p id="gBody"></p>
     <div class="gnav">
-      <span id="gSkip">Skip the tour</span>
-      <span class="gdots" id="gDots"></span>
-      <span id="gNext" class="gprime">Next</span>
+      <button id="gSkip" type="button">Skip the tour</button>
+      <span class="gdots" id="gDots" aria-hidden="true"></span>
+      <button id="gNext" class="gprime" type="button">Next</button>
     </div>
   </div>
 </div>
-<div id="gloss">
+<div id="gloss" role="dialog" aria-modal="true" aria-labelledby="glossH">
   <div class="glossbox">
-    <h3>The vocabulary<span id="glossX">Close</span></h3>
-    <div class="glosssub">Fifteen words worth knowing</div>
+    <h3 id="glossH">The vocabulary<button id="glossX" type="button">Close</button></h3>
+    <div class="glosssub">The words worth knowing</div>
     <div id="glossList"></div>
   </div>
 </div>
@@ -344,9 +608,11 @@ const TAU=Math.PI*2;
 
 /* ————— the design ————— */
 const S={
+  /* the movement — everything else is built around this */
+  arch:'bridges', mvFinish:'geneva', vph:28800, jewels:27, pr:60, rotor:'full', screws:'blued',
   /* case */
-  family:'round', size:38, thick:'slim', lug:'wire', bezel:'smooth', bezelW:.10,
-  metal:'steel', finish:'polish',
+  family:'round', size:38, thick:'slim', lug:'wire', lugW:19, bezel:'smooth', bezelW:.10,
+  metal:'steel', finish:'polish', crystal:'domed',
   /* dial */
   layout:'baton', dialCol:'silver', texture:'sunray', track:'railroad',
   indexMat:'applied', numFont:'grot', chapter:false,
@@ -355,90 +621,120 @@ const S={
   /* hands */
   hands:'dauphine', handMat:'steel', lume:true,
   /* strap */
-  strap:'leather', strapCol:'#8a5c34', stitch:'tonal',
+  strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
   /* meta */
   name:'', view:'studio', tiltX:0, tiltY:0,
   /* stage */
-  bg:'#121110'
+  light:'softbox', bg:'#121110'
 };
+/* ————— the movement, described the way a calibre sheet describes one ————— */
+const ARCH={
+  bridges :{n:'Separate bridges',d:'Individual bridges over each wheel — the Swiss standard, and the architecture that gives a caseback something to look at.'},
+  threeq  :{n:'Three-quarter plate',d:'One large plate covering the train, pierced only for the balance. Glashütte practice: rigid, austere, and hard to regulate.'},
+  full    :{n:'Full plate',d:'The oldest layout — the whole train under one plate with the balance riding on top. English pocket-watch descent.'},
+  skeleton:{n:'Skeletonised',d:'Every plate and bridge cut back to the load path, then the remaining metal engraved. Structural jewellery.'}
+};
+const MVFIN={
+  geneva:{n:'Côtes de Genève',d:'Parallel waves cut into the bridges. Traditionally applied before the plate is drilled, so the pattern runs unbroken under the jewels.'},
+  perlage:{n:'Perlage',d:'Overlapping circular grains, applied to plates and to the underside of bridges — the surfaces no one sees.'},
+  frosted:{n:'Frosted',d:'A fine matte texture, historically raised by acid. Reads warm under gold plating.'},
+  grained:{n:'Straight graining',d:'Unidirectional brushing. The most modern of the four, and the least forgiving of a scratch.'}
+};
+const ROTORS={
+  full  :{n:'Full rotor',d:'A half-disc winding in both directions. Efficient, and it hides half the movement.'},
+  micro :{n:'Micro-rotor',d:'A small rotor sunk into the plate so the whole calibre stays thin and stays visible. Difficult, and the reason a watch can be 3mm thick.'},
+  peri  :{n:'Peripheral rotor',d:'A ring turning around the outside of the movement. Nothing is hidden at all.'},
+  manual:{n:'Hand-wound',d:'No rotor. You wind it. The movement is fully exposed and about 2mm thinner.'}
+};
+/* a mechanical watch beats; it does not glide. this is the number that decides it. */
+const BEATS={
+  18000:{n:'18,000 A/h',d:'2.5 Hz — five beats a second. Vintage cadence: long, slow, audible.'},
+  21600:{n:'21,600 A/h',d:'3 Hz — six a second. The compromise most 1960s calibres settled on.'},
+  28800:{n:'28,800 A/h',d:'4 Hz — eight a second. The modern default: accurate, and hard on lubricants.'},
+  36000:{n:'36,000 A/h',d:'5 Hz — ten a second. A high-beat calibre. Nearly a sweep, and it needs servicing sooner.'}
+};
+const CRYSTN={flat:'Flat',domed:'Domed',ddomed:'Double domed',box:'Box'};
 /* ————— curated starting points ————— */
 const PRESETS=[
-  {n:'Bauhaus',s:{family:'round',size:38,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+  {n:'Bauhaus',w:'Ulm, 1961',p:'The school that removed everything which was not information. No ornament survives on this dial that does not help you read it.',s:{arch:'threeq',mvFinish:'grained',vph:21600,jewels:17,pr:42,rotor:'manual',crystal:'flat',buckle:'pin',lugW:18,family:'round',size:38,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
     layout:'baton',dialCol:'white',texture:'matte',track:'ticks',indexMat:'printed',comp:'none',date:'none',
     hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#26231f',stitch:'tonal'}},
-  {n:'Dress noir',s:{family:'round',size:37,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.08,metal:'white',finish:'polish',
+  {n:'Dress noir',w:'Geneva, 1950s',p:'A black dial exists so that the hands are the only bright thing on the watch. Everything else is subtraction.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:19,pr:45,rotor:'manual',crystal:'domed',buckle:'pin',lugW:18,family:'round',size:37,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.08,metal:'white',finish:'polish',
     layout:'roman',dialCol:'black',texture:'sunray',track:'railroad',indexMat:'applied',comp:'small',date:'none',
     hands:'leaf',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
-  {n:'Skin diver',s:{family:'round',size:40,thick:'sport',lug:'straight',bezel:'dive',bezelW:.13,metal:'steel',finish:'brush',
+  {n:'Skin diver',w:'1953',p:'The first watches rated for depth wore a turning bezel to count a dive, and nothing else that could flood.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:25,pr:50,rotor:'full',crystal:'domed',buckle:'pin',lugW:20,family:'round',size:40,thick:'sport',lug:'straight',bezel:'dive',bezelW:.13,metal:'steel',finish:'brush',
     layout:'dot',dialCol:'black',texture:'matte',track:'ticks',indexMat:'applied',comp:'none',date:'3',
-    hands:'mercedes',handMat:'steel',lume:true,strap:'nato',strapCol:'#2f4034',stitch:'tonal'}},
-  {n:'Flieger',s:{family:'round',size:42,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'black',finish:'sand',
+    hands:'circlebar',handMat:'steel',lume:true,strap:'nato',strapCol:'#2f4034',stitch:'tonal'}},
+  {n:'Flieger',w:'Germany, 1940',p:'Navigation watches: matte case so nothing signals your position, and a triangle at twelve you can find in the dark.',s:{arch:'threeq',mvFinish:'frosted',vph:21600,jewels:21,pr:46,rotor:'manual',crystal:'flat',buckle:'pin',lugW:22,family:'round',size:42,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'black',finish:'sand',
     layout:'arabic',dialCol:'black',texture:'matte',track:'railroad',indexMat:'printed',numFont:'cond',comp:'none',date:'none',
     hands:'cathedral',handMat:'steel',lume:true,strap:'leather',strapCol:'#4d3524',stitch:'contrast'}},
-  {n:'Royal octagon',s:{family:'octagon',size:41,thick:'slim',lug:'none',bezel:'screws',bezelW:.13,metal:'steel',finish:'brush',
+  {n:'Octagon 1972',w:'Le Brassus, 1972',p:'Steel priced above gold, and the first luxury watch whose case was designed never to be polished.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:36,pr:40,rotor:'micro',crystal:'flat',buckle:'deploy',lugW:20,family:'octagon',size:41,thick:'slim',lug:'none',bezel:'screws',bezelW:.13,metal:'steel',finish:'brush',
     layout:'baton',dialCol:'blue',texture:'tapestry',track:'ticks',indexMat:'applied',comp:'none',date:'3',
-    hands:'baton',handMat:'steel',lume:true,strap:'oyster'}},
-  {n:'Tank',s:{family:'rect',size:36,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'yellow',finish:'polish',
+    hands:'baton',handMat:'steel',lume:true,strap:'link3'}},
+  {n:'Rectangle 1917',w:'Paris, 1917',p:'A case drawn from the shape of a tank seen from above — the tracks became the flanks.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:18,pr:38,rotor:'manual',crystal:'box',buckle:'deploy',lugW:16,family:'rect',size:36,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'yellow',finish:'polish',
     layout:'roman',dialCol:'white',texture:'guilloche',track:'railroad',indexMat:'printed',numFont:'serif',comp:'none',date:'none',
     hands:'breguet',handMat:'blued',lume:false,strap:'leather',strapCol:'#5a2c2e',stitch:'tonal'}},
-  {n:'Salmon sector',s:{family:'cushion',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'rose',finish:'polish',
+  {n:'Salmon sector',w:'Switzerland, 1930s',p:'The sector dial divides the face into fields so a doctor could read a pulse without losing the count.',s:{arch:'bridges',mvFinish:'frosted',vph:18000,jewels:17,pr:40,rotor:'manual',crystal:'box',buckle:'pin',lugW:18,family:'cushion',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'rose',finish:'polish',
     layout:'arabic',dialCol:'salmon',texture:'sector',track:'railroad',indexMat:'printed',numFont:'serif',comp:'small',date:'none',
     hands:'leaf',handMat:'blued',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
-  {n:'Explorer',s:{family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'brush',
+  {n:'Explorer',w:'Himalaya, 1953',p:'3, 6 and 9 in Arabic: the eye finds orientation before it finds the time.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:26,pr:48,rotor:'full',crystal:'domed',buckle:'deploy',lugW:20,family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'brush',
     layout:'explorer',dialCol:'black',texture:'matte',track:'ticks',indexMat:'applied',comp:'none',date:'none',
-    hands:'mercedes',handMat:'steel',lume:true,strap:'oyster'}},
-  {n:'Moonlit',s:{family:'round',size:39,thick:'slim',lug:'horn',bezel:'fluted',bezelW:.11,metal:'yellow',finish:'polish',
+    hands:'circlebar',handMat:'steel',lume:true,strap:'link3'}},
+  {n:'Moonlit',w:'since the 1600s',p:'The oldest complication that is purely poetic. A good one runs one day out in 122 years.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:29,pr:45,rotor:'full',crystal:'domed',buckle:'pin',lugW:19,family:'round',size:39,thick:'slim',lug:'horn',bezel:'fluted',bezelW:.11,metal:'yellow',finish:'polish',
     layout:'mixed',dialCol:'champ',texture:'sunray',track:'dots',indexMat:'applied',comp:'moon',date:'none',
     hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
-  {n:'Voyager GMT',s:{family:'round',size:40,thick:'std',lug:'twisted',bezel:'gmt',bezelW:.12,metal:'steel',finish:'brush',
+  {n:'Voyager GMT',w:'1954',p:'A fourth hand turning once a day, for pilots crossing more time zones than a dial could hold.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:31,pr:70,rotor:'full',crystal:'domed',buckle:'deploy',lugW:20,family:'round',size:40,thick:'std',lug:'twisted',bezel:'gmt',bezelW:.12,metal:'steel',finish:'brush',
     layout:'baton',dialCol:'slate',texture:'sunray',track:'ticks',indexMat:'applied',comp:'gmt',date:'3',
-    hands:'mercedes',handMat:'steel',lume:true,strap:'jubilee'}},
-  {n:'Tonneau blue',s:{family:'tonneau',size:38,thick:'sport',lug:'none',bezel:'coin',bezelW:.10,metal:'titan',finish:'sand',
+    hands:'circlebar',handMat:'steel',lume:true,strap:'link5'}},
+  {n:'Tonneau blue',w:'barrel cases, 1920s',p:'A shape that curves with the wrist instead of sitting on top of it.',s:{arch:'skeleton',mvFinish:'grained',vph:28800,jewels:33,pr:55,rotor:'peri',crystal:'ddomed',buckle:'deploy',lugW:0,family:'tonneau',size:38,thick:'sport',lug:'none',bezel:'coin',bezelW:.10,metal:'titan',finish:'sand',
     layout:'bar',dialCol:'ice',texture:'linen',track:'none',indexMat:'applied',comp:'power',date:'none',
     hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
-  {n:'Verdigris',s:{family:'porthole',size:40,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'rose',finish:'polish',
+  {n:'Verdigris',w:'grand feu, 800°C',p:'Enamel fired four times. Any one of the firings can crack the dial and end it.',s:{arch:'bridges',mvFinish:'geneva',vph:18000,jewels:19,pr:42,rotor:'manual',crystal:'box',buckle:'pin',lugW:18,family:'porthole',size:40,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'rose',finish:'polish',
     layout:'quarter',dialCol:'tiff',texture:'enamel',track:'railroad',indexMat:'applied',comp:'none',date:'none',
     hands:'alpha',handMat:'blued',lume:false,strap:'mesh'}},
-  {n:'Panda chrono',s:{family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+  {n:'Panda chrono',w:'Bienne, 1960s',p:'White dial, dark registers. The contrast is a legibility decision, not a styling one.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:17,pr:48,rotor:'manual',crystal:'domed',buckle:'pin',lugW:19,family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
     layout:'baton',dialCol:'white',texture:'matte',track:'ticks',indexMat:'applied',comp:'chrono2',date:'none',
     hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
-  {n:'Racing chrono',s:{family:'cushion',size:41,thick:'sport',lug:'straight',bezel:'tachy',bezelW:.11,metal:'black',finish:'sand',
+  {n:'Racing chrono',w:'motorsport, 1960s',p:'The tachymètre on the bezel converts elapsed seconds over a measured mile into average speed.',s:{arch:'bridges',mvFinish:'grained',vph:28800,jewels:27,pr:44,rotor:'full',crystal:'flat',buckle:'deploy',lugW:22,family:'cushion',size:41,thick:'sport',lug:'straight',bezel:'tachy',bezelW:.11,metal:'black',finish:'sand',
     layout:'bar',dialCol:'black',texture:'grain',track:'ticks',indexMat:'applied',comp:'chrono3',date:'6',
     hands:'sword',handMat:'steel',lume:true,strap:'rubber',strapCol:'#23282b'}},
-  {n:'Field chrono',s:{family:'round',size:40,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'titan',finish:'sand',
+  {n:'Field chrono',w:'military issue, 1940s',p:'Matte everything, condensed numerals, and a case small enough to sit under a cuff.',s:{arch:'bridges',mvFinish:'frosted',vph:28800,jewels:25,pr:46,rotor:'full',crystal:'flat',buckle:'pin',lugW:20,family:'round',size:40,thick:'std',lug:'straight',bezel:'smooth',bezelW:.06,metal:'titan',finish:'sand',
     layout:'arabic',dialCol:'green',texture:'matte',track:'railroad',indexMat:'printed',numFont:'cond',comp:'chrono2',date:'none',
     hands:'syringe',handMat:'steel',lume:true,strap:'canvas',strapCol:'#5a4a30',stitch:'contrast'}},
-  {n:'Roland',s:{family:'round',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
+  {n:'Roland',w:'terre battue',p:'Crushed brick over limestone, watered twice a day. The only major still played on clay.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:21,pr:50,rotor:'micro',crystal:'domed',buckle:'pin',lugW:18,family:'round',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'steel',finish:'polish',
     layout:'quarter',dialCol:'silver',texture:'clay',track:'none',indexMat:'applied',comp:'none',date:'none',
     hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#8a5c34',stitch:'contrast'}},
-  {n:'Centre court',s:{family:'cushion',size:39,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
+  {n:'Centre court',w:'rye grass, 8mm',p:'The fastest surface in the sport, and the oldest — cut to the millimetre every morning.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:21,pr:45,rotor:'micro',crystal:'domed',buckle:'pin',lugW:18,family:'cushion',size:39,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
     layout:'quarter',dialCol:'silver',texture:'grass',track:'none',indexMat:'applied',comp:'none',date:'none',
     hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#2f4034',stitch:'tonal'}},
-  {n:'Nuit étoilée',s:{family:'round',size:39,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
+  {n:'Nuit étoilée',w:'aventurine',p:'Molten glass with copper filings, cooled slowly so the metal crystallises into a night sky.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:29,pr:45,rotor:'full',crystal:'domed',buckle:'pin',lugW:19,family:'round',size:39,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
     layout:'dot',dialCol:'blue',texture:'starry',track:'none',indexMat:'applied',comp:'moon',date:'none',
     hands:'breguet',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
-  {n:'Composition',s:{family:'square',size:37,thick:'slim',lug:'none',bezel:'smooth',bezelW:.08,metal:'steel',finish:'polish',
+  {n:'Composition',w:'De Stijl, 1921',p:'Three primaries, black rules, no diagonal. A dial that refuses to tell you the time politely.',s:{arch:'skeleton',mvFinish:'grained',vph:28800,jewels:23,pr:55,rotor:'peri',crystal:'flat',buckle:'pin',lugW:18,family:'square',size:37,thick:'slim',lug:'none',bezel:'smooth',bezelW:.08,metal:'steel',finish:'polish',
     layout:'none',dialCol:'white',texture:'mondrian',track:'none',indexMat:'printed',comp:'none',date:'none',
     hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
-  {n:'Terminal',s:{family:'octagon',size:41,thick:'sport',lug:'none',bezel:'screws',bezelW:.12,metal:'black',finish:'sand',
+  {n:'Terminal',w:'a circuit trace',p:'The only ornament is the path the current takes. Nothing decorative was added.',s:{arch:'skeleton',mvFinish:'grained',vph:36000,jewels:35,pr:38,rotor:'peri',crystal:'flat',buckle:'deploy',lugW:0,family:'octagon',size:41,thick:'sport',lug:'none',bezel:'screws',bezelW:.12,metal:'black',finish:'sand',
     layout:'bar',dialCol:'black',texture:'circuit',track:'none',indexMat:'printed',comp:'gmt',date:'none',
-    hands:'syringe',handMat:'steel',lume:true,strap:'oyster'}},
-  {n:'Horizon',s:{family:'tonneau',size:40,thick:'sport',lug:'none',bezel:'smooth',bezelW:.09,metal:'black',finish:'polish',
+    hands:'syringe',handMat:'steel',lume:true,strap:'link3'}},
+  {n:'Horizon',w:'gradient, no markers',p:'The watch tells you roughly what time it is, and asks you to be comfortable with that.',s:{arch:'skeleton',mvFinish:'grained',vph:36000,jewels:31,pr:40,rotor:'peri',crystal:'ddomed',buckle:'deploy',lugW:0,family:'tonneau',size:40,thick:'sport',lug:'none',bezel:'smooth',bezelW:.09,metal:'black',finish:'polish',
     layout:'none',dialCol:'black',texture:'synth',track:'none',indexMat:'printed',comp:'none',date:'none',
     hands:'baton',handMat:'steel',lume:true,strap:'rubber',strapCol:'#232120'}},
-  {n:'Meteorite',s:{family:'round',size:40,thick:'std',lug:'twisted',bezel:'fluted',bezelW:.10,metal:'white',finish:'polish',
+  {n:'Meteorite',w:'Gibeon iron',p:'Cooled at one degree per million years. The Widmanstätten pattern cannot be manufactured.',s:{arch:'bridges',mvFinish:'geneva',vph:28800,jewels:31,pr:70,rotor:'full',crystal:'ddomed',buckle:'deploy',lugW:20,family:'round',size:40,thick:'std',lug:'twisted',bezel:'fluted',bezelW:.10,metal:'white',finish:'polish',
     layout:'baton',dialCol:'slate',texture:'lava',track:'ticks',indexMat:'applied',comp:'none',date:'3',
-    hands:'dauphine',handMat:'steel',lume:false,strap:'president'}}
+    hands:'dauphine',handMat:'steel',lume:false,strap:'linkR'}}
 ];
 
 /* ————— materials ————— */
+/* gloss = how tight the specular is. titanium scatters; DLC barely reflects at all. */
 const METAL={
-  steel :{lo:'#6f7274',mid:'#c9ccce',hi:'#f4f6f7',ink:'#3d4042',name:'Steel'},
-  white :{lo:'#75797c',mid:'#d3d7da',hi:'#ffffff',ink:'#41454a',name:'White gold'},
-  yellow:{lo:'#8a6a24',mid:'#e2bd63',hi:'#fbeab4',ink:'#54401a',name:'Yellow gold'},
-  rose  :{lo:'#8c5a3c',mid:'#e0a883',hi:'#fbdcc6',ink:'#5a3826',name:'Rose gold'},
-  titan :{lo:'#5c6165',mid:'#a3a9ad',hi:'#d5dade',ink:'#3a3e42',name:'Titanium'},
-  black :{lo:'#1a1b1c',mid:'#3a3d3f',hi:'#6d7275',ink:'#0d0e0f',name:'Black DLC'}
+  steel :{lo:'#6f7274',mid:'#c9ccce',hi:'#f4f6f7',ink:'#3d4042',name:'Steel',      gloss:1.00},
+  white :{lo:'#75797c',mid:'#d3d7da',hi:'#ffffff',ink:'#41454a',name:'White gold', gloss:1.06},
+  yellow:{lo:'#8a6a24',mid:'#e2bd63',hi:'#fbeab4',ink:'#54401a',name:'Yellow gold',gloss:0.94},
+  rose  :{lo:'#8c5a3c',mid:'#e0a883',hi:'#fbdcc6',ink:'#5a3826',name:'Rose gold',  gloss:0.92},
+  /* titanium: lower lustre, and warm-grey rather than blue-grey */
+  titan :{lo:'#5f6058',mid:'#9d9c93',hi:'#bfbeb4',ink:'#3c3d38',name:'Titanium',   gloss:0.52},
+  /* DLC over steel: the coating is near-matte, but the metal underneath still shows at the edges */
+  black :{lo:'#141414',mid:'#2e3032',hi:'#4b4f52',ink:'#0b0c0c',name:'Black DLC',  gloss:0.34}
 };
 const DIALCOL={
   silver:{base:'#cfcdc6',ink:'#1d1b17',name:'Silver'},
@@ -547,16 +843,60 @@ function pathPoly(c,n,R,rot){
   c.closePath();
 }
 /* ap = largest circle the case can hold · ow = outer half-width, for the profile view */
+/* l2l = lug-to-lug as a multiple of the stated diameter — the number that
+   actually decides whether a watch fits a wrist */
 const FAMILY={
-  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ap:1.00,ow:1.00},
-  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ap:.955,ow:1.00},
-  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ap:.845,ow:.86},
-  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ap:.665,ow:.68,rect:1},
-  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ap:.915,ow:.93},
-  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ap:.945,ow:1.03},
-  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ap:1.00,ow:1.02,ears:1},
-  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ap:.975,ow:.99,slab:1}
+  round     :{n:'Round',        path:(c,R)=>pathRound(c,R),                     ap:1.00,ow:1.00,l2l:1.16},
+  cushion   :{n:'Cushion',      path:(c,R)=>pathCushion(c,R),                   ap:.955,ow:1.00,l2l:1.12},
+  tonneau   :{n:'Tonneau',      path:(c,R)=>pathTonneau(c,R),                   ap:.845,ow:.86,l2l:1.30},
+  rect      :{n:'Rectangular',  path:(c,R)=>pathRRect(c,R*.68,R*1.16,R*.09),    ap:.665,ow:.68,rect:1,l2l:1.42},
+  square    :{n:'Square',       path:(c,R)=>pathRRect(c,R*.93,R*.93,R*.22),     ap:.915,ow:.93,l2l:1.08},
+  octagon   :{n:'Octagonal',    path:(c,R)=>pathPoly(c,8,R*1.03,Math.PI/8),     ap:.945,ow:1.03,l2l:1.14},
+  porthole  :{n:'Porthole',     path:(c,R)=>pathRRect(c,R*1.02,R*1.02,R*.62),   ap:1.00,ow:1.02,ears:1,l2l:1.10},
+  integrated:{n:'Integrated',   path:(c,R)=>pathRRect(c,R*.99,R*.99,R*.46),     ap:.975,ow:.99,slab:1,l2l:1.06}
 };
+/* ————— the light: a setup, not a background colour —————
+   a watch photograph is a lighting decision before it is anything else. */
+const LIGHT={
+  softbox  :{n:'Soft box',  bg:'#121110',key:-.55,spread:1.00,strength:.85,ground:.30,rim:.22,
+    d:'A large diffused source above and to the left. Even, forgiving, and how nearly all catalogue photography is lit.'},
+  raking   :{n:'Raking',    bg:'#0f0e0d',key:-1.15,spread:.44,strength:1.25,ground:.44,rim:.14,
+    d:'A hard light almost parallel to the dial. The only setup in which guilloché and sunray show what they actually are.'},
+  darkfield:{n:'Dark field',bg:'#08080a',key:-.80,spread:.30,strength:.55,ground:.10,rim:.85,
+    d:'No key light at all — the case is drawn by two rim lights alone. Used for polished metal, which any frontal light destroys.'},
+  daylight :{n:'Daylight',  bg:'#e7e2d6',key:-.75,spread:1.25,strength:.70,ground:.52,rim:.10,
+    d:'A north-facing window at midday. The one setup that tells you what the watch will look like on a wrist.'}
+};
+const BUCKLE={pin:'Pin buckle',deploy:'Deployant clasp'};
+/* ————— the numbers a collector actually asks for ————— */
+function dims(){
+  const f=FAMILY[S.family];
+  const d=S.size;
+  const crys=S.crystal==='box'?1.5:S.crystal==='ddomed'?.9:S.crystal==='domed'?.5:0;
+  const mv=(S.rotor==='manual'?0:S.rotor==='micro'?.6:S.rotor==='peri'?.5:1.3)
+          +(S.comp==='chrono2'||S.comp==='chrono3'?1.7:S.comp==='moon'?.5:0)
+          +(S.arch==='full'?.6:S.arch==='threeq'?.3:0);
+  const thick=d*THICK[S.thick].v*2.55+crys+mv;
+  const l2l=d*(f.l2l||1.16)+(S.lug==='wire'?1.6:S.lug==='horn'?2.6:S.lug==='straight'?2.2:S.lug==='twisted'?2.4:0);
+  /* water resistance follows construction, not marketing */
+  let wr=30;
+  if(S.bezel==='dive')wr=300;
+  else if(S.bezel==='screws'||S.strap==='rubber')wr=100;
+  else if(S.thick==='sport')wr=100;
+  if(S.crystal==='box')wr=Math.min(wr,30);
+  if(S.comp==='chrono2'||S.comp==='chrono3')wr=Math.min(wr,100);
+  if(S.arch==='skeleton')wr=Math.min(wr,50);
+  return {d:d.toFixed(1),thick:thick.toFixed(1),l2l:l2l.toFixed(1),
+    lugW:FAMILY[S.family].slab?0:S.lugW,wr,
+    bph:S.vph,hz:(S.vph/3600).toFixed(S.vph%3600?1:0)};
+}
+/* a calibre number the house would actually stamp: family + beat + complication */
+function calibre(){
+  const a={bridges:'1',threeq:'2',full:'3',skeleton:'9'}[S.arch]||'1';
+  const b={18000:'18',21600:'21',28800:'28',36000:'36'}[S.vph]||'28';
+  const c={none:'0',small:'1',gmt:'4',moon:'6',power:'7',chrono2:'2',chrono3:'3'}[S.comp]||'0';
+  return 'SM '+a+b+'.'+c+(S.rotor==='manual'?'M':'A');
+}
 /* deterministic noise: a design must look identical on every repaint */
 let _sd=1;
 function seed(s){_sd=s>>>0||1;}
@@ -569,7 +909,16 @@ const BEZELS={smooth:'Smooth',coin:'Coin edge',fluted:'Fluted',dive:'Dive 60',gm
 
 /* ————— metal shading: the whole illusion lives here ————— */
 function metalFill(c,R,m,finish,ang){
-  const M=METAL[m];
+  const M=METAL[m], gl=M.gloss===undefined?1:M.gloss;
+  /* a low-gloss metal never reaches its own highlight: pull the bright stop
+     back toward the mid tone rather than faking it with opacity */
+  if(gl<.9){
+    const soft={lo:M.lo,mid:M.mid,hi:lerpHex(M.mid,M.hi,gl),ink:M.ink};
+    return metalFillCore(c,R,soft,finish,ang,gl);
+  }
+  return metalFillCore(c,R,M,finish,ang,gl);
+}
+function metalFillCore(c,R,M,finish,ang,gl){
   if(finish==='brush'){
     const g=c.createLinearGradient(-R,-R,R,R);
     g.addColorStop(0,shade(M.mid,.10));g.addColorStop(.28,M.lo);g.addColorStop(.5,M.mid);
@@ -1108,7 +1457,7 @@ function sigPlan(){
   if(botBusy && y > 0.20) y = -0.42;
   return {y,scale,variant};
 }
-/* the emblem: two orbits, or 蝉 — semi, the cicada that keeps a calendar */
+/* the emblem: two orbits, or 蝉 — the character that means axis */
 function drawEmblem(c,size,ink){
   /* the house has no device — only its name, and sometimes its character */
   if(S.brand!=='kanji')return false;
@@ -1288,9 +1637,7 @@ function chronoReg(c,cx,cy,rr,ink,marks,label){
     c.lineTo(Math.cos(a)*rr*.95,Math.sin(a)*rr*.95);c.stroke();
   }
   c.globalAlpha=1;
-  /* register hand, parked at zero */
-  c.strokeStyle=ink;c.lineWidth=rr*.075;c.lineCap='round';
-  c.beginPath();c.moveTo(0,rr*.12);c.lineTo(0,-rr*.72);c.stroke();
+  /* the hand of every register is drawn live, over the cached base */
   c.fillStyle=ink;c.beginPath();c.arc(0,0,rr*.1,0,TAU);c.fill();
   if(label){c.globalAlpha=.55;c.textAlign='center';c.font=`400 ${rr*.26}px ${FONTS.grot}`;
     c.fillText(label,0,rr*.55);c.globalAlpha=1;}
@@ -1349,7 +1696,7 @@ function drawComp(c,R,ink,M){
 }
 /* ————— hands ————— */
 const HANDS={dauphine:'Dauphine',sword:'Sword',leaf:'Leaf',alpha:'Alpha',baton:'Baton',
-  cathedral:'Cathedral',mercedes:'Mercedes',syringe:'Syringe',breguet:'Breguet',snowflake:'Snowflake'};
+  cathedral:'Cathedral',circlebar:'Circle & bar',syringe:'Syringe',breguet:'Breguet',snowflake:'Snowflake'};
 function handPath(c,k,L,W){
   c.beginPath();
   switch(k){
@@ -1391,7 +1738,7 @@ function drawHand(c,k,L,W,M,lume,blue){
       c.beginPath();c.arc(0,-L*.62,W*.62,0,TAU);c.fill();}
     c.restore();return;
   }
-  if(k==='mercedes'){
+  if(k==='circlebar'){
     c.fillStyle=blue?'#2b4a9e':M.mid;
     c.beginPath();c.rect(-W*.45,-L*.5,W*.9,L*.6);c.fill();
     c.beginPath();c.arc(0,-L*.62,W*1.15,0,TAU);c.fill();
@@ -1430,7 +1777,7 @@ function drawStrap(c,R,fam){
   const halfW=(fam.slab||fam.ears)?R*.92:(fam.rect?R*.62:R*.56);
   const top=(fam.rect?R*1.16:R)* (fam.slab?.98:1);
   const far=R*3.05;
-  if(k==='oyster'||k==='jubilee'||k==='president'||k==='mesh'){
+  if(k==='link3'||k==='link5'||k==='linkR'||k==='mesh'){
     /* the folding clasp, closed, seen from above */
     const clasp=()=>{
       const cw=halfW*.80, cy=far*.86;
@@ -1467,12 +1814,12 @@ function drawStrap(c,R,fam){
         const t=i/rows, t2=(i+1-gap)/rows;
         const y0=dir*(top+(far-top)*t), y1=dir*(top+(far-top)*t2);
         const w0=halfW*(1-t*.20), w1=halfW*(1-t2*.20);
-        const cols=(k==='jubilee')?[.19,.125,.37,.125,.19]:(k==='president'?[.27,.46,.27]:[.29,.42,.29]);
+        const cols=(k==='link5')?[.19,.125,.37,.125,.19]:(k==='linkR'?[.27,.46,.27]:[.29,.42,.29]);
         let x=-w0,x1=-w1;
         cols.forEach((cw,ci)=>{
           const centre=(cols.length===3&&ci===1)||(cols.length===5&&ci===2);
-          const pol=(k==='jubilee')?(ci%2===1):centre;
-          const round=(k==='president');
+          const pol=(k==='link5')?(ci%2===1):centre;
+          const round=(k==='linkR');
           const xa=x, xb=x+w0*2*cw, xc=x1+w1*2*cw, xd=x1;
           const rr=round?Math.abs(xb-xa)*.42:Math.abs(xb-xa)*.16;
           c.beginPath();
@@ -1720,29 +2067,66 @@ function drawLugs(c,R,fam,M){
     c.restore();
   });
 }
+/* pushers at two and four: a guard, a shoulder, a chamfered head, and the
+   gap the return spring lives in. they are the most-handled part after the crown. */
 function drawPushers(c,R,fam,M){
   if(S.comp!=='chrono2'&&S.comp!=='chrono3')return;
   const x=(fam.ow||1)*R;
   [-1,1].forEach(dir=>{
     c.save();c.translate(x*.93,dir*R*.42);
-    c.fillStyle=metalFill(c,R*.16,S.metal,'polish');
-    c.fillRect(0,-R*.048,R*.12,R*.096);
-    c.beginPath();c.arc(R*.14,0,R*.052,0,TAU);c.fill();
-    c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=1;c.stroke();
+    /* the guard: a raised collar of case metal the pusher passes through */
+    c.fillStyle=metalFill(c,R*.18,S.metal,S.finish);
+    c.beginPath();
+    c.moveTo(-R*.03,-R*.075);c.lineTo(R*.055,-R*.062);
+    c.lineTo(R*.055, R*.062);c.lineTo(-R*.03, R*.075);c.closePath();c.fill();
+    c.strokeStyle='rgba(0,0,0,.42)';c.lineWidth=Math.max(R*.005,.6);c.stroke();
+    /* the shoulder */
+    c.fillStyle=metalFill(c,R*.14,S.metal,'polish');
+    c.fillRect(R*.045,-R*.044,R*.055,R*.088);
+    /* the return-spring gap, seen as a dark line */
+    c.fillStyle='rgba(0,0,0,.42)';c.fillRect(R*.098,-R*.040,R*.010,R*.080);
+    /* the head, with a polished chamfer around its face */
+    c.beginPath();c.arc(R*.145,0,R*.052,0,TAU);
+    c.fillStyle=metalFill(c,R*.10,S.metal,'polish');c.fill();
+    c.strokeStyle='rgba(255,255,255,.42)';c.lineWidth=Math.max(R*.007,.7);c.stroke();
+    c.beginPath();c.arc(R*.145,0,R*.034,0,TAU);
+    c.fillStyle=shade(M.mid,-.10);c.fill();
+    c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=Math.max(R*.004,.5);c.stroke();
     c.restore();
   });
 }
+/* the crown: a tube through the case, a knurled body cut as real flutes,
+   and a domed cap. it is the part a wearer touches every single day. */
 function drawCrown(c,R,fam,M){
   const x=(fam.ow||1)*R*1.0;
-  const w=R*.09,h=R*.14;
+  const dive=(S.bezel==='dive'||S.bezel==='screws');
+  const w=R*(dive?.115:.095), h=R*(dive?.165:.145);
   c.save();c.translate(x,0);
-  c.fillStyle=metalFill(c,R*.2,S.metal,'polish');
-  c.fillRect(-w*.3,-h*.36,w*.5,h*.72);
-  c.beginPath();c.roundRect?c.roundRect(0,-h/2,w,h,w*.28):c.rect(0,-h/2,w,h);c.fill();
-  c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=1;c.stroke();
-  c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=1.1;
-  for(let i=0;i<7;i++){const yy=-h/2+h*(i+.5)/7;
-    c.beginPath();c.moveTo(.5,yy);c.lineTo(w-.5,yy);c.stroke();}
+  /* the tube, brazed into the case — this is what makes a crown screw down */
+  c.fillStyle=metalFill(c,R*.2,S.metal,S.finish);
+  c.fillRect(-w*.34,-h*.34,w*.62,h*.68);
+  c.strokeStyle='rgba(0,0,0,.38)';c.lineWidth=Math.max(R*.004,.5);
+  c.strokeRect(-w*.34,-h*.34,w*.62,h*.68);
+  /* the body */
+  c.beginPath();
+  c.roundRect?c.roundRect(w*.20,-h/2,w,h,w*.20):c.rect(w*.20,-h/2,w,h);
+  c.fillStyle=metalFill(c,R*.2,S.metal,'polish');c.fill();
+  c.strokeStyle='rgba(0,0,0,.5)';c.lineWidth=Math.max(R*.005,.7);c.stroke();
+  /* flutes: cut, not scratched — each is a light face and a dark face */
+  const n=dive?9:11;
+  for(let i=0;i<n;i++){
+    const y0=-h/2+h*i/n, y1=-h/2+h*(i+.55)/n;
+    c.fillStyle='rgba(255,255,255,.24)';c.fillRect(w*.20,y0,w,(y1-y0));
+    c.fillStyle='rgba(0,0,0,.30)';c.fillRect(w*.20,y1,w,h/n-(y1-y0));
+  }
+  /* the domed cap, and a chamfer where it meets the body */
+  const g=c.createLinearGradient(w*1.20,0,w*1.40,0);
+  g.addColorStop(0,shade(M.hi,.05));g.addColorStop(1,shade(M.lo,-.10));
+  c.fillStyle=g;
+  c.beginPath();c.moveTo(w*1.20,-h*.42);
+  c.quadraticCurveTo(w*1.46,0,w*1.20,h*.42);c.closePath();c.fill();
+  c.strokeStyle='rgba(255,255,255,.34)';c.lineWidth=Math.max(R*.004,.5);
+  c.beginPath();c.moveTo(w*1.20,-h*.42);c.lineTo(w*1.20,h*.42);c.stroke();
   c.restore();
 }
 function drawCrystal(c,R){
@@ -1761,6 +2145,366 @@ function drawCrystal(c,R){
   c.beginPath();c.ellipse(R*.40+ox*.6,R*.48+oy*.6,R*.24,R*.07,-.7,0,TAU);c.fill();
   c.globalAlpha=1;c.restore();
 }
+/* ============================================================
+   THE MOVEMENT
+   A watch is not a dial. This is the side a collector turns over
+   first, and until now it did not exist.
+   ============================================================ */
+const JEWEL='#9c1f2e', JEWELHI='#e0596a';
+function mvMetal(c,R,warm){
+  /* movement plates are rhodium or gilt, never the case metal */
+  const g=c.createLinearGradient(-R,-R,R*.7,R);
+  if(warm){g.addColorStop(0,'#8d6c34');g.addColorStop(.42,'#d8b473');g.addColorStop(.68,'#a8813d');g.addColorStop(1,'#7d5f2c');}
+  else    {g.addColorStop(0,'#7d8085');g.addColorStop(.42,'#c2c7cb');g.addColorStop(.68,'#93989d');g.addColorStop(1,'#6e7276');}
+  return g;
+}
+/* the four finishes, each cut the way it is actually cut */
+function mvFinishFill(c,r,kind,warm,ang){
+  c.save();c.rotate(ang||0);
+  if(kind==='geneva'){
+    /* côtes de genève: parallel waves, each a soft gradient across its own width */
+    const step=Math.max(r*.115,2);
+    for(let y=-r*1.5;y<r*1.5;y+=step){
+      const g=c.createLinearGradient(0,y,0,y+step);
+      g.addColorStop(0,warm?'rgba(255,236,198,.30)':'rgba(255,255,255,.26)');
+      g.addColorStop(.55,'rgba(0,0,0,.12)');
+      g.addColorStop(1,warm?'rgba(255,236,198,.08)':'rgba(255,255,255,.07)');
+      c.fillStyle=g;c.fillRect(-r*1.6,y,r*3.2,step);
+    }
+  }else if(kind==='perlage'){
+    /* overlapping circular grains, laid in rows and offset like brickwork */
+    const d=Math.max(r*.10,2.2);
+    let row=0;
+    for(let y=-r*1.5;y<r*1.5;y+=d*.62,row++){
+      for(let x=-r*1.6+(row%2?d*.34:0);x<r*1.6;x+=d*.68){
+        const g=c.createRadialGradient(x-d*.22,y-d*.22,0,x,y,d*.55);
+        g.addColorStop(0,warm?'rgba(255,240,208,.34)':'rgba(255,255,255,.30)');
+        g.addColorStop(1,'rgba(0,0,0,.14)');
+        c.fillStyle=g;c.beginPath();c.arc(x,y,d*.55,0,TAU);c.fill();
+      }
+    }
+  }else if(kind==='frosted'){
+    for(let i=0;i<520;i++){
+      const x=(rnd()*2-1)*r*1.5,y=(rnd()*2-1)*r*1.5;
+      c.fillStyle=rnd()>.5?'rgba(255,255,255,.16)':'rgba(0,0,0,.14)';
+      c.fillRect(x,y,r*.018,r*.018);
+    }
+  }else{ /* straight graining */
+    const step=Math.max(r*.02,1);
+    for(let y=-r*1.5;y<r*1.5;y+=step){
+      c.fillStyle=rnd()>.5?'rgba(255,255,255,.10)':'rgba(0,0,0,.09)';
+      c.fillRect(-r*1.6,y,r*3.2,step*.6);
+    }
+  }
+  c.restore();
+}
+/* anglage: the chamfer along a bridge edge, polished until it throws a line of light */
+function anglage(c,pathFn,r){
+  c.save();pathFn();c.lineWidth=Math.max(r*.022,1.2);
+  c.strokeStyle='rgba(255,255,255,.62)';c.stroke();
+  c.lineWidth=Math.max(r*.010,.6);c.strokeStyle='rgba(0,0,0,.42)';c.stroke();
+  c.restore();
+}
+function jewel(c,x,y,r,sunk){
+  if(sunk){ /* a gold chaton: the jewel sits in a screwed gold setting */
+    c.fillStyle='#c9a34e';c.beginPath();c.arc(x,y,r*1.85,0,TAU);c.fill();
+    c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=Math.max(r*.2,.5);c.stroke();
+    for(let i=0;i<3;i++){const a=i*TAU/3-.5;
+      c.fillStyle='#8f7433';c.beginPath();c.arc(x+Math.cos(a)*r*2.6,y+Math.sin(a)*r*2.6,r*.62,0,TAU);c.fill();}
+  }
+  const g=c.createRadialGradient(x-r*.35,y-r*.35,0,x,y,r);
+  g.addColorStop(0,JEWELHI);g.addColorStop(1,JEWEL);
+  c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
+  c.fillStyle='rgba(0,0,0,.45)';c.beginPath();c.arc(x,y,r*.34,0,TAU);c.fill();
+}
+function blueScrew(c,x,y,r,blued){
+  const g=c.createRadialGradient(x-r*.3,y-r*.3,0,x,y,r);
+  if(blued){g.addColorStop(0,'#6d8fd8');g.addColorStop(.6,'#33529e');g.addColorStop(1,'#1d2f63');}
+  else{g.addColorStop(0,'#e6e9ec');g.addColorStop(.6,'#9aa0a6');g.addColorStop(1,'#5f6469');}
+  c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
+  c.strokeStyle='rgba(0,0,0,.55)';c.lineWidth=Math.max(r*.22,.7);
+  c.beginPath();c.moveTo(x-r*.72,y);c.lineTo(x+r*.72,y);c.stroke();
+}
+/* a toothed wheel, drawn from its pitch circle out */
+function wheel(c,x,y,r,teeth,spokes,warm){
+  c.save();c.translate(x,y);
+  c.fillStyle=warm?'#b8912f':'#b9a06a';
+  c.beginPath();
+  for(let i=0;i<teeth;i++){
+    const a=i*TAU/teeth, a2=a+TAU/teeth*.46;
+    c.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+    c.lineTo(Math.cos(a2)*r*.90,Math.sin(a2)*r*.90);
+  }
+  c.closePath();c.fill();
+  c.strokeStyle='rgba(0,0,0,.30)';c.lineWidth=Math.max(r*.03,.4);c.stroke();
+  /* crossings-out: the spokes a finisher files by hand */
+  c.fillStyle='rgba(0,0,0,.30)';
+  for(let i=0;i<spokes;i++){
+    const a=i*TAU/spokes;
+    c.save();c.rotate(a);
+    c.beginPath();c.moveTo(r*.16,-r*.10);c.lineTo(r*.80,-r*.055);
+    c.lineTo(r*.80,r*.055);c.lineTo(r*.16,r*.10);c.closePath();c.fill();
+    c.restore();
+  }
+  c.fillStyle=warm?'#8f7433':'#8d8069';
+  c.beginPath();c.arc(0,0,r*.17,0,TAU);c.fill();
+  c.restore();
+}
+/* the layout of the calibre: where the balance, barrel and train sit */
+function mvPlan(R){
+  return {
+    plate:R*.855,
+    bal  :{x:-R*.34,y: R*.34,r:R*.235},   /* balance, lower left */
+    esc  :{x:-R*.08,y: R*.44,r:R*.085},   /* escape wheel */
+    barr :{x: R*.30,y:-R*.30,r:R*.28},    /* mainspring barrel, upper right */
+    tr   :[{x:R*.06,y:-R*.02,r:R*.16},{x:-R*.12,y:R*.14,r:R*.13}]
+  };
+}
+function drawMovement(c,R,fam,M){
+  seed(1301+Math.round(S.size*7)+S.vph/1000+S.jewels);
+  const warm=(S.metal==='yellow'||S.metal==='rose');
+  const P=mvPlan(R);
+  const sunk=(S.screws==='blued'&&S.arch!=='skeleton'&&S.jewels>=25);
+
+  /* ————— the case back: a ring of case metal, notched for the tool ————— */
+  c.save();
+  fam.path(c,R*1.02);
+  c.fillStyle=metalFill(c,R,S.metal,S.finish);c.fill();
+  c.strokeStyle='rgba(0,0,0,.45)';c.lineWidth=Math.max(R*.008,1);c.stroke();
+  /* the six notches a case knife engages */
+  c.save();
+  for(let i=0;i<6;i++){
+    const a=i*TAU/6+.4;
+    c.save();c.rotate(a);
+    c.fillStyle='rgba(0,0,0,.30)';
+    c.fillRect(R*.90,-R*.028,R*.11,R*.056);
+    c.restore();
+  }
+  c.restore();
+  /* the engraving that circles the sapphire */
+  c.save();
+  c.fillStyle=shade(M.ink,.18);c.textAlign='center';c.textBaseline='middle';
+  c.font=`400 ${R*.052}px ${FONTS.grot}`;
+  if(c.letterSpacing!==undefined)c.letterSpacing=`${R*.016}px`;
+  const rim=R*.935;
+  const top=`${calibre()} · ${S.jewels} JEWELS · ${S.vph.toLocaleString('en-US')} A/H`;
+  const bot=`${dims().wr} M · SAPPHIRE · ${S.name?S.name.toUpperCase():'SEMI'}`;
+  arcText(c,top,rim,-Math.PI/2,1,R*.052);
+  arcText(c,bot,rim, Math.PI/2,-1,R*.052);
+  c.restore();
+
+  /* ————— the sapphire aperture ————— */
+  c.save();
+  c.beginPath();c.arc(0,0,R*.875,0,TAU);
+  c.fillStyle='#15161a';c.fill();
+  c.strokeStyle='rgba(0,0,0,.6)';c.lineWidth=Math.max(R*.012,1);c.stroke();
+  c.clip();
+
+  /* the main plate, finished all over */
+  c.beginPath();c.arc(0,0,P.plate,0,TAU);
+  c.fillStyle=mvMetal(c,P.plate,warm);c.fill();
+  c.save();c.beginPath();c.arc(0,0,P.plate,0,TAU);c.clip();
+  mvFinishFill(c,P.plate,'perlage',warm,0);
+  c.restore();
+
+  /* the going train, seen through whatever the architecture leaves open */
+  if(S.arch!=='full'){
+    wheel(c,P.barr.x,P.barr.y,P.barr.r*.92,64,0,warm);
+    P.tr.forEach((t,i)=>wheel(c,t.x,t.y,t.r,52-i*8,4,warm));
+    wheel(c,P.esc.x,P.esc.y,P.esc.r,15,3,warm);
+  }
+
+  /* ————— bridges ————— */
+  const bridgeFills=[];
+  const plateEdge=()=>{c.beginPath();c.arc(0,0,P.plate,0,TAU);};
+  const bridge=(fn)=>{
+    c.save();fn();c.clip();
+    c.fillStyle=mvMetal(c,P.plate,warm);c.fillRect(-R,-R,R*2,R*2);
+    mvFinishFill(c,P.plate,S.mvFinish,warm,S.arch==='threeq'?.15:-.35);
+    c.restore();
+    /* the chamfer, and the shadow it casts on the plate below */
+    c.save();fn();
+    c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=R*.045;c.shadowOffsetY=R*.012;
+    c.strokeStyle='rgba(0,0,0,.001)';c.lineWidth=1;c.stroke();c.restore();
+    anglage(c,fn,R);
+    bridgeFills.push(fn);
+  };
+  if(S.arch==='threeq'){
+    /* one plate over everything, pierced only for the balance */
+    bridge(()=>{
+      c.beginPath();
+      c.arc(0,0,P.plate,0,TAU);
+      c.arc(P.bal.x,P.bal.y,P.bal.r*1.32,0,TAU,true);
+    });
+  }else if(S.arch==='full'){
+    bridge(()=>{c.beginPath();c.arc(0,0,P.plate,0,TAU);});
+  }else if(S.arch==='skeleton'){
+    /* only the load paths remain */
+    bridge(()=>{
+      c.beginPath();
+      c.arc(0,0,P.plate,0,TAU);
+      c.arc(P.barr.x,P.barr.y,P.barr.r*.80,0,TAU,true);
+      c.arc(P.bal.x,P.bal.y,P.bal.r*1.30,0,TAU,true);
+      P.tr.forEach(t=>c.arc(t.x,t.y,t.r*.84,0,TAU,true));
+      c.arc(P.esc.x,P.esc.y,P.esc.r*1.25,0,TAU,true);
+      c.arc(0,0,P.plate*.30,0,TAU,true);
+    });
+  }else{
+    /* separate bridges: barrel, train, and the balance cock on top */
+    bridge(()=>{
+      c.beginPath();
+      c.moveTo(-R*.06,-P.plate*.98);
+      c.arc(0,0,P.plate,-Math.PI*.52,Math.PI*.14);
+      c.lineTo(R*.30,R*.06);
+      c.quadraticCurveTo(R*.10,-R*.02,R*.04,-R*.30);
+      c.closePath();
+    });
+    bridge(()=>{
+      c.beginPath();
+      c.moveTo(-P.plate*.98,R*.02);
+      c.arc(0,0,P.plate,Math.PI*.99,Math.PI*.46,true);
+      c.lineTo(-R*.02,-R*.40);
+      c.quadraticCurveTo(-R*.30,-R*.30,-R*.42,-R*.06);
+      c.closePath();
+    });
+  }
+
+  /* jewels sit where the pivots run: two per wheel, plus the escapement's */
+  const holes=[P.barr,...P.tr,P.esc,{x:P.bal.x,y:P.bal.y,r:P.bal.r}];
+  const jr=Math.max(R*.030,1.4);
+  holes.forEach((h,i)=>jewel(c,h.x,h.y,jr,sunk&&i<3));
+  /* and the count the customer paid for, scattered where a calibre puts them */
+  const extra=Math.max(0,Math.min(18,S.jewels-holes.length*2));
+  for(let i=0;i<extra;i++){
+    const a=rnd()*TAU, rr=P.plate*(.30+rnd()*.60);
+    jewel(c,Math.cos(a)*rr,Math.sin(a)*rr,jr*.86,false);
+  }
+  /* screws, in blue or in steel */
+  const blued=S.screws==='blued';
+  const sr=Math.max(R*.028,1.3);
+  for(let i=0;i<9;i++){
+    const a=i*TAU/9+.7, rr=P.plate*(.55+((i*37)%40)/100*.55);
+    blueScrew(c,Math.cos(a)*rr,Math.sin(a)*rr,sr,blued);
+  }
+
+  /* ————— the winding rotor ————— */
+  if(S.rotor==='full'){
+    c.save();
+    c.beginPath();c.arc(0,0,P.plate*.99,-Math.PI*.08,Math.PI*.92);c.closePath();
+    c.clip();
+    c.fillStyle=mvMetal(c,P.plate,warm);c.fillRect(-R,-R,R*2,R*2);
+    mvFinishFill(c,P.plate,S.mvFinish,warm,.2);
+    /* the heavy segment: a denser metal, so the rotor has inertia */
+    c.beginPath();c.arc(0,0,P.plate*.99,-Math.PI*.08,Math.PI*.92);
+    c.arc(0,0,P.plate*.66,Math.PI*.92,-Math.PI*.08,true);c.closePath();
+    c.fillStyle=warm?'rgba(120,86,30,.55)':'rgba(64,68,74,.55)';c.fill();
+    c.restore();
+    anglage(c,()=>{c.beginPath();c.arc(0,0,P.plate*.99,-Math.PI*.08,Math.PI*.92);c.closePath();},R);
+    c.fillStyle='rgba(255,255,255,.5)';c.textAlign='center';c.textBaseline='middle';
+    c.font=`400 ${R*.058}px ${FONTS.grot}`;
+    c.save();c.rotate(Math.PI*.42);c.fillText('SEMI',0,-P.plate*.82);c.restore();
+  }else if(S.rotor==='micro'){
+    c.save();c.translate(-R*.30,-R*.36);
+    c.beginPath();c.arc(0,0,R*.38,0,TAU);
+    c.fillStyle=mvMetal(c,R*.38,warm);c.fill();
+    c.save();c.clip();mvFinishFill(c,R*.38,S.mvFinish,warm,.6);c.restore();
+    anglage(c,()=>{c.beginPath();c.arc(0,0,R*.38,0,TAU);},R);
+    c.restore();
+  }else if(S.rotor==='peri'){
+    c.save();
+    c.beginPath();c.arc(0,0,P.plate*1.00,0,TAU);c.arc(0,0,P.plate*.88,0,TAU,true);
+    c.fillStyle=mvMetal(c,P.plate,warm);c.fill('evenodd');
+    c.restore();
+    anglage(c,()=>{c.beginPath();c.arc(0,0,P.plate*.94,0,TAU);},R);
+  }
+  c.restore(); /* sapphire clip */
+  c.restore(); /* case back */
+}
+/* text set around an arc — the way a caseback is engraved */
+function arcText(c,str,r,mid,dir,size){
+  const per=size*.62;
+  const total=str.length*per/r;
+  let a=mid-dir*total/2+dir*per/(2*r);
+  for(let i=0;i<str.length;i++){
+    c.save();c.rotate(a);c.translate(0,-r*dir);
+    if(dir<0)c.rotate(Math.PI);
+    c.fillText(str[i],0,0);c.restore();
+    a+=dir*per/r;
+  }
+}
+/* the balance: the only part of a watch that is always moving.
+   it does not glide — it beats, at exactly the rate chosen. */
+function drawBalance(c,R,t){
+  const P=mvPlan(R), warm=(S.metal==='yellow'||S.metal==='rose');
+  const b=P.bal;
+  const hz=S.vph/7200;                       /* full oscillations per second */
+  const amp=Math.PI*1.45;                    /* ±260°, a healthy amplitude */
+  const ang=Math.sin(t/1000*TAU*hz)*amp;
+  c.save();c.translate(b.x,b.y);
+  /* the cock that carries it */
+  c.save();
+  c.beginPath();c.arc(0,0,b.r*1.30,-Math.PI*.15,Math.PI*.62);
+  c.lineTo(b.r*1.9,b.r*.9);c.closePath();
+  c.fillStyle=mvMetal(c,b.r,warm);c.fill();
+  c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=Math.max(b.r*.05,1);c.stroke();
+  c.restore();
+  /* hairspring: a breguet overcoil, turning with the wheel */
+  c.save();c.rotate(ang*.32);
+  c.strokeStyle='rgba(220,225,232,.85)';c.lineWidth=Math.max(b.r*.026,.7);
+  c.beginPath();
+  for(let i=0;i<=150;i++){const k=i/150,a=k*TAU*3.1,rr=b.r*(.13+k*.50);
+    const x=Math.cos(a)*rr,y=Math.sin(a)*rr;i?c.lineTo(x,y):c.moveTo(x,y);}
+  c.stroke();c.restore();
+  /* the wheel itself */
+  c.save();c.rotate(ang);
+  c.strokeStyle=warm?'#c49a48':'#b9bcc0';c.lineWidth=Math.max(b.r*.11,1.4);
+  c.beginPath();c.arc(0,0,b.r*.86,0,TAU);c.stroke();
+  c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=Math.max(b.r*.035,.5);
+  c.beginPath();c.arc(0,0,b.r*.86,0,TAU);c.stroke();
+  c.strokeStyle=warm?'#a8802f':'#93979b';c.lineWidth=Math.max(b.r*.075,1);
+  for(let i=0;i<2;i++){c.save();c.rotate(i*Math.PI/2);
+    c.beginPath();c.moveTo(-b.r*.86,0);c.lineTo(b.r*.86,0);c.stroke();c.restore();}
+  /* timing screws around the rim */
+  for(let i=0;i<8;i++){const a=i*TAU/8;
+    c.fillStyle=warm?'#8f6c26':'#7f8388';
+    c.beginPath();c.arc(Math.cos(a)*b.r*.86,Math.sin(a)*b.r*.86,b.r*.10,0,TAU);c.fill();}
+  c.fillStyle=warm?'#c9a34e':'#d3d7da';
+  c.beginPath();c.arc(0,0,b.r*.13,0,TAU);c.fill();
+  c.restore();
+  jewel(c,0,0,Math.max(b.r*.10,1.2),false);
+  c.restore();
+  /* the escape wheel advances one tooth per beat — the tick you can see */
+  const beats=Math.floor(t/1000*(S.vph/3600));
+  c.save();c.translate(P.esc.x,P.esc.y);c.rotate(beats*TAU/45);
+  wheel(c,0,0,P.esc.r,15,3,warm);
+  c.restore();
+}
+/* ————— the room: a surface for the watch to sit on ————— */
+function drawRoom(c,w,h,R,L){
+  const cy=h/2, horizon=cy+R*1.62;
+  if(L.ground<=0)return;
+  /* the plane */
+  const g=c.createLinearGradient(0,horizon-R*.5,0,h);
+  const pale=L.bg==='#e7e2d6';
+  g.addColorStop(0,pale?'rgba(255,255,255,0)':'rgba(255,255,255,0)');
+  g.addColorStop(.35,pale?`rgba(255,255,255,${L.ground*.5})`:`rgba(255,250,236,${L.ground*.055})`);
+  g.addColorStop(1,pale?`rgba(190,182,166,${L.ground*.35})`:`rgba(0,0,0,${L.ground*.5})`);
+  c.fillStyle=g;c.fillRect(0,horizon-R*.5,w,h-horizon+R*.5);
+  /* the seam where the sweep meets the plane */
+  c.strokeStyle=pale?`rgba(150,142,126,${L.ground*.30})`:`rgba(255,246,226,${L.ground*.055})`;
+  c.lineWidth=1;c.beginPath();c.moveTo(0,horizon);c.lineTo(w,horizon);c.stroke();
+  /* contact shadow: tight under the case, thrown away from the key light */
+  const dir=Math.cos(L.key)>0?1:-1;
+  c.save();
+  c.translate(w/2+R*.30*dir*L.strength,horizon-R*.06);
+  c.scale(1,.19);
+  const sg=c.createRadialGradient(0,0,0,0,0,R*1.55);
+  sg.addColorStop(0,pale?`rgba(88,82,70,${.42*L.ground*2})`:`rgba(0,0,0,${.72})`);
+  sg.addColorStop(.55,pale?`rgba(88,82,70,${.16*L.ground*2})`:'rgba(0,0,0,.34)');
+  sg.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=sg;c.beginPath();c.arc(0,0,R*1.55,0,TAU);c.fill();
+  c.restore();
+}
 /* ————— static layers are cached; only the hands move ————— */
 const base=document.createElement('canvas');
 const BX=base.getContext('2d');
@@ -1771,16 +2515,33 @@ function renderBase(){
   const X=BX;
   X.setTransform(DPR,0,0,DPR,0,0);
   X.clearRect(0,0,w,h);
-  X.fillStyle=S.bg;X.fillRect(0,0,w,h);
+  const L=LIGHT[S.light]||LIGHT.softbox;
+  S.bg=L.bg;
+  X.fillStyle=L.bg;X.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
   const R=Math.min(w,h)*.185*(S.size/38);
-  geom={R,dR:0,w,h,profile:S.view==='profile'};
+  geom={R,dR:0,w,h,profile:S.view==='profile',movement:S.view==='movement'};
   /* a zero-sized canvas (hidden tab, collapsed layout) would make every
      radius-relative step zero — never start drawing into nothing */
   if(!(R>1))return;
+  /* the key light falls across the whole scene, not just the watch */
+  X.save();
+  const kg=X.createRadialGradient(w/2+Math.cos(L.key)*w*.34,h/2+Math.sin(L.key)*h*.42,0,
+                                  w/2,h/2,Math.max(w,h)*(.55*L.spread+.35));
+  kg.addColorStop(0,`rgba(255,247,230,${.10*L.strength})`);
+  kg.addColorStop(1,'rgba(255,247,230,0)');
+  X.fillStyle=kg;X.fillRect(0,0,w,h);
+  X.restore();
+  drawRoom(X,w,h,R,L);
   if(S.view==='profile'){
     X.save();X.translate(w/2,h/2);
     drawProfile(X,R*1.05,fam,M);
+    X.restore();
+    return;
+  }
+  if(S.view==='movement'){
+    X.save();X.translate(w/2,h/2);
+    drawMovement(X,R,fam,M);
     X.restore();
     return;
   }
@@ -1835,10 +2596,22 @@ function render(){
   X.clearRect(0,0,w,h);
   X.drawImage(base,0,0,w,h);
   if(geom.profile)return;   /* no hands visible from the side */
+  if(geom.movement){        /* the only moving part is the one that matters */
+    X.save();X.translate(w/2,h/2);
+    X.beginPath();X.arc(0,0,R*.875,0,TAU);X.clip();
+    drawBalance(X,R,Date.now());
+    X.restore();
+    return;
+  }
   const M=METAL[S.metal],D=DIALCOL[S.dialCol];
   X.save();X.translate(w/2,h/2);
   X.save();X.beginPath();X.arc(0,0,dR,0,TAU);X.clip();
-  const now=new Date(),sec=now.getSeconds()+now.getMilliseconds()/1000;
+  const now=new Date();
+  /* a mechanical watch does not sweep. it advances one beat at a time,
+     S.vph/3600 times a second, and that cadence is the whole tell. */
+  const raw=now.getSeconds()+now.getMilliseconds()/1000;
+  const bps=S.vph/3600;
+  const sec=Math.floor(raw*bps)/bps;
   const blue=S.handMat==='blued';
   /* GMT: a fourth hand, one turn a day */
   if(S.comp==='gmt'){
@@ -1854,13 +2627,29 @@ function render(){
   X.save();X.rotate((now.getMinutes()+sec/60)*TAU/60);
   drawHand(X,S.hands,dR*.80,dR*.042,M,S.lume,blue);X.restore();
   if(S.comp==='chrono2'||S.comp==='chrono3'){
-    /* a chronograph at rest: the central hand is parked at twelve */
-    X.save();
+    /* the running seconds register at nine turns whether the chronograph is
+       engaged or not — it is the movement's own seconds, not the stopwatch's */
+    X.save();X.translate(-dR*.50,0);X.rotate(sec*TAU/60);
+    X.strokeStyle=dialInk();X.lineWidth=dR*.012;X.lineCap='round';
+    X.beginPath();X.moveTo(0,dR*.05);X.lineTo(0,-dR*.16);X.stroke();
+    X.restore();
+    /* the stopwatch itself: started, stopped and reset by the pushers */
+    const e=chronoElapsed();
+    X.save();X.rotate((e%60)*TAU/60);
     X.strokeStyle='#c9391b';X.lineWidth=dR*.017;X.lineCap='round';
     X.beginPath();X.moveTo(0,dR*.20);X.lineTo(0,-dR*.88);X.stroke();
     X.fillStyle='#c9391b';
     X.beginPath();X.arc(0,dR*.20,dR*.030,0,TAU);X.fill();
     X.restore();
+    /* the elapsed-minute counter at three, and the hour counter at six */
+    X.save();X.translate(dR*.50,0);X.rotate(Math.min(e/60,30)*TAU/30);
+    X.strokeStyle=dialInk();X.lineWidth=dR*.014;X.lineCap='round';
+    X.beginPath();X.moveTo(0,dR*.05);X.lineTo(0,-dR*.17);X.stroke();X.restore();
+    if(S.comp==='chrono3'){
+      X.save();X.translate(0,dR*.50);X.rotate(Math.min(e/3600,12)*TAU/12);
+      X.strokeStyle=dialInk();X.lineWidth=dR*.014;X.lineCap='round';
+      X.beginPath();X.moveTo(0,dR*.05);X.lineTo(0,-dR*.17);X.stroke();X.restore();
+    }
   }else if(S.comp!=='small'&&S.comp!=='moon'){
     X.save();X.rotate(sec*TAU/60);
     X.strokeStyle=blue?'#3f63c4':'#c9391b';X.lineWidth=dR*.014;X.lineCap='round';
@@ -1882,56 +2671,136 @@ function render(){
    PANEL
    ============================================================ */
 const TABS=[
-  {k:'start',n:'Start'},{k:'case',n:'Case'},{k:'bezel',n:'Bezel'},{k:'dial',n:'Dial'},
-  {k:'index',n:'Indices'},{k:'comp',n:'Functions'},{k:'hands',n:'Hands'},
+  {k:'start',n:'Start'},{k:'movement',n:'Movement'},{k:'case',n:'Case'},{k:'bezel',n:'Bezel'},
+  {k:'dial',n:'Dial'},{k:'index',n:'Indices'},{k:'comp',n:'Functions'},{k:'hands',n:'Hands'},
   {k:'strap',n:'Strap'},{k:'finish',n:'Finish'}
 ];
 let tab='start';
-function chips(title,opts,cur,cb,swatch){
+/* a technical word you can ask about, inline, without leaving the control */
+function TERM(word,term){
+  return `<button class="term" type="button" data-term="${term||word}">${word}</button>`;
+}
+function chips(title,opts,cur,cb,swatch,desc){
   const g=document.createElement('div');g.className='grp';
   /* the header carries the live value — you always know where you stand */
   const sel=opts.filter(o=>o.v===cur)[0];
   g.innerHTML=`<h4>${title}${sel?`<em>${swatch?(sel.n||''):sel.n}</em>`:''}</h4>`;
   const box=document.createElement('div');box.className='chips';
   opts.forEach(o=>{
-    const b=document.createElement('div');
-    b.className='chip'+(swatch?' sw':'')+(o.v===cur?' on':'');
-    if(swatch)b.style.background=o.c; else b.textContent=o.n;
-    if(swatch)b.title=o.n;
-    b.onclick=()=>{cb(o.v);build();paint();};
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='chip'+(swatch?' sw':'');
+    b.setAttribute('aria-pressed',o.v===cur?'true':'false');
+    if(swatch){b.style.setProperty('--swc',o.c);b.style.background=o.c;
+      b.setAttribute('aria-label',o.n);b.title=o.n;}
+    else b.textContent=o.n;
+    if(o.off){b.disabled=true;b.title=o.off;}
+    b.onclick=()=>{snapshot();cb(o.v);build();paint();};
     box.appendChild(b);
   });
-  g.appendChild(box);return g;
+  g.appendChild(box);
+  /* the explanation of what you just chose — this is the teaching */
+  if(desc&&sel&&desc[sel.v]){
+    const p=document.createElement('p');p.className='note';p.style.marginTop='11px';
+    p.innerHTML=desc[sel.v];g.appendChild(p);
+  }
+  return g;
 }
+let _sid=0;
 function slider(title,min,max,step,val,unit,cb){
   const g=document.createElement('div');g.className='row';
-  g.innerHTML=`<label>${title}</label>`;
+  const id='sl'+(++_sid);
+  g.innerHTML=`<label for="${id}">${title}</label>`;
   const i=document.createElement('input');
-  i.type='range';i.min=min;i.max=max;i.step=step;i.value=val;
+  i.type='range';i.id=id;i.min=min;i.max=max;i.step=step;i.value=val;
   const o=document.createElement('output');o.textContent=val+unit;
-  i.oninput=()=>{o.textContent=(+i.value)+unit;cb(+i.value);paint();};
+  i.setAttribute('aria-valuetext',val+unit);
+  let pending=0;
+  i.oninput=()=>{o.textContent=(+i.value)+unit;i.setAttribute('aria-valuetext',(+i.value)+unit);
+    cb(+i.value);paint();clearTimeout(pending);pending=setTimeout(snapshot,600);};
   g.appendChild(i);g.appendChild(o);return g;
 }
 const SECTION={
-  start:{n:'The commission',h:'Begin from a finished design, choose how you wish to view it, and give the piece a name.'},
+  start:{n:'The commission',h:'Begin from a reference design, choose how you wish to view it, and give the piece a name.'},
+  movement:{n:'The movement',h:'The calibre everything else is built around. Choose it first — its height, its rotor and its beat decide what the case can be.'},
   case:{n:'The case',h:'The body of the watch. Shape and diameter set its character; the metal and its finish set the mood.'},
   bezel:{n:'The bezel',h:'The ring that frames the crystal. Plain for a dress watch, a working scale for an instrument.'},
   dial:{n:'The dial',h:'The face. Colour and texture — or an art dial, which arrives with its own palette.'},
   index:{n:'The indices',h:'The hour markers, and how they are made: separate pieces of metal set onto the dial, or printed flat.'},
   comp:{n:'The complications',h:'Everything the movement does beyond telling the hour.'},
   hands:{n:'The hands',h:'What the eye finds first. Each pattern balances the dial differently.'},
-  strap:{n:'The bracelet',h:'How the watch meets the wrist. Hide, fabric, or articulated links.'},
-  finish:{n:'The delivery',h:'Name the piece, then take it with you — as an image, a certificate, or a link.'}
+  strap:{n:'The strap & bracelet',h:'How the watch meets the wrist. Hide and fabric are straps; articulated metal is a bracelet.'},
+  finish:{n:'The delivery',h:'Name the piece, keep it on your shelf, then take it with you — as an image, a certificate, or a link.'}
 };
+function bigbtn(label,fn,ghost){
+  const b=document.createElement('button');b.type='button';
+  b.className='bigbtn'+(ghost?' ghost':'');
+  b.appendChild(document.createTextNode(label));
+  b.onclick=fn;return b;
+}
+/* ————— the shelf, wherever it is needed ————— */
+function shelfBlock(add){
+  const a=loadShelf();
+  const g=document.createElement('div');g.className='grp';
+  g.innerHTML=`<h4>Your shelf<em>${a.length?a.length+' saved':'empty'}</em></h4>`;
+  if(!a.length){
+    g.innerHTML+='<p class="note">Designs you save are kept in this browser and survive a refresh. Press <b>S</b>, or use <b>Save to my shelf</b> in Chapter 10.</p>';
+    add(g);return;
+  }
+  const box=document.createElement('div');box.className='shelf';
+  a.forEach((it,i)=>{
+    const fig=document.createElement('figure');
+    const cvs=document.createElement('canvas');cvs.width=cvs.height=150;
+    cvs.style.cursor='pointer';
+    const btn=document.createElement('button');btn.type='button';
+    btn.style.cssText='background:none;border:0;padding:0;width:100%;cursor:pointer';
+    btn.setAttribute('aria-label','Load '+it.n);
+    btn.appendChild(cvs);
+    btn.onclick=()=>{snapshot();Object.assign(S,it.s);build();paint();announce(it.n+' loaded from your shelf');};
+    const cap=document.createElement('figcaption');cap.textContent=it.n;
+    const del=document.createElement('button');del.type='button';del.className='del';del.textContent='×';
+    del.setAttribute('aria-label','Remove '+it.n);
+    del.onclick=e=>{e.stopPropagation();const x=loadShelf();x.splice(i,1);saveShelf(x);build();announce('Removed');};
+    fig.appendChild(btn);fig.appendChild(cap);fig.appendChild(del);box.appendChild(fig);
+    thumb(cvs,it.s);
+  });
+  g.appendChild(box);
+  if(a.length){
+    const cb=document.createElement('button');cb.type='button';cb.className='bigbtn ghost';
+    cb.style.marginTop='12px';
+    cb.appendChild(document.createTextNode(CMP.on?'Stop comparing':'Compare against the newest saved'));
+    cb.onclick=()=>{CMP.on?compareOff():compareWith(a[0].s);build();};
+    g.appendChild(cb);
+  }
+  add(g);
+}
+function specPlain(){
+  const d=dims();
+  return [`Calibre ${calibre()} · ${S.jewels} jewels · ${S.vph.toLocaleString('en-US')} A/h · ${S.pr} h · ${ROTORS[S.rotor].n}`,
+    `${FAMILY[S.family].n} case · ${d.d} mm × ${d.thick} mm · ${d.l2l} mm lug to lug · ${METAL[S.metal].name} · ${d.wr} m`,
+    `${ARTDIAL[S.texture]?TEXTURES[S.texture]:DIALCOL[S.dialCol].name+' '+TEXTURES[S.texture].toLowerCase()} dial · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp]}`,
+    `${HANDS[S.hands]} hands · ${BEZELS[S.bezel]} bezel · ${CRYSTN[S.crystal]} crystal · ${STRAPN[S.strap]}`].join('\n');
+}
 function build(){
   const T=document.getElementById('rail');
   T.innerHTML='';
   TABS.forEach((t,i)=>{
-    const d=document.createElement('div');
-    d.className='rl'+(t.k===tab?' on':'');
-    d.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b>`;
-    d.title=SECTION[t.k]?SECTION[t.k].n:t.n;
+    const d=document.createElement('button');
+    d.type='button';d.className='rl';d.setAttribute('role','tab');
+    d.setAttribute('aria-selected',t.k===tab?'true':'false');
+    d.tabIndex=t.k===tab?0:-1;
+    const nm=SECTION[t.k]?SECTION[t.k].n:t.n;
+    d.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b><i>${t.n}</i>`;
+    d.title=nm;d.setAttribute('aria-label','Chapter '+(i+1)+': '+nm);
     d.onclick=()=>{tab=t.k;build();document.getElementById('body').scrollTop=0;};
+    d.onkeydown=e=>{
+      const dirs={ArrowDown:1,ArrowRight:1,ArrowUp:-1,ArrowLeft:-1};
+      if(dirs[e.key]){e.preventDefault();
+        const n=(i+dirs[e.key]+TABS.length)%TABS.length;
+        tab=TABS[n].k;build();T.children[n].focus();}
+      if(e.key==='Home'){e.preventDefault();tab=TABS[0].k;build();T.children[0].focus();}
+      if(e.key==='End'){e.preventDefault();tab=TABS[TABS.length-1].k;build();T.children[TABS.length-1].focus();}
+    };
     T.appendChild(d);
   });
   const sec=SECTION[tab]||{n:tab,h:''};
@@ -1941,109 +2810,262 @@ function build(){
   document.getElementById('secHelp').textContent=sec.h;
   const B=document.getElementById('body');B.innerHTML='';
   const add=e=>B.appendChild(e);
+  /* ————— what a maison would say about this combination ————— */
+  advisories().forEach(a=>{
+    const d=document.createElement('div');d.className='advice';
+    const sp=document.createElement('span');
+    sp.innerHTML=`<b style="color:var(--ink)">${a.t}.</b> ${a.b} `;
+    const btn=document.createElement('button');btn.type='button';btn.textContent=a.fix;
+    btn.onclick=()=>{snapshot();a.act();build();paint();announce(a.fix+' — done');};
+    sp.appendChild(btn);
+    const lb=document.createElement('b');lb.textContent='Note';
+    d.appendChild(lb);d.appendChild(sp);add(d);
+  });
   if(tab==='start'){
     const g=document.createElement('div');g.className='grp';
-    g.innerHTML='<h4>Start from a design</h4>';
+    g.innerHTML='<h4>Start from a reference<em>'+PRESETS.length+' designs</em></h4>';
     const box=document.createElement('div');box.className='presets';
     PRESETS.forEach(p=>{
-      const card=document.createElement('div');card.className='pcard';
+      const card=document.createElement('button');card.type='button';card.className='pcard';
       const cvs=document.createElement('canvas');cvs.width=cvs.height=160;
       card.appendChild(cvs);
       const lb=document.createElement('span');lb.textContent=p.n;card.appendChild(lb);
-      card.onclick=()=>{Object.assign(S,p.s);S.name=p.n;build();paint();};
+      if(p.w){const em=document.createElement('em');em.textContent=p.w;card.appendChild(em);}
+      card.setAttribute('aria-label',p.n+(p.w?' — '+p.w+'. '+p.p:''));
+      card.title=p.p||p.n;
+      card.onclick=()=>{snapshot();Object.assign(S,p.s);S.name=p.n;build();paint();
+        announce(p.n+' loaded. '+(p.p||''));};
       box.appendChild(card);
       thumb(cvs,p.s);
     });
     g.appendChild(box);add(g);
-    add(chips('View',[{v:'studio',n:'Studio'},{v:'profile',n:'Profile'}],
-      S.view,v=>{S.view=v;if(v!=='studio'){S.tiltX=0;S.tiltY=0;}}));
+    const cur=PRESETS.filter(p=>p.n===S.name)[0];
+    if(cur&&cur.p){
+      const st=document.createElement('div');st.className='grp';
+      st.innerHTML=`<h4>Where this comes from<em>${cur.w}</em></h4><p class="note">${cur.p}</p>`;
+      add(st);
+    }
+    add(chips('View',[{v:'studio',n:'Dial side'},{v:'movement',n:'Movement'},{v:'profile',n:'Profile'}],
+      S.view,v=>{S.view=v;if(v!=='studio'){S.tiltX=0;S.tiltY=0;}},false,{
+        studio:'The face, lit and tilted. Drag the watch to turn it in the light.',
+        movement:'The caseback. The balance beats at the rate set in Chapter 02 — count it against a second hand.',
+        profile:'Edge on, where thickness, crystal shape and lug curve become visible.'}));
     if(S.view==='studio'){
       const t=document.createElement('div');t.className='grp';
-      t.innerHTML='<h4>Tilt</h4><p class="note">Drag the watch to turn it in the light. Double-click to lay it flat.</p>';
+      t.innerHTML='<h4>Tilt</h4><p class="note">Drag the watch to tilt it — the case flank appears and the reflection slides across the '+TERM('crystal')+'. Double-click, or press 0, to lay it flat.</p>';
       add(t);
     }
     const nm=document.createElement('div');nm.className='grp';
     nm.innerHTML='<h4>Name your design</h4>';
-    const inp=document.createElement('input');inp.className='tin';
+    const inp=document.createElement('input');inp.className='tin';inp.id='nameIn';
+    inp.setAttribute('aria-label','Name your design');
     inp.placeholder='e.g. Northline';inp.value=S.name;inp.maxLength=22;
-    inp.oninput=()=>{S.name=inp.value;paint();};
+    let np=0;
+    inp.oninput=()=>{S.name=inp.value;paint();clearTimeout(np);np=setTimeout(snapshot,800);};
     nm.appendChild(inp);add(nm);
+    shelfBlock(add);
+  }
+  else if(tab==='movement'){
+    const d=dims();
+    const g=document.createElement('div');g.className='grp';
+    g.innerHTML='<h4>The calibre<em>'+calibre()+'</em></h4>'+
+      '<p class="note">A watch is built outward from this. The '+TERM('rotor','Rotor')+' decides about a millimetre of case height, the '+
+      TERM('beat rate','Beat rate')+' decides how the seconds hand moves, and the '+TERM('architecture','Architecture')+
+      ' decides whether the caseback is worth opening at all.</p>';
+    add(g);
+    add(chips('Architecture',Object.keys(ARCH).map(k=>({v:k,n:ARCH[k].n})),S.arch,v=>S.arch=v,false,
+      Object.fromEntries(Object.keys(ARCH).map(k=>[k,ARCH[k].d]))));
+    add(chips('Winding',Object.keys(ROTORS).map(k=>({v:k,n:ROTORS[k].n})),S.rotor,v=>S.rotor=v,false,
+      Object.fromEntries(Object.keys(ROTORS).map(k=>[k,ROTORS[k].d]))));
+    add(chips('Beat rate',Object.keys(BEATS).map(k=>({v:+k,n:BEATS[k].n})),S.vph,v=>S.vph=v,false,
+      Object.fromEntries(Object.keys(BEATS).map(k=>[k,BEATS[k].d]))));
+    add(chips('Finishing',Object.keys(MVFIN).map(k=>({v:k,n:MVFIN[k].n})),S.mvFinish,v=>S.mvFinish=v,false,
+      Object.fromEntries(Object.keys(MVFIN).map(k=>[k,MVFIN[k].d]))));
+    add(chips('Screws',[{v:'blued',n:'Flame blued'},{v:'steel',n:'Polished steel'}],S.screws,v=>S.screws=v,false,{
+      blued:'Steel heated to about 290°C until it turns cornflower. The colour is an oxide layer a few atoms thick, and it is also rust-proofing.',
+      steel:'Left bright and mirror-polished. Far less forgiving of a slipped screwdriver.'}));
+    add(slider('Jewels',17,41,1,S.jewels,'',v=>S.jewels=v));
+    add(slider('Reserve',36,120,1,S.pr,' h',v=>S.pr=v));
+    const t=document.createElement('div');t.className='grp';
+    t.innerHTML='<h4>What this calibre is<em>'+d.hz+' Hz</em></h4>'+
+      '<p class="note">'+S.jewels+' jewels · '+S.vph.toLocaleString('en-US')+' A/h · '+S.pr+' hours · '+
+      ROTORS[S.rotor].n.toLowerCase()+'. Adds about <b>'+
+      (S.rotor==='manual'?0:S.rotor==='micro'?.6:S.rotor==='peri'?.5:1.3).toFixed(1)+' mm</b> to the case.<br>'+
+      'Switch to the <b>Movement</b> view in Chapter 01 and count the beats against a second hand — that cadence is the whole difference between a mechanical watch and a quartz one.</p>';
+    add(t);
   }
   else if(tab==='finish'){
+    const d=dims();
     const g=document.createElement('div');g.className='grp';
     g.innerHTML='<h4>Your instrument</h4>'+
-      `<p class="note">${S.name?'“'+S.name+'”':'Unnamed design'} — ready to export. `+
-      `The certificate carries the full specification and a serial number.</p>`;
+      '<p class="note">'+(S.name?'“'+S.name+'”':'Unnamed design')+' — '+calibre()+', '+d.d+' mm × '+d.thick+' mm, '+
+      d.l2l+' mm lug to lug, '+d.wr+' m. The certificate carries the full specification.</p>';
     add(g);
-    add(chips('Backdrop',[{v:'#121110',n:'Black'},{v:'#e7e2d6',n:'Bone'},{v:'#2a2119',n:'Walnut'},{v:'#5d5a54',n:'Concrete'}],S.bg,v=>S.bg=v));
-    const b1=document.createElement('div');b1.className='bigbtn';b1.textContent='Download image';
-    b1.onclick=download;add(b1);
-    const b2=document.createElement('div');b2.className='bigbtn';b2.textContent='Download certificate';
-    b2.onclick=certificate;add(b2);
-    const b0=document.createElement('div');b0.className='bigbtn ghost';b0.textContent='The vocabulary';
-    b0.onclick=()=>{buildGlossary();const gx=document.getElementById('gloss');gx.style.display='flex';requestAnimationFrame(()=>gx.classList.add('on'));};
-    add(b0);
-    const b3=document.createElement('div');b3.className='bigbtn ghost';b3.textContent='Copy shareable link';
-    b3.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
-      b3.textContent='Link copied';setTimeout(()=>b3.textContent='Copy shareable link',1600);};
+    add(chips('Lighting',Object.keys(LIGHT).map(k=>({v:k,n:LIGHT[k].n})),S.light,v=>S.light=v,false,
+      Object.fromEntries(Object.keys(LIGHT).map(k=>[k,LIGHT[k].d]))));
+    shelfBlock(add);
+    add(bigbtn('Download image',download));
+    add(bigbtn('Download certificate',certificate));
+    add(bigbtn('Save to my shelf',()=>{shelveCurrent();build();}));
+    add(bigbtn('The vocabulary',()=>openGloss(),true));
+    const b3=bigbtn('Copy shareable link',()=>{
+      navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
+      b3.firstChild.textContent='Link copied';announce('Link copied to your clipboard');
+      setTimeout(()=>{b3.firstChild.textContent='Copy shareable link';},1600);},true);
     add(b3);
+    const c=document.createElement('div');c.className='grp';c.style.marginTop='var(--s5)';
+    c.innerHTML='<h4>Have it made<em>or just say hello</em></h4>'+
+      '<p class="note">Semi does not sell watches. If you want this design worked up properly — a real technical '+
+      'drawing, or an introduction to someone who can case it — send the link with a note about what it is for.</p>';
+    const mail=document.createElement('a');mail.className='bigbtn';mail.style.textDecoration='none';
+    mail.textContent='Send this design to the studio';
+    mail.href='mailto:33fazirana@gmail.com?subject='+encodeURIComponent('Semi — '+(S.name||'a design'))+
+      '&body='+encodeURIComponent('Design: '+location.href+'\n\nSpecification:\n'+specPlain()+'\n\nWhat it is for:\n');
+    c.appendChild(mail);add(c);
   }
   else if(tab==='case'){
+    const d=dims();
     add(chips('Shape family',Object.keys(FAMILY).map(k=>({v:k,n:FAMILY[k].n})),S.family,v=>{
       S.family=v;if(FAMILY[v].slab)S.lug='none';else if(S.lug==='none')S.lug='straight';
-      if(FAMILY[v].slab&&['leather','rubber','canvas','nato'].includes(S.strap))S.strap='oyster';}));
+      if(FAMILY[v].slab&&['leather','rubber','canvas','nato'].includes(S.strap))S.strap='link3';}));
     add(slider('Diameter',34,44,.5,S.size,' mm',v=>S.size=v));
-    add(chips('Profile',Object.keys(THICK).map(k=>({v:k,n:THICK[k].n})),S.thick,v=>S.thick=v));
+    add(chips('Height',Object.keys(THICK).map(k=>({v:k,n:THICK[k].n})),S.thick,v=>S.thick=v));
+    add(chips('Crystal',Object.keys(CRYSTN).map(k=>({v:k,n:CRYSTN[k]})),S.crystal,v=>S.crystal=v,false,{
+      flat:'Sapphire, flat. Modern, honest, and the only shape with no distortion at the edge.',
+      domed:'A gentle curve. It picks up an arc of light and hides a millimetre of case height.',
+      ddomed:'Curved on both faces, so the dial reads undistorted while the outside still catches light.',
+      box:'A vertical wall with a flat top — the dial sits in a little vitrine. Vintage, fragile, and rarely sealed beyond 30 m.'}));
     add(chips('Lugs',Object.keys(LUGS).map(k=>({v:k,n:LUGS[k]})),S.lug,v=>S.lug=v));
+    if(!FAMILY[S.family].slab)add(slider('Lug width',16,24,1,S.lugW,' mm',v=>S.lugW=v));
     add(chips('Metal',Object.keys(METAL).map(k=>({v:k,n:METAL[k].name})),S.metal,v=>S.metal=v));
     add(chips('Finish',[{v:'polish',n:'Polished'},{v:'brush',n:'Brushed'},{v:'sand',n:'Sandblasted'}],S.finish,v=>S.finish=v));
+    const t=document.createElement('div');t.className='grp';
+    t.innerHTML='<h4>How it will wear<em>'+d.l2l+' mm lug to lug</em></h4>'+
+      '<p class="note"><b>'+d.d+' mm</b> across · <b>'+d.thick+' mm</b> tall · <b>'+d.l2l+' mm</b> lug to lug'+
+      (d.lugW?' · <b>'+d.lugW+' mm</b> lug width':' · integrated bracelet')+' · water resistant to <b>'+d.wr+' m</b>.<br>'+
+      'Lug-to-lug, not diameter, is the number that decides fit — under 46 mm sits on most wrists, over 50 mm overhangs.</p>';
+    add(t);
   }
   else if(tab==='bezel'){
-    add(chips('Bezel type',Object.keys(BEZELS).map(k=>({v:k,n:BEZELS[k]})),S.bezel,v=>S.bezel=v));
+    const chrono=(S.comp==='chrono2'||S.comp==='chrono3');
+    add(chips('Bezel type',Object.keys(BEZELS).map(k=>({v:k,n:BEZELS[k]})),S.bezel,v=>S.bezel=v,false,{
+      smooth:'Nothing at all. The dial is the whole event.',
+      coin:'Fine vertical knurling, cut so that wet fingers can still turn it.',
+      fluted:'Angled facets that throw light in every direction. Originally a functional thread that screwed the bezel down.',
+      dive:'A count-up scale. On any watch built to the diving standard it turns one way only — so a knock can shorten your dive, never lengthen it.',
+      gmt:'A 24-hour scale, read against a fourth hand to give a third time zone.',
+      tachy:'Time a measured mile with the chronograph and the scale reads average speed. It is 3600 divided by elapsed seconds, printed once.',
+      screws:'Exposed screws through the bezel into the case. Structural, and the reason the shape cannot be polished away.'}));
     add(slider('Bezel width',5,20,1,Math.round(S.bezelW*100),' %',v=>S.bezelW=v/100));
+    if(S.bezel==='dive'||S.bezel==='tachy'||S.bezel==='gmt'){
+      const t=document.createElement('div');t.className='grp';
+      t.innerHTML='<h4>Is this bezel doing anything?</h4><p class="note">'+
+        (S.bezel==='dive'?'A dive bezel needs a case that can actually be sealed — a screw-down crown and a gasketed back.'
+        :S.bezel==='tachy'?(chrono?'<b>Working.</b> The chronograph seconds hand reads against the scale.':'<b>Ornamental.</b> There is no chronograph hand to time against.')
+        :(S.comp==='gmt'?'<b>Working.</b> The fourth hand reads against the 24-hour scale.':'<b>Ornamental.</b> There is no 24-hour hand to read against.'))+
+        '</p>';
+      add(t);
+    }
   }
   else if(tab==='dial'){
     const plain=Object.keys(TEXTURES).filter(k=>!ARTDIAL[k]);
     const art=Object.keys(TEXTURES).filter(k=>ARTDIAL[k]);
     if(!ARTDIAL[S.texture])
       add(chips('Colour',Object.keys(DIALCOL).map(k=>({v:k,n:DIALCOL[k].name,c:DIALCOL[k].base})),S.dialCol,v=>S.dialCol=v,true));
-    add(chips('Finish',plain.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
+    add(chips('Finish',plain.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v,false,{
+      sunray:'Brushed outward from the centre so the light moves in a fan as the watch turns.',
+      matte:'No reflection at all. Everything is legibility.',
+      enamel:'Grand feu: powdered glass fired onto a copper base at 800°C, four times. Any firing can crack it, which is why enamel dials cost what they do.',
+      guilloche:'Engine-turned on a hand-cranked rose engine. The pattern only appears when light rakes across it.',
+      sector:'The face divided into fields so a reading can be taken without losing the count. A 1930s scientific convention.',
+      fume:'Pale at the centre, dark at the rim — sprayed, then lacquered.',
+      grain:'A fine sandblasted tooth. Reads as a photographic print rather than a mirror.',
+      tapestry:'A grid milled into the dial with a pantograph, one square at a time. Depth without colour.',
+      linen:'A woven cross-hatch, pressed into the brass before the colour goes on.'}));
     add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
-    add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v));
-    add(chips('Chapter ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v));
+    add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v,false,{
+      railroad:'Two concentric rings with the minutes between them. The most legible track ever drawn, and the reason it survives.',
+      ticks:'Plain minute strokes. Modern, quiet.',
+      dots:'A point per minute. Softest of the three.',
+      none:'No track. The dial becomes a graphic rather than an instrument.'}));
+    add(chips('Rehaut ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v,false,{
+      true:'A fine inner flange between the numerals and the minute track. Not the '+TERM('chapter ring','Chapter ring')+' — that is the ring the markings sit on.',
+      false:'The dial runs uninterrupted to the track.'}));
     add(chips('Emblem',[{v:'orbit',n:'Name only'},{v:'kanji',n:'蝉 above the name'}],S.brand,v=>S.brand=v));
     add(chips('Signature',[{v:'auto',n:'Automatic'},{v:'full',n:'Mark + name'},{v:'mark',n:'Mark only'},{v:'name',n:'Name only'},{v:'none',n:'Unsigned'}],S.sig,v=>S.sig=v));
   }
   else if(tab==='index'){
     add(chips('Index style',Object.keys(LAYOUTS).map(k=>({v:k,n:LAYOUTS[k]})),S.layout,v=>S.layout=v));
-    add(chips('Execution',[{v:'applied',n:'Applied metal'},{v:'printed',n:'Printed'}],S.indexMat,v=>S.indexMat=v));
+    add(chips('Execution',[{v:'applied',n:'Applied metal'},{v:'printed',n:'Printed'}],S.indexMat,v=>S.indexMat=v,false,{
+      applied:'Separate pieces of metal, each with two feet riveted through holes in the dial. They catch light and cast a shadow — that shadow is the whole point.',
+      printed:'Pad-printed flat. Cleaner to read, and the only honest option on a fired enamel dial.'}));
     add(chips('Numeral font',[{v:'grot',n:'Grotesque'},{v:'cond',n:'Condensed'},{v:'serif',n:'Serif'}],S.numFont,v=>S.numFont=v));
-    add(chips('Luminous',[{v:true,n:'Lumed'},{v:false,n:'None'}],S.lume,v=>S.lume=v));
+    add(chips('Luminous',[{v:true,n:'Lumed'},{v:false,n:'None'}],S.lume,v=>S.lume=v,false,{
+      true:'Super-LumiNova on the markers and hands. It is a phosphor, not radioactive — it charges in light and gives it back.',
+      false:'No lume. Correct on a dress watch, and the only option under fired enamel.'}));
   }
   else if(tab==='comp'){
     add(chips('Complication',[{v:'none',n:'Time only'},{v:'small',n:'Small seconds'},
       {v:'gmt',n:'GMT / 24h'},{v:'moon',n:'Moonphase'},{v:'power',n:'Power reserve'},
-      {v:'chrono2',n:'Chronograph, 2 registers'},{v:'chrono3',n:'Chronograph, 3 registers'}],S.comp,v=>S.comp=v));
+      {v:'chrono2',n:'Chronograph, 2 registers'},{v:'chrono3',n:'Chronograph, 3 registers'}],S.comp,v=>S.comp=v,false,{
+      none:'Hours, minutes, seconds. The hardest thing to make beautiful, because nothing distracts from the proportions.',
+      small:'The seconds moved off centre and onto their own axis — an artefact of where the fourth wheel sits, kept because it looks right.',
+      gmt:'A fourth hand turning once a day. Read against a 24-hour scale it gives a second zone; against a rotating bezel, a third.',
+      moon:'A disc with two moons under an aperture, advanced one tooth a day off the date wheel. A good one errs by a day in 122 years.',
+      power:'A hand reading how much of the mainspring is left. On a hand-wound watch it tells you when to wind; on an automatic it tells you whether you have been sitting still.',
+      chrono2:'Running seconds at nine, elapsed minutes at three. Pushers at two and four.',
+      chrono3:'Adds a twelve-hour counter at six, so you can time something longer than half an hour.'}));
     add(chips('Date window',[{v:'none',n:'No date'},{v:'3',n:'At 3'},{v:'6',n:'At 6'},{v:'12',n:'At 12'}],S.date,v=>S.date=v));
+    if(S.comp==='chrono2'||S.comp==='chrono3'){
+      const g=document.createElement('div');g.className='grp';
+      g.innerHTML='<h4>Operate it<em>'+chronoElapsed().toFixed(1)+' s</em></h4>'+
+        '<p class="note">The pushers work. Two starts and stops, four resets — and four is locked while the hand is running, '+
+        'exactly as it is on every chronograph that is not a flyback. You can also click the pushers on the case.</p>';
+      const r=document.createElement('div');r.className='chips';
+      const p1=document.createElement('button');p1.type='button';p1.className='chip';
+      p1.textContent=CH.running?'Stop (pusher at 2)':'Start (pusher at 2)';
+      p1.onclick=()=>{chronoToggle();build();};
+      const p2=document.createElement('button');p2.type='button';p2.className='chip';
+      p2.textContent='Reset (pusher at 4)';p2.disabled=CH.running;
+      if(CH.running)p2.title='Locked while the chronograph runs';
+      p2.onclick=()=>{chronoReset();build();};
+      r.appendChild(p1);r.appendChild(p2);g.appendChild(r);add(g);
+    }
   }
   else if(tab==='hands'){
     add(chips('Hand style',Object.keys(HANDS).map(k=>({v:k,n:HANDS[k]})),S.hands,v=>S.hands=v));
-    add(chips('Treatment',[{v:'steel',n:'Polished metal'},{v:'blued',n:'Flame blued'}],S.handMat,v=>S.handMat=v));
+    add(chips('Treatment',[{v:'steel',n:'Polished metal'},{v:'blued',n:'Flame blued'}],S.handMat,v=>S.handMat=v,false,{
+      steel:'Polished and, on the best work, faceted so one side is always dark and the other always bright.',
+      blued:'Heated over sand to about 290°C. The blue is an oxide film, it is only a few atoms thick, and it will go straight past to grey if you leave it a second too long.'}));
   }
   else if(tab==='strap'){
-    const metalBr=FAMILY[S.family].slab;
-    add(chips('Construction',[{v:'leather',n:'Leather'},{v:'rubber',n:'Rubber'},{v:'canvas',n:'Canvas'},
-      {v:'nato',n:'NATO'},{v:'oyster',n:'3-link bracelet'},{v:'jubilee',n:'5-link bracelet'},
-      {v:'president',n:'Round-link'},{v:'mesh',n:'Milanese mesh'}],S.strap,v=>S.strap=v));
+    add(chips('Construction',[{v:'leather',n:'Leather strap'},{v:'rubber',n:'Rubber strap'},{v:'canvas',n:'Canvas strap'},
+      {v:'nato',n:'NATO strap'},{v:'link3',n:'3-link bracelet'},{v:'link5',n:'5-link bracelet'},
+      {v:'linkR',n:'Semi-circular link'},{v:'mesh',n:'Milanese mesh'}],S.strap,v=>S.strap=v,false,{
+      leather:'Hide, lined and edge-painted. It shapes to a wrist in a fortnight and is finished in about three years.',
+      rubber:'Vulcanised, and the only material here that does not mind salt water.',
+      canvas:'Woven, backed with leather. Military descent.',
+      nato:'One piece passing under the case, so a broken spring bar does not lose you the watch. That is the entire reason it exists.',
+      link3:'Three links across — a wide centre between two flanks. The tool-watch standard since the 1940s.',
+      link5:'Five links across, so the bracelet drapes and catches more light. Dressier, and far more parts to finish.',
+      linkR:'Semi-circular links, three across. The softest of the three against skin.',
+      mesh:'Woven wire, brazed. It has no fixed adjustment steps at all.'}));
     if(['leather','rubber','canvas'].includes(S.strap))
       add(chips('Hide / colour',STRAPCOL.map(c=>({v:c,n:c,c:c})),S.strapCol,v=>S.strapCol=v,true));
     if(['leather','canvas'].includes(S.strap))
       add(chips('Stitching',[{v:'tonal',n:'Tonal'},{v:'contrast',n:'Contrast'}],S.stitch,v=>S.stitch=v));
+    if(!['link3','link5','linkR','mesh'].includes(S.strap))
+      add(chips('Buckle',Object.keys(BUCKLE).map(k=>({v:k,n:BUCKLE[k]})),S.buckle,v=>S.buckle=v,false,{
+        pin:'A tongue through a hole. Simple, thin, and it wears the strap out at one point.',
+        deploy:'A folding clasp. Kinder to the strap, adds about 2 mm under the wrist, and it will not let the watch fall.'}));
   }
   spec();
+  /* every technical word in this panel can be asked about */
+  B.querySelectorAll('.term').forEach(t=>{t.onclick=()=>openGloss(t.dataset.term);});
+  const u=document.getElementById('bUndo');if(u)u.disabled=HIST.past.length<2;
 }
 const STRAPN={leather:'Leather strap',rubber:'Rubber strap',canvas:'Canvas strap',nato:'NATO strap',
-  oyster:'3-link bracelet',jubilee:'5-link bracelet',president:'Round-link bracelet',mesh:'Milanese mesh'};
+  link3:'3-link bracelet',link5:'5-link bracelet',linkR:'Round-link bracelet',mesh:'Milanese mesh'};
 const COMPN={none:'Time only',small:'Small seconds',gmt:'GMT',moon:'Moonphase',power:'Power reserve',
   chrono2:'Chronograph, two registers',chrono3:'Chronograph, three registers'};
 function spec(){
@@ -2053,17 +3075,178 @@ function spec(){
   nm.textContent=S.name||'';
   nm.classList.toggle('on',!!S.name);
   const dialName=ARTDIAL[S.texture]?TEXTURES[S.texture]:`${DIALCOL[S.dialCol].name} ${TEXTURES[S.texture].toLowerCase()}`;
+  const d=dims();
   document.getElementById('specText').innerHTML=
-    `<b>${F.n}</b> · ${S.size} mm · ${THICK[S.thick].n.toLowerCase()} · ${METAL[S.metal].name} ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')}<br>`+
+    `<b>${calibre()}</b> · ${S.jewels} jewels · ${S.vph.toLocaleString('en-US')} A/h · ${S.pr} h · ${ROTORS[S.rotor].n.toLowerCase()}<br>`+
+    `<b>${F.n}</b> · ${d.d} × ${d.thick} mm · ${d.l2l} mm lug to lug · ${METAL[S.metal].name} ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')} · ${d.wr} m<br>`+
     `<b>${dialName}</b> · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp].toLowerCase()}${S.date!=='none'?' · date at '+S.date:''}<br>`+
     `${HANDS[S.hands]} hands · ${BEZELS[S.bezel].toLowerCase()} bezel · ${STRAPN[S.strap].toLowerCase()}`;
-  document.querySelectorAll('.bgs').forEach(b=>b.classList.toggle('on',b.dataset.bg===S.bg));
+  /* the canvas describes itself to anyone who cannot see it */
+  cv.setAttribute('aria-label',(S.name?S.name+': ':'')+specPlain().replace(/\n/g,'. '));
+  document.querySelectorAll('.bgs').forEach(b=>b.setAttribute('aria-pressed',b.dataset.light===S.light?'true':'false'));
   /* a pale backdrop must not swallow the maison */
-  const c=S.bg.replace('#','');
+  const c=(LIGHT[S.light]||LIGHT.softbox).bg.replace('#','');
   const lum=(parseInt(c.substr(0,2),16)*.299+parseInt(c.substr(2,2),16)*.587+parseInt(c.substr(4,2),16)*.114)/255;
   document.getElementById('stage').classList.toggle('light',lum>0.5);
 }
+/* ============================================================
+   SYSTEMS — the things that make this a tool rather than a toy
+   ============================================================ */
+function announce(msg){
+  const el=document.getElementById('live');
+  if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},30);}
+}
+/* ————— the chronograph, as a mechanism you operate ————— */
+const CH={running:false,start:0,acc:0};
+function chronoElapsed(){return CH.acc+(CH.running?(Date.now()-CH.start)/1000:0);}
+function chronoToggle(){
+  if(CH.running){CH.acc=chronoElapsed();CH.running=false;
+    announce('Chronograph stopped at '+CH.acc.toFixed(1)+' seconds');}
+  else{CH.start=Date.now();CH.running=true;announce('Chronograph running');}
+  buildIfTab('comp');
+}
+function chronoReset(){
+  /* on all but a flyback, the reset pusher is locked while the hand runs.
+     that lock is a real part, and refusing the input teaches it. */
+  if(CH.running){announce('Reset is locked while the chronograph runs — stop it first');return false;}
+  CH.acc=0;announce('Chronograph reset to zero');buildIfTab('comp');return true;
+}
+function buildIfTab(k){if(tab===k)build();}
 
+/* ————— coherence: a maison would not let you build a nonsense watch —————
+   each rule is a real constraint, and each says why. */
+function advisories(){
+  const a=[];
+  const chrono=(S.comp==='chrono2'||S.comp==='chrono3');
+  if(S.bezel==='tachy'&&!chrono)a.push({
+    t:'A tachymètre needs a chronograph',
+    b:'The scale converts elapsed seconds over a measured distance into speed. With no central chronograph hand to time against, it is decoration.',
+    fix:'Fit a chronograph',act:()=>{S.comp='chrono2';S.date=S.date==='3'?'none':S.date;}});
+  if(S.bezel==='gmt'&&S.comp!=='gmt')a.push({
+    t:'A 24-hour bezel needs a 24-hour hand',
+    b:'The bezel exists to read a third time zone against the fourth hand. Without a GMT hand it reads nothing at all.',
+    fix:'Fit a GMT hand',act:()=>{S.comp='gmt';}});
+  if(S.bezel==='dive'&&(S.thick==='slim'||S.strap==='mesh'))a.push({
+    t:'A dive bezel on a dress case',
+    b:'A timing bezel belongs on a case thick enough to carry a screw-down crown and a gasket. On a slim case or a mesh bracelet it is a costume.',
+    fix:'Give it a sport case',act:()=>{S.thick='sport';if(S.strap==='mesh')S.strap='rubber';}});
+  if(S.comp==='moon'&&S.date==='none')a.push({
+    t:'A moonphase without a date',
+    b:'The moonphase is a calendar complication — it is driven off the date wheel. A watch that tracks the moon but not the day is unusual to the point of being an error.',
+    fix:'Add a date at 3',act:()=>{S.date='3';}});
+  if(S.texture==='enamel'&&S.indexMat==='applied')a.push({
+    t:'Applied markers on grand feu enamel',
+    b:'Enamel is fired at 800°C after the dial feet are set; drilling a fired dial for markers is how enamel dials crack. Printed or transferred markers are the traditional answer.',
+    fix:'Print the markers',act:()=>{S.indexMat='printed';}});
+  if(S.lume&&(S.texture==='enamel'||S.metal==='yellow'&&S.thick==='slim'&&S.strap==='leather')&&S.handMat==='blued')a.push({
+    t:'Lume on a dress watch',
+    b:'Luminous compound is a tool-watch feature. On a fired enamel dial with blued hands it fights everything else the watch is saying.',
+    fix:'Remove the lume',act:()=>{S.lume=false;}});
+  if(S.arch==='skeleton'&&S.bezel==='dive')a.push({
+    t:'A skeletonised calibre in a diver',
+    b:'Skeletonising removes the metal that keeps water and pressure out. A 300 m rating and an open-worked plate do not go in the same watch.',
+    fix:'Close the movement',act:()=>{S.arch='bridges';}});
+  if(S.rotor!=='manual'&&S.thick==='slim'&&S.size<=36)a.push({
+    t:'An automatic in a very slim, very small case',
+    b:'A full rotor adds about 1.3 mm and needs the diameter to swing in. Under 36 mm and slim, this is a hand-wound watch.',
+    fix:'Make it hand-wound',act:()=>{S.rotor='manual';}});
+  if(S.vph===36000&&S.pr>50)a.push({
+    t:'A high-beat calibre with a long reserve',
+    b:'At 36,000 A/h the escapement consumes the mainspring far faster. High-beat movements historically run 40–45 hours, not 60.',
+    fix:'Set the reserve to 42 hours',act:()=>{S.pr=42;}});
+  if(FAMILY[S.family].slab&&['leather','rubber','canvas','nato'].includes(S.strap))a.push({
+    t:'An integrated case with a strap',
+    b:'An integrated case has no lugs — the bracelet is part of the case profile. A strap has nothing to attach to.',
+    fix:'Fit the bracelet',act:()=>{S.strap='link3';}});
+  return a;
+}
+/* ————— history: nothing is ever lost ————— */
+const HIST={past:[],future:[],lock:false};
+function snapshot(){
+  if(HIST.lock)return;
+  const j=JSON.stringify(S);
+  if(HIST.past.length&&HIST.past[HIST.past.length-1]===j)return;
+  HIST.past.push(j);if(HIST.past.length>60)HIST.past.shift();
+  HIST.future.length=0;
+  const u=document.getElementById('bUndo');if(u)u.disabled=HIST.past.length<2;
+}
+function undo(){
+  if(HIST.past.length<2){announce('Nothing to undo');return;}
+  HIST.future.push(HIST.past.pop());
+  applySnapshot(HIST.past[HIST.past.length-1]);announce('Undone');
+}
+function redo(){
+  if(!HIST.future.length){announce('Nothing to redo');return;}
+  const j=HIST.future.pop();HIST.past.push(j);applySnapshot(j);announce('Redone');
+}
+function applySnapshot(j){
+  HIST.lock=true;Object.assign(S,JSON.parse(j));build();paint();HIST.lock=false;
+  const u=document.getElementById('bUndo');if(u)u.disabled=HIST.past.length<2;
+}
+/* ————— the shelf: designs survive a refresh ————— */
+function loadShelf(){try{return JSON.parse(localStorage.getItem('semi.shelf')||'[]');}catch(e){return [];}}
+function saveShelf(a){try{localStorage.setItem('semi.shelf',JSON.stringify(a.slice(0,12)));}catch(e){}}
+function shelveCurrent(){
+  const a=loadShelf();
+  a.unshift({n:S.name||'Untitled',t:Date.now(),s:JSON.parse(JSON.stringify(S))});
+  saveShelf(a);announce('Saved to your shelf');buildIfTab('finish');buildIfTab('start');
+}
+/* ————— compare: hold one design against another ————— */
+const CMP={on:false,spec:null};
+function compareWith(spec){
+  CMP.spec=spec;CMP.on=true;
+  document.getElementById('cmp').classList.add('on');
+  drawCompare();announce('Comparing against '+(spec.name||'saved design'));
+}
+function compareOff(){CMP.on=false;document.getElementById('cmp').classList.remove('on');}
+function drawCompare(){
+  if(!CMP.on||!CMP.spec)return;
+  const c=document.getElementById('cmpCv'),st=document.getElementById('stage');
+  c.width=st.clientWidth*DPR;c.height=st.clientHeight*DPR;
+  c.style.width=st.clientWidth+'px';c.style.height=st.clientHeight+'px';
+  const keep=JSON.parse(JSON.stringify(S));
+  Object.assign(S,CMP.spec);
+  const cx=c.getContext('2d');
+  const sv=[cv.width,cv.height];
+  /* render the comparison through the same engine, into its own canvas */
+  const tmp=document.createElement('canvas');tmp.width=c.width;tmp.height=c.height;
+  renderInto(tmp.getContext('2d'),tmp.width/DPR,tmp.height/DPR);
+  cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,c.width,c.height);
+  cx.drawImage(tmp,0,0);
+  Object.assign(S,keep);
+}
+/* one renderer, two destinations — used by compare and by the shelf thumbnails */
+function renderInto(ctx,w,h){
+  const R=Math.min(w,h)*.185*(S.size/38);
+  const L=LIGHT[S.light]||LIGHT.softbox;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle=L.bg;ctx.fillRect(0,0,w,h);
+  if(!(R>1))return;
+  drawRoom(ctx,w,h,R,L);
+  const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
+  ctx.save();ctx.translate(w/2,h/2);
+  if(S.view==='profile'){drawProfile(ctx,R*1.05,fam,M);ctx.restore();return;}
+  if(S.view==='movement'){drawMovement(ctx,R,fam,M);drawBalance(ctx,R,Date.now());ctx.restore();return;}
+  drawStrap(ctx,R,fam);drawLugs(ctx,R,fam,M);drawCrown(ctx,R,fam,M);drawPushers(ctx,R,fam,M);
+  drawCase(ctx,R,fam,M);drawBezel(ctx,R,fam,M);
+  const dR=R*fam.ap*(1-S.bezelW)-R*.006;
+  ctx.save();ctx.beginPath();ctx.arc(0,0,dR,0,TAU);ctx.clip();
+  const INK=dialInk();
+  ctx.fillStyle=ARTDIAL[S.texture]?ARTDIAL[S.texture].base:D.base;
+  ctx.fillRect(-dR,-dR,dR*2,dR*2);
+  dialTexture(ctx,dR,S.texture,S.dialCol);drawTrack(ctx,dR,INK);
+  if(S.chapter){ctx.strokeStyle=INK;ctx.globalAlpha=.35;ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(0,0,dR*.70,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
+  drawIndices(ctx,dR,D,M);drawComp(ctx,dR,INK,M);drawSignature(ctx,dR,INK);
+  const nw=new Date();
+  ctx.save();ctx.rotate(((nw.getHours()%12)+nw.getMinutes()/60)*TAU/12);
+  drawHand(ctx,S.hands,dR*.52,dR*.055,M,S.lume,S.handMat==='blued');ctx.restore();
+  ctx.save();ctx.rotate(nw.getMinutes()*TAU/60);
+  drawHand(ctx,S.hands,dR*.80,dR*.042,M,S.lume,S.handMat==='blued');ctx.restore();
+  ctx.restore();
+  drawCrystal(ctx,dR);
+  ctx.restore();
+}
 /* ————— shareable designs ————— */
 function encode(){
   try{return btoa(unescape(encodeURIComponent(JSON.stringify(S)))).replace(/=+$/,'');}catch(e){return '';}
@@ -2082,34 +3265,58 @@ function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
    designed one. No jargon without an explanation.
    ============================================================ */
 const GUIDE=[
-  {t:'You are the designer',
-   b:'This is a watch design studio, not a shop. Every control here is a real decision a watchmaker makes — case shape, dial architecture, hand pattern, bezel engineering. Nothing is a colour swap.'},
-  {t:'Start from a design',
-   b:'The <b>Start</b> tab holds twenty-two finished watches — Bauhaus, diver, Tank, chronograph, aventurine. Pick one you like, then change what you want. Starting from something is far easier than starting from nothing.'},
-  {t:'Work through the tabs',
-   b:'<b>Case</b> is the shape and metal. <b>Dial</b> is the face and its texture. <b>Indices</b> are the hour markers. <b>Functions</b> add complications like a chronograph or moonphase. Each tab tells you what it does.'},
-  {t:'Turn it in the light',
-   b:'<b>Drag the watch</b> to tilt it — the case flank appears and the reflection slides across the crystal. Switch to <b>Profile</b> in the Start tab to see it edge-on, where thickness and crystal shape become visible.'},
-  {t:'Take it with you',
-   b:'Name your design, then use <b>Finish</b> to download the image, print a <b>certificate</b> with the full specification, or copy a <b>link</b> that rebuilds your exact watch for anyone who opens it. Press <b>R</b> any time for a surprise.'}
+  {t:'Five decisions make a watch',
+   b:'You do not need to know anything to start. There are five decisions that settle what a watch <i>is</i> — the movement, the case, the dial, the hands, the strap — and everything else is refinement. This tour is those five, in order.'},
+  {t:'One · the movement',
+   b:'Open <b>Chapter 02</b> first. This is the calibre, and it decides the rest: a full rotor adds a millimetre of height, a hand-wound movement lets the watch be thin, and the <b>beat rate</b> decides whether the seconds hand steps or glides. Then switch the view to <b>Movement</b> and watch the balance actually beat.'},
+  {t:'Two and three · case and dial',
+   b:'<b>Chapter 03</b> is shape, size and metal — watch the <b>lug-to-lug</b> figure, because that is what decides whether a watch fits, not the diameter. <b>Chapter 05</b> is the face. Dark dials make hands loud; enamel and guilloché change with the light.'},
+  {t:'Four and five · hands and strap',
+   b:'<b>Chapter 08</b> is the first thing anyone actually looks at, and <b>Chapter 09</b> is what the watch feels like all day. If a choice is not how watches are built, a note appears at the top of the panel telling you why — and offering to fix it.'},
+  {t:'Then keep it',
+   b:'Name the design, press <b>S</b> to put it on your shelf, and it survives a refresh. <b>Chapter 10</b> exports an image, a certificate with the full specification, or a link that rebuilds your exact watch for anyone who opens it. <b>R</b> for a surprise, <b>⌘Z</b> to undo, <b>?</b> for this tour.'}
 ];
 const GLOSSARY=[
+  ['Movement','The mechanism. Also called the calibre. Everything else on the watch — height, diameter, where the seconds sit — is decided by it first.'],
+  ['Architecture','How the movement is covered. Separate bridges leave the train visible; a three-quarter plate covers it under one piece of metal; a full plate covers everything; skeletonising cuts away all metal that is not carrying load.'],
+  ['Beat rate','How many times a second the balance swings, quoted in vibrations per hour. 28,800 A/h is eight beats a second. It is why a mechanical seconds hand steps rather than glides — a smooth sweep means quartz.'],
+  ['Balance wheel','The oscillator. A weighted wheel on a hairspring, swinging back and forth about 260° each way. It is the only part of a watch that never stops moving.'],
+  ['Escapement','The gate between the mainspring and the balance. It lets exactly one tooth of the escape wheel through per beat, and gives the balance a push on the way. That is the ticking you hear.'],
+  ['Jewels','Synthetic ruby bearings at the pivots, where steel would otherwise wear steel. 17 is a fully jewelled time-only watch; a chronograph runs 25–31; anything past 35 is usually a complication or a marketing decision.'],
+  ['Rotor','The weight that winds an automatic as you move. A full rotor is a half-disc that hides half the movement; a micro-rotor sinks into the plate to keep the watch thin; a peripheral rotor rides the outside edge and hides nothing.'],
+  ['Power reserve','How long the watch runs from fully wound. A single barrel gives 40–48 hours; more than 60 means either a bigger barrel or two of them, and a high beat rate spends it faster.'],
+  ['Côtes de Genève','Parallel waves cut into the bridges with a rotating abrasive. Applied before the plate is drilled, so the pattern runs unbroken under the jewels.'],
+  ['Anglage','The chamfer along the edge of a bridge, filed and then polished until it throws a continuous line of light. Inward angles cannot be made by machine, which is why they are the first thing a collector looks for.'],
+  ['Perlage','Overlapping circular grains applied to plates and to the undersides of bridges — the surfaces nobody will ever see.'],
   ['Case','The metal body that holds everything. Its shape family — round, cushion, tonneau, rectangular — sets the character before anything else is decided.'],
+  ['Lug-to-lug','The distance from the tip of one lug to the tip of the opposite one. This, not the stated diameter, is what decides whether a watch fits: under 46 mm sits on most wrists, over 50 mm overhangs.'],
   ['Lugs','The horns the strap attaches to. Wire lugs are delicate and vintage; straight lugs are sporty; horn lugs curve down to hug the wrist.'],
-  ['Bezel','The ring around the crystal. It can be plain, knurled for grip, fluted for light, or carry a scale: a dive bezel counts sixty minutes, a tachymètre reads speed.'],
+  ['Bezel','The ring around the crystal. It can be plain, knurled for grip, fluted for light, or carry a working scale: a dive bezel counts sixty minutes and turns one way only, a tachymètre reads average speed.'],
   ['Dial','The face. Its texture is the difference between a flat print and a real object: sunray throws light in a fan, guilloché is engine-turned, grand feu is fired enamel.'],
-  ['Indices','The hour markers. Applied indices are separate metal pieces set onto the dial and catch light; printed indices lie flat and read cleaner.'],
-  ['Chapter ring','A fine circle drawn inside the minute track — it tightens the dial and separates numerals from the outer scale.'],
+  ['Indices','The hour markers. Applied indices are separate metal pieces riveted through the dial by two feet, and they cast a shadow; printed indices lie flat and read cleaner.'],
+  ['Chapter ring','The ring that carries the hour and minute markings themselves. Often confused with the rehaut, which is the plain inner flange between that ring and the crystal.'],
+  ['Rehaut','The angled inner flange between the dial and the crystal. It is a surface, not a scale — though some houses engrave it.'],
   ['Complication','Anything the watch does beyond hours and minutes: small seconds, a second time zone (GMT), a moonphase, a power reserve, a chronograph.'],
-  ['Chronograph','A stopwatch. The pushers at 2 and 4 start, stop and reset a central hand; the small registers count elapsed minutes and hours.'],
-  ['Crystal','The glass over the dial. Flat is honest and modern; domed bends the light at the edges; a box crystal stands the dial in a little vitrine — very vintage.'],
-  ['Crown','The knurled wheel you wind and set the time with. Bigger and deeper knurling means you can use it with gloves on.'],
-  ['Lume','Luminous compound on the hands and markers so the watch reads in the dark.'],
-  ['Guilloché','A geometric pattern cut into the dial by a hand-turned engine. Rings, waves and grids that only appear when light rakes across.'],
-  ['Tapisserie','A fine grid milled into the dial, most associated with integrated-bracelet sports watches. It gives depth without colour.'],
-  ['Aventurine','Glass with copper flecks suspended in it — it reads as a night sky. Malachite, lapis and mother of pearl are natural stone dials cut into wafers.'],
-  ['Bracelet','A metal strap. Three-link (Oyster) is the tool-watch standard; five-link (Jubilee) is dressier; round-link is the softest of the three.']
+  ['Chronograph','A stopwatch built into a watch. The pusher at 2 starts and stops, the one at 4 resets — and on all but a flyback the reset is mechanically locked while the hand runs. The register at 9 is the movement’s own running seconds and never stops.'],
+  ['Crystal','The glass over the dial. Flat is honest and modern; domed bends the light at the edges; a box crystal stands the dial in a little vitrine — vintage, and rarely sealed past 30 m.'],
+  ['Crown','The knurled wheel you wind and set the time with. A screw-down crown threads into a tube in the case, and it is the difference between 30 m and 300 m.'],
+  ['Lume','Super-LumiNova on the hands and markers. It is a phosphor, not radioactive — it charges in daylight and gives it back for a few hours.'],
+  ['Guilloché','A geometric pattern cut into the dial by a hand-cranked rose engine. Rings, waves and grids that only appear when light rakes across them.'],
+  ['Tapisserie','A grid milled into the dial with a pantograph, one square at a time. It gives depth without colour, and it is the reason those dials cannot be reproduced by printing.'],
+  ['Grand feu','Enamel: powdered glass fused onto a copper or gold base at about 800°C, fired four or five times. Any one firing can crack it, which is the whole reason enamel dials cost what they do.'],
+  ['Aventurine','Glass with copper filings suspended in it, cooled slowly so the metal crystallises — it reads as a night sky. Malachite, lapis and mother of pearl are natural stone dials cut into wafers.'],
+  ['Strap','Leather, rubber or fabric. It attaches to the lugs with spring bars, and it is consumable — a leather strap is finished in about three years.'],
+  ['Bracelet','Articulated metal. Three-link across is the tool-watch standard; five-link drapes and catches more light; semi-circular links are the softest against skin. Mesh has no fixed adjustment steps at all.'],
+  ['Water resistance','A pressure rating, not a depth. 30 m survives rain and hand-washing; 100 m survives swimming; 300 m is a diving instrument with a screw-down crown and a gasketed back.']
 ];
+function openGloss(term){
+  buildGlossary(term);
+  const gx=document.getElementById('gloss');
+  gx.style.display='flex';requestAnimationFrame(()=>gx.classList.add('on'));
+  const hit=gx.querySelector('.gitem.hit');
+  if(hit&&hit.scrollIntoView)try{hit.scrollIntoView({block:'center'});}catch(e){}
+  const x=document.getElementById('glossX');if(x&&x.focus)x.focus();
+}
 let gStep=0;
 function showGuide(i){
   gStep=Math.max(0,Math.min(GUIDE.length-1,i));
@@ -2126,9 +3333,12 @@ function closeGuide(){
   gv.classList.remove('on');setTimeout(()=>{if(!gv.classList.contains('on'))gv.style.display='';},500);
   try{localStorage.setItem('semi.seen','1');}catch(e){}
 }
-function buildGlossary(){
+function buildGlossary(term){
+  const t=(term||'').toLowerCase();
   document.getElementById('glossList').innerHTML=
-    GLOSSARY.map(g=>`<div class="gitem"><b>${g[0]}</b><span>${g[1]}</span></div>`).join('');
+    GLOSSARY.map(g=>`<div class="gitem${t&&g[0].toLowerCase()===t?' hit':''}"><b>${g[0]}</b><span>${g[1]}</span></div>`).join('');
+  const sub=document.querySelector('.glosssub');
+  if(sub)sub.textContent=GLOSSARY.length+' words worth knowing';
 }
 /* ————— preset thumbnails: same engine, tiny canvas ————— */
 function thumb(cvs,spec){
@@ -2139,6 +3349,12 @@ function thumb(cvs,spec){
   c.fillStyle='#1a1917';c.fillRect(0,0,w,h);
   const fam=FAMILY[S.family],M=METAL[S.metal],D=DIALCOL[S.dialCol];
   const R=w*.36;
+  /* a design saved from the caseback shows its caseback on the shelf */
+  if(S.view==='movement'){
+    c.save();c.translate(w/2,h/2);
+    drawMovement(c,R,fam,M);drawBalance(c,R,Date.now());
+    c.restore();Object.assign(S,keep);return;
+  }
   c.save();c.translate(w/2,h/2);
   drawLugs(c,R,fam,M);
   drawCase(c,R,fam,M);
@@ -2306,7 +3522,6 @@ function drawProfile(c,R,fam,M){
   c.fillText(`${THICK[S.thick].n.toUpperCase()} PROFILE · ${CRYSTN[S.crystal].toUpperCase()} CRYSTAL`,0,R*1.44);
   c.restore();
 }
-const CRYSTN={flat:'Flat',domed:'Domed',ddomed:'Double domed',box:'Box'};
 /* ————— certificate ————— */
 function certificate(){
   const W=1400,H=1900,c=document.createElement('canvas');
@@ -2334,32 +3549,39 @@ function certificate(){
   x.fillText(S.name||'Unnamed design',W/2,y);y+=52;
   x.strokeStyle='#c3bba6';x.beginPath();x.moveTo(W/2-90,y-14);x.lineTo(W/2+90,y-14);x.stroke();
   y+=26;
+  const d=dims();
   const rows=[
-    ['CASE',`${FAMILY[S.family].n} · ${S.size} mm · ${THICK[S.thick].n}`],
+    ['CALIBRE',`${calibre()} · ${ARCH[S.arch].n.toLowerCase()}`],
+    ['WINDING',`${ROTORS[S.rotor].n} · ${S.pr} h reserve`],
+    ['FREQUENCY',`${S.vph.toLocaleString('en-US')} A/h · ${d.hz} Hz · ${S.jewels} jewels`],
+    ['FINISHING',`${MVFIN[S.mvFinish].n} · ${S.screws==='blued'?'blued':'polished steel'} screws`],
+    ['CASE',`${FAMILY[S.family].n} · ${d.d} × ${d.thick} mm · ${d.l2l} mm lug to lug`],
     ['MATERIAL',`${METAL[S.metal].name}, ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')}`],
+    ['CRYSTAL',`${CRYSTN[S.crystal]} sapphire · water resistant to ${d.wr} m`],
     ['BEZEL',`${BEZELS[S.bezel]}`],
-    ['DIAL',`${DIALCOL[S.dialCol].name} · ${TEXTURES[S.texture]}`],
-    ['INDICES',`${LAYOUTS[S.layout]} · ${S.indexMat==='applied'?'applied':'printed'}`],
+    ['DIAL',`${ARTDIAL[S.texture]?TEXTURES[S.texture]:DIALCOL[S.dialCol].name+' · '+TEXTURES[S.texture]}`],
+    ['INDICES',`${LAYOUTS[S.layout]} · ${S.indexMat==='applied'?'applied':'printed'}${S.lume?' · luminous':''}`],
     ['FUNCTION',`${COMPN[S.comp]}${S.date!=='none'?', date at '+S.date:''}`],
     ['HANDS',`${HANDS[S.hands]}${S.handMat==='blued'?', flame blued':''}`],
-    ['STRAP',`${STRAPN[S.strap]}`]
+    ['STRAP',`${STRAPN[S.strap]}${d.lugW?' · '+d.lugW+' mm':''}${['link3','link5','linkR','mesh'].includes(S.strap)?'':' · '+BUCKLE[S.buckle].toLowerCase()}`]
   ];
-  x.font='400 21px "Archivo Narrow"';
+  x.font='400 20px "Archivo Narrow"';
   rows.forEach(r=>{
     x.textAlign='right';x.fillStyle='#8d867a';
     if(x.letterSpacing!==undefined)x.letterSpacing='3px';
     x.fillText(r[0],W/2-24,y);
     x.textAlign='left';x.fillStyle='#211d16';
     if(x.letterSpacing!==undefined)x.letterSpacing='0px';
-    x.font='400 23px "Archivo Narrow"';
-    x.fillText(r[1],W/2+24,y);
     x.font='400 21px "Archivo Narrow"';
-    y+=40;
+    x.fillText(r[1],W/2+24,y);
+    x.font='400 20px "Archivo Narrow"';
+    y+=34;
   });
-  const serial='SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
+  /* a design reference, not a serial number — a serial belongs to a made object */
+  const ref='SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
   x.textAlign='center';x.fillStyle='#8d867a';x.font='400 18px "Archivo Narrow"';
   if(x.letterSpacing!==undefined)x.letterSpacing='5px';
-  x.fillText('DESIGN No. '+serial,W/2,y+34);
+  x.fillText('DESIGN REFERENCE '+ref,W/2,y+34);
   x.fillText('DESIGNED BY THE OWNER · SEMI STUDIO',W/2,y+66);
   const a=document.createElement('a');
   a.href=c.toDataURL('image/png');
@@ -2391,10 +3613,22 @@ function randomize(){
   S.handMat=pick(['steel','steel','blued']);
   S.lume=Math.random()>.4;
   S.chapter=Math.random()>.7;
-  S.strap=FAMILY[S.family].slab?pick(['oyster','jubilee','president','mesh'])
-    :pick(['leather','leather','rubber','canvas','nato','oyster','jubilee','mesh']);
+  S.strap=FAMILY[S.family].slab?pick(['link3','link5','linkR','mesh'])
+    :pick(['leather','leather','rubber','canvas','nato','link3','link5','mesh']);
   S.strapCol=pick(STRAPCOL);
   S.stitch=pick(['tonal','contrast']);
+  /* the movement is chosen first, and the case follows it */
+  S.arch=pick(['bridges','bridges','bridges','threeq','full','skeleton']);
+  S.mvFinish=pick(Object.keys(MVFIN));
+  S.vph=+pick(['21600','28800','28800','18000','36000']);
+  S.rotor=pick(['full','full','manual','micro','peri']);
+  S.jewels=17+Math.round(Math.random()*20);
+  S.pr=Math.round((38+Math.random()*40)/2)*2;
+  S.screws=pick(['blued','blued','steel']);
+  S.crystal=pick(['flat','domed','domed','ddomed','box']);
+  S.lugW=16+Math.round(Math.random()*8);
+  S.buckle=pick(['pin','pin','deploy']);
+  S.light=pick(Object.keys(LIGHT));
   /* curation: keep it believable */
   if(S.bezel==='dive'&&S.layout==='roman')S.layout='baton';
   if(S.texture==='sector')S.layout=pick(['arabic','baton','mixed']);
@@ -2403,6 +3637,8 @@ function randomize(){
     S.date=pick(['none','none','6']);
     if(S.layout==='explorer'||S.layout==='california')S.layout='baton';
   }
+  /* and then every coherence rule is applied, so a surprise is never nonsense */
+  for(let i=0;i<6;i++){const a=advisories();if(!a.length)break;a.forEach(x=>x.act());}
   build();paint();
 }
 function download(){
@@ -2414,31 +3650,71 @@ function download(){
 const DEFAULTS=JSON.parse(JSON.stringify(S));
 document.getElementById('bRand').onclick=randomize;
 document.getElementById('bPng').onclick=download;
+document.getElementById('bUndo').onclick=undo;
 document.getElementById('bSave').onclick=()=>{
   navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
   const b=document.getElementById('bSave'),t=b.textContent;
-  b.textContent='Link copied';setTimeout(()=>b.textContent=t,1600);
+  b.textContent='Link copied';announce('Link copied to your clipboard');
+  setTimeout(()=>b.textContent=t,1600);
 };
-document.getElementById('bReset').onclick=()=>{Object.assign(S,DEFAULTS);build();paint();};
-document.querySelectorAll('.bgs').forEach(b=>b.onclick=()=>{S.bg=b.dataset.bg;paint();});
-
-/* ————— drag the watch to turn it in the light ————— */
+document.getElementById('bReset').onclick=()=>{snapshot();Object.assign(S,DEFAULTS);build();paint();announce('Reset to the default design');};
+/* ————— the lighting row: a setup, chosen, not a background colour ————— */
 (function(){
-  let drag=false,lx=0,ly=0;
+  const row=document.getElementById('bgRow');
+  Object.keys(LIGHT).forEach(k=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='bgs';b.dataset.light=k;
+    b.setAttribute('aria-pressed',S.light===k?'true':'false');
+    b.setAttribute('aria-label',LIGHT[k].n+' lighting');
+    b.title=LIGHT[k].n+' — '+LIGHT[k].d;
+    const i=document.createElement('i');i.style.setProperty('--sw',LIGHT[k].bg);
+    b.appendChild(i);
+    b.onclick=()=>{snapshot();S.light=k;paint();buildIfTab('finish');announce(LIGHT[k].n+' lighting')};
+    row.appendChild(b);
+  });
+})();
+
+/* ————— drag the watch to turn it in the light, and press its pushers ————— */
+(function(){
+  let drag=false,lx=0,ly=0,moved=0;
   const LIM=.95;
   cv.style.cursor='grab';
+  /* where the pushers sit on screen, so a click can find them */
+  function pusherHit(e){
+    if(S.comp!=='chrono2'&&S.comp!=='chrono3')return 0;
+    if(S.view!=='studio')return 0;
+    const r=cv.getBoundingClientRect();
+    const x=(e.clientX-r.left)-r.width/2, y=(e.clientY-r.top)-r.height/2;
+    const R=geom.R, ow=(FAMILY[S.family].ow||1)*R;
+    const px=ow*1.02, tol=R*.16;
+    if(Math.abs(x-px)>tol)return 0;
+    if(Math.abs(y+R*.42)<tol)return 2;   /* the pusher at two */
+    if(Math.abs(y-R*.42)<tol)return 4;   /* the pusher at four */
+    return 0;
+  }
+  cv.addEventListener('pointermove',e=>{
+    if(drag)return;
+    cv.style.cursor=pusherHit(e)?'pointer':(S.view==='studio'?'grab':'default');
+  });
   cv.addEventListener('pointerdown',e=>{
+    if(pusherHit(e))return;              /* a pusher press is not a drag */
     if(S.view!=='studio')return;
-    drag=true;lx=e.clientX;ly=e.clientY;cv.style.cursor='grabbing';
+    drag=true;moved=0;lx=e.clientX;ly=e.clientY;cv.style.cursor='grabbing';
     cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);
   });
   addEventListener('pointermove',e=>{
     if(!drag)return;
+    moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);
     S.tiltY=Math.max(-LIM,Math.min(LIM,(S.tiltY||0)+(e.clientX-lx)*.006));
     S.tiltX=Math.max(-LIM,Math.min(LIM,(S.tiltX||0)-(e.clientY-ly)*.006));
     lx=e.clientX;ly=e.clientY;paint();
   });
   addEventListener('pointerup',()=>{drag=false;cv.style.cursor='grab';});
+  cv.addEventListener('click',e=>{
+    const p=pusherHit(e);
+    if(p===2)chronoToggle();
+    else if(p===4)chronoReset();
+  });
   cv.addEventListener('dblclick',()=>{S.tiltX=0;S.tiltY=0;paint();});
 })();
 
@@ -2451,7 +3727,10 @@ function paint(){
 }
 let last=0;
 function loop(t){
-  if(dirty||t-last>200){render();dirty=false;last=t;}
+  /* the hands layer costs ~0.02 ms, so there is no reason to throttle it —
+     and a balance beating at 36,000 A/h needs every frame it can get.
+     requestAnimationFrame already stops when the tab is hidden. */
+  render();dirty=false;last=t;
   requestAnimationFrame(loop);
 }
 function resize(){
@@ -2459,7 +3738,7 @@ function resize(){
   DPR=Math.min(devicePixelRatio||1,2);
   cv.width=st.clientWidth*DPR;cv.height=st.clientHeight*DPR;
   cv.style.width=st.clientWidth+'px';cv.style.height=st.clientHeight+'px';
-  paint();
+  paint();drawCompare();
 }
 /* ————— guide wiring ————— */
 document.getElementById('gNext').onclick=()=>{
@@ -2468,31 +3747,59 @@ document.getElementById('gNext').onclick=()=>{
 document.getElementById('gSkip').onclick=closeGuide;
 document.getElementById('guide').onclick=e=>{if(e.target.id==='guide')closeGuide();};
 document.getElementById('bHelp').onclick=()=>showGuide(0);
-document.getElementById('glossX').onclick=()=>{const gx=document.getElementById('gloss');gx.classList.remove('on');setTimeout(()=>{if(!gx.classList.contains('on'))gx.style.display='';},450);};
-document.getElementById('gloss').onclick=e=>{if(e.target.id==='gloss')e.currentTarget.classList.remove('on');};
+document.getElementById('glossX').onclick=closeGloss;
+document.getElementById('gloss').onclick=e=>{if(e.target.id==='gloss')closeGloss();};
+function closeGloss(){
+  const gx=document.getElementById('gloss');gx.classList.remove('on');
+  setTimeout(()=>{if(!gx.classList.contains('on'))gx.style.display='';},450);
+}
+/* keep the keyboard inside an open dialog, and give it back on close */
+addEventListener('keydown',e=>{
+  const dlg=[document.getElementById('guide'),document.getElementById('gloss')]
+    .filter(d=>d.classList.contains('on'))[0];
+  if(dlg&&e.key==='Tab'){
+    const f=dlg.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])');
+    if(!f.length)return;
+    const first=f[0], last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+});
 addEventListener('keydown',e=>{
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
-  if(e.key==='Escape'){closeGuide();document.getElementById('gloss').classList.remove('on');}
+  const meta=e.metaKey||e.ctrlKey;
+  if(meta&&(e.key==='z'||e.key==='Z')){e.preventDefault();e.shiftKey?redo():undo();return;}
+  if(meta&&(e.key==='y'||e.key==='Y')){e.preventDefault();redo();return;}
+  if(meta)return;
+  if(e.key==='Escape'){closeGuide();closeGloss();if(CMP.on){compareOff();build();}}
   if(e.key==='r'||e.key==='R')randomize();
   if(e.key==='d'||e.key==='D')download();
+  if(e.key==='s'||e.key==='S'){shelveCurrent();build();}
+  if(e.key==='m'||e.key==='M'){snapshot();S.view=S.view==='movement'?'studio':'movement';build();paint();
+    announce(S.view==='movement'?'Movement view':'Dial side');}
+  if(e.key==='0'){S.tiltX=0;S.tiltY=0;paint();}
+  if(e.key==='g'||e.key==='G')openGloss();
   if(e.key==='?')showGuide(0);
 });
 addEventListener('resize',resize);
+/* a hidden tab is not worth a single pixel */
+addEventListener('visibilitychange',()=>{if(!document.hidden){dirty=true;drawCompare();}});
 const fromLink=decode();
-resize();build();
+resize();build();snapshot();
 /* first visit gets the guide; a shared design opens straight into the watch */
-/* the guide opens from enterStudio(), once the studio is on screen */
+/* the guide is opened by enterStudio(), once the studio is on screen */
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{build();resize();});
 requestAnimationFrame(loop);
-setInterval(()=>{if(document.hidden)render();},400);
 window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   renderBase:()=>{baseDirty=true;render();},
   png:()=>cv.toDataURL('image/png').length,
+  dims,calibre,advisories,undo,redo,snapshot,
   link:()=>location.href};
 
 /* ============================================================
-   THE DRAWING — one page from a sketchbook. Every line is drawn
-   twice, slightly apart, the way a pencil never lands twice the same.
+   THE DRAWING — one page from a sketchbook.
+   Every line is drawn twice, slightly apart, the way a pencil
+   never lands in exactly the same place.
    ============================================================ */
 (function(){
   const SK=document.getElementById('sk'), FN=document.getElementById('skFine');
@@ -2501,74 +3808,120 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   let sd=20260816;
   const rr=()=>{sd^=sd<<13;sd^=sd>>>17;sd^=sd<<5;return ((sd>>>0)%100000)/100000;};
   const j=(a)=>(rr()-.5)*a;
-  function el(par,name,attrs){const e=document.createElementNS(NS,name);
-    for(const k in attrs)e.setAttribute(k,attrs[k]);par.appendChild(e);return e;}
-  function ink(par,d,w,passes,alpha){passes=passes||2;
+
+  function el(par,name,attrs){
+    const e=document.createElementNS(NS,name);
+    for(const k in attrs)e.setAttribute(k,attrs[k]);
+    par.appendChild(e);return e;
+  }
+  /* a stroke drawn like a hand: two passes, never identical */
+  function ink(par,d,w,passes,alpha){
+    passes=passes||2;
     for(let i=0;i<passes;i++){
       el(par,'path',{d:d,'stroke-width':(w||1.5)*(i?0.72:1),
         opacity:(alpha||1)*(i?0.5:0.92),
-        transform:'translate('+j(2.4).toFixed(2)+' '+j(2.4).toFixed(2)+')'});}}
-  function hatch(par,x,y,w,h,ang,gap,alpha){let d='';
+        transform:`translate(${j(2.4)} ${j(2.4)})`});
+    }
+  }
+  /* shading, the way you scribble it in */
+  function hatch(par,x,y,w,h,ang,gap,alpha){
+    let d='';
     const st=Math.max(gap||6,3), diag=(w+h);
     for(let i=-h;i<diag;i+=st){
-      const x1=x+i,y1=y,x2=x+i-h*Math.tan(ang||0.5),y2=y+h;
-      d+='M'+(x1+j(1.6)).toFixed(1)+' '+(y1+j(1.6)).toFixed(1)+'L'+(x2+j(1.6)).toFixed(1)+' '+(y2+j(1.6)).toFixed(1);}
+      const x1=x+i, y1=y, x2=x+i-h*Math.tan(ang||0.5), y2=y+h;
+      d+=`M${x1+j(1.6)} ${y1+j(1.6)}L${x2+j(1.6)} ${y2+j(1.6)}`;
+    }
     el(par,'path',{d:d,'stroke-width':.75,opacity:alpha||.22,
-      'clip-path':'inset(0 '+(1000-(x+w))+'px 0 '+x+'px)'});}
-  /* the tree */
+      'clip-path':`inset(0 ${1000-(x+w)}px 0 ${x}px)`});
+  }
+
+  /* ————— the tree ————— */
   ink(SK,'M243 470 C238 400 236 340 244 276 C248 245 246 218 238 196',3.1);
   ink(SK,'M281 470 C288 398 292 336 286 274 C282 243 285 218 294 197',3.1);
   ink(SK,'M262 300 C238 282 214 268 190 262',2.1);
   ink(SK,'M268 258 C292 236 318 224 344 220',2.1);
   ink(SK,'M258 226 C242 210 226 200 208 194',1.8);
-  for(let i=0;i<9;i++){const y=286+i*20;
-    ink(FN,'M'+(250+j(6)).toFixed(1)+' '+y+' C'+(258+j(4)).toFixed(1)+' '+(y+6)+' '+(262+j(4)).toFixed(1)+' '+(y+2)+' '+(272+j(6)).toFixed(1)+' '+(y+9),.9,1,.5);}
+  /* bark */
+  for(let i=0;i<9;i++){
+    const y=286+i*20;
+    ink(FN,`M${250+j(6)} ${y} C${258+j(4)} ${y+6} ${262+j(4)} ${y+2} ${272+j(6)} ${y+9}`,.9,1,.5);
+  }
+  /* canopy: scribbled clouds, not outlines */
   const CANOPY=[[262,170,150,62],[168,196,96,44],[366,196,96,44],[228,132,84,38],[330,148,74,34],[132,232,62,30],[416,236,60,30]];
-  CANOPY.forEach(c=>{let d='';
+  CANOPY.forEach(c=>{
+    let d='';
     for(let a=0;a<=Math.PI*2+.2;a+=.24){
       const w=c[2]*(0.86+rr()*0.3), h=c[3]*(0.84+rr()*0.34);
       const x=c[0]+Math.cos(a)*w, y=c[1]+Math.sin(a)*h;
-      d+=(a?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
-    ink(SK,d+'Z',1.6,2,.8);});
+      d+=(a?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);
+    }
+    ink(SK,d+'Z',1.6,2,.8);
+  });
+  /* a few leaves let go */
   [[452,300],[478,352],[430,392],[500,262],[150,318]].forEach(p=>{
-    ink(FN,'M'+p[0]+' '+p[1]+' q7 -6 13 1 q-7 6 -13 -1Z',1.1,1,.75);});
-  /* the ground and the cloth */
+    ink(FN,`M${p[0]} ${p[1]} q7 -6 13 1 q-7 6 -13 -1Z`,1.1,1,.75);
+  });
+
+  /* ————— the ground, and the cloth he works on ————— */
   ink(SK,'M60 470 C260 462 620 466 940 470',2.2);
   ink(SK,'M508 452 L742 452 L764 486 L486 486 Z',1.7);
   hatch(FN,486,452,278,34,.35,9,.16);
-  /* the boy */
+
+  /* ————— the boy ————— */
+  /* back and head: one confident curve */
   ink(SK,'M398 452 C392 404 398 366 414 342 C424 326 438 316 452 312',3.0);
   ink(SK,'M452 312 C438 298 440 276 456 268 C474 259 494 268 496 286 C498 300 488 312 474 315',3.0);
+  /* hair, scribbled */
   ink(SK,'M448 288 C444 268 458 254 478 254 C494 254 504 264 504 276 C498 268 486 264 474 268 C462 272 452 280 448 288Z',2.0);
-  for(let i=0;i<7;i++)ink(FN,'M'+(452+i*7)+' '+(268-i*1.5)+' c4 -8 10 -12 17 -13',.9,1,.55);
+  for(let i=0;i<7;i++)ink(FN,`M${452+i*7} ${268-i*1.5} c4 -8 10 -12 17 -13`,.9,1,.55);
+  /* the loupe at the eye */
   ink(SK,'M494 292 m-11 0 a11 11 0 1 0 22 0 a11 11 0 1 0 -22 0',2.0);
   ink(FN,'M494 292 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0',1.0,1,.7);
+  /* shoulder, arm reaching to the cloth, hand with tweezers */
   ink(SK,'M424 340 C446 336 470 344 486 358 C500 370 512 388 520 404',2.6);
   ink(SK,'M520 404 C528 414 538 420 550 421',2.4);
-  ink(SK,'M550 421 l34 -13',1.7);
+  ink(SK,'M550 421 l34 -13',1.7);          /* tweezers */
   ink(SK,'M550 425 l34 -9',1.7);
+  /* the second arm, resting */
   ink(FN,'M420 366 C438 372 452 386 458 404 C462 416 466 424 474 430',2.0,2,.85);
+  /* folded legs */
   ink(SK,'M398 452 C420 448 448 442 470 440 C492 438 512 442 526 452',2.6);
   ink(SK,'M470 440 C466 424 470 410 480 400',2.0);
-  for(let i=0;i<4;i++)ink(FN,'M'+(408+i*5)+' '+(380+i*16)+' c14 -4 26 -2 36 4',.9,1,.5);
+  /* shirt folds */
+  for(let i=0;i<4;i++)ink(FN,`M${408+i*5} ${380+i*16} c14 -4 26 -2 36 4`,.9,1,.5);
+  /* his shadow, cast toward us */
   hatch(FN,372,452,190,26,.6,7,.2);
-  /* what he is building */
+
+  /* ————— what he is building ————— */
+  /* the movement he is holding, large, on the cloth */
   ink(SK,'M602 424 m-40 0 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0',2.4);
   ink(FN,'M602 424 m-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0',1.1,1,.7);
+  /* bridges and a wheel inside it */
   ink(FN,'M580 408 C596 400 616 402 626 414 C632 422 630 434 622 440',1.3,1,.8);
   ink(FN,'M602 424 m-13 0 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0',1.1,1,.8);
-  for(let i=0;i<14;i++){const a=i*Math.PI/7;
-    ink(FN,'M'+(602+Math.cos(a)*13).toFixed(1)+' '+(424+Math.sin(a)*13).toFixed(1)+' L'+(602+Math.cos(a)*16).toFixed(1)+' '+(424+Math.sin(a)*16).toFixed(1),1.0,1,.75);}
+  for(let i=0;i<14;i++){
+    const a=i*Math.PI/7;
+    ink(FN,`M${602+Math.cos(a)*13} ${424+Math.sin(a)*13} L${602+Math.cos(a)*16} ${424+Math.sin(a)*16}`,1.0,1,.75);
+  }
+  /* loose parts laid out on the cloth */
   const PARTS=[[664,440,15],[700,428,10],[540,462,12],[726,452,7],[576,466,7]];
   PARTS.forEach(p=>{
-    ink(SK,'M'+p[0]+' '+p[1]+' m-'+p[2]+' 0 a'+p[2]+' '+p[2]+' 0 1 0 '+(p[2]*2)+' 0 a'+p[2]+' '+p[2]+' 0 1 0 -'+(p[2]*2)+' 0',1.5);
+    ink(SK,`M${p[0]} ${p[1]} m-${p[2]} 0 a${p[2]} ${p[2]} 0 1 0 ${p[2]*2} 0 a${p[2]} ${p[2]} 0 1 0 -${p[2]*2} 0`,1.5);
     const n=Math.max(7,Math.round(p[2]));
-    for(let i=0;i<n;i++){const a=i*Math.PI*2/n;
-      ink(FN,'M'+(p[0]+Math.cos(a)*p[2]).toFixed(1)+' '+(p[1]+Math.sin(a)*p[2]).toFixed(1)+' L'+(p[0]+Math.cos(a)*(p[2]+3)).toFixed(1)+' '+(p[1]+Math.sin(a)*(p[2]+3)).toFixed(1),.9,1,.7);}});
+    for(let i=0;i<n;i++){
+      const a=i*Math.PI*2/n;
+      ink(FN,`M${p[0]+Math.cos(a)*p[2]} ${p[1]+Math.sin(a)*p[2]} L${p[0]+Math.cos(a)*(p[2]+3)} ${p[1]+Math.sin(a)*(p[2]+3)}`,.9,1,.7);
+    }
+  });
+  /* three tiny screws */
   [[758,438],[772,448],[748,458]].forEach(p=>{
-    ink(FN,'M'+p[0]+' '+p[1]+' m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M'+(p[0]-2)+' '+p[1]+' l4 0',1.0,1,.8);});
+    ink(FN,`M${p[0]} ${p[1]} m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M${p[0]-2} ${p[1]} l4 0`,1.0,1,.8);
+  });
+
+  /* ————— light through the leaves ————— */
   [[330,214],[386,246],[300,262],[424,214]].forEach(p=>{
-    ink(FN,'M'+p[0]+' '+p[1]+' l38 62',.8,1,.16);});
+    ink(FN,`M${p[0]} ${p[1]} l38 62`,.8,1,.16);
+  });
 })();
 
 /* ============================================================
@@ -2579,55 +3932,97 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   if(!track)return;
   const part=document.getElementById('part'), fill=document.getElementById('trackFill'),
         svg=document.getElementById('partSvg');
+  /* it is a real dial, drawn by the same engine as everything else */
   (function draw(){
     const NS='http://www.w3.org/2000/svg';
     const mk=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;};
     mk('circle',{cx:0,cy:0,r:46,fill:'#e7e2d4',stroke:'#22201a','stroke-width':3});
     mk('circle',{cx:0,cy:0,r:38,fill:'none',stroke:'#22201a','stroke-width':1,opacity:.4});
-    for(let m=0;m<60;m++){const a=m*Math.PI/30, maj=m%5===0;
+    for(let m=0;m<60;m++){
+      const a=m*Math.PI/30, maj=m%5===0;
       const r1=maj?30:34,r2=38;
       mk('line',{x1:Math.sin(a)*r1,y1:-Math.cos(a)*r1,x2:Math.sin(a)*r2,y2:-Math.cos(a)*r2,
-        stroke:'#22201a','stroke-width':maj?2.4:1,opacity:maj?.9:.55});}
+        stroke:'#22201a','stroke-width':maj?2.4:1,opacity:maj?.9:.55});
+    }
     mk('line',{x1:0,y1:6,x2:0,y2:-22,stroke:'#22201a','stroke-width':3.4,'stroke-linecap':'round'});
     mk('line',{x1:0,y1:4,x2:17,y2:12,stroke:'#22201a','stroke-width':2.6,'stroke-linecap':'round'});
     mk('circle',{cx:0,cy:0,r:3.4,fill:'#c9391b'});
   })();
+
   const W=()=>track.clientWidth-62;
   let x=0, dragging=false, sx=0, done=false;
-  const set=v=>{x=Math.max(0,Math.min(W(),v));
-    part.style.transform='translateX('+x+'px) rotate('+(x*1.6)+'deg)';
+  const set=v=>{
+    x=Math.max(0,Math.min(W(),v));
+    part.style.transform=`translateX(${x}px) rotate(${x*1.6}deg)`;
     fill.style.width=(x+40)+'px';
-    track.classList.toggle('near',x>W()*0.72);};
-  const finish=()=>{if(done)return;done=true;
-    part.style.transform='translateX('+W()+'px) rotate('+(W()*1.6)+'deg) scale(1.12)';
-    track.classList.remove('drag');enterStudio();};
-  const release=()=>{if(!dragging)return;dragging=false;track.classList.remove('drag');
+    track.classList.toggle('near',x>W()*0.72);
+    const pc=Math.round(x/Math.max(W(),1)*100);
+    track.setAttribute('aria-valuenow',pc);
+    track.setAttribute('aria-valuetext',pc>=100?'open — the studio is ready':pc+' per cent across');
+  };
+  const finish=()=>{
+    if(done)return;done=true;
+    part.style.transform=`translateX(${W()}px) rotate(${W()*1.6}deg) scale(1.12)`;
+    track.classList.remove('drag');
+    enterStudio();
+  };
+  const release=()=>{
+    if(!dragging)return;dragging=false;track.classList.remove('drag');
     if(x>W()*0.72)finish();
     else{part.style.transition='transform .7s var(--ease)';set(0);
-      setTimeout(()=>part.style.transition='',700);}};
-  track.addEventListener('pointerdown',e=>{if(done)return;
-    dragging=true;sx=e.clientX-x;track.classList.add('drag');part.style.transition='none';
-    track.setPointerCapture&&track.setPointerCapture(e.pointerId);});
+      setTimeout(()=>part.style.transition='',700);}
+  };
+  track.addEventListener('pointerdown',e=>{
+    if(done)return;
+    dragging=true;sx=e.clientX-x;track.classList.add('drag');
+    part.style.transition='none';
+    track.setPointerCapture&&track.setPointerCapture(e.pointerId);
+  });
   addEventListener('pointermove',e=>{if(dragging)set(e.clientX-sx);});
   addEventListener('pointerup',release);
   addEventListener('pointercancel',release);
-  track.addEventListener('click',e=>{if(dragging||done)return;
-    part.style.transition='transform .9s var(--ease)';set(W());setTimeout(finish,520);});
+  /* a click anywhere on the track also walks it across */
+  track.addEventListener('click',e=>{
+    if(dragging||done)return;
+    part.style.transition='transform .9s var(--ease)';
+    set(W());setTimeout(finish,520);
+  });
   document.getElementById('enterSkip').onclick=()=>{part.style.transition='transform .8s var(--ease)';set(W());setTimeout(finish,420);};
+  /* the same control, driven from the keyboard: arrows walk it, Enter opens it */
+  track.addEventListener('keydown',e=>{
+    const step=W()/8;
+    if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();part.style.transition='transform .25s var(--ease)';set(x+step);
+      if(x>=W())setTimeout(finish,260);}
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();part.style.transition='transform .25s var(--ease)';set(x-step);}
+    if(e.key==='Home'){e.preventDefault();set(0);}
+    if(e.key==='End'){e.preventDefault();set(W());setTimeout(finish,260);}
+  });
   addEventListener('keydown',e=>{
     if(document.getElementById('landing').classList.contains('gone'))return;
-    if(e.key==='Enter'||e.key===' '){e.preventDefault();part.style.transition='transform .8s var(--ease)';set(W());setTimeout(finish,420);}});
+    if(e.key==='Enter'||(e.key===' '&&e.target===track)){e.preventDefault();
+      part.style.transition='transform .8s var(--ease)';set(W());setTimeout(finish,420);}
+  });
 })();
+
 function enterStudio(){
   const L=document.getElementById('landing');
   setTimeout(()=>{
     L.classList.add('gone');
-    setTimeout(()=>{L.style.display='none';resize();},1100);
-    try{if(!localStorage.getItem('semi.seen'))setTimeout(()=>showGuide(0),1000);}catch(e){}
+    try{sessionStorage.setItem('semi.entered','1');}catch(e){}
+    setTimeout(()=>{L.style.display='none';resize();
+      /* the keyboard follows the eye into the studio */
+      const first=document.querySelector('#rail .rl');if(first&&first.focus)first.focus();
+    },1100);
+    /* the guide waits until the studio is actually visible */
+    try{
+      if(!localStorage.getItem('semi.seen'))setTimeout(()=>showGuide(0),1000);
+    }catch(e){}
   },260);
 }
-/* a shared link goes straight to the watch */
-(function(){const L=document.getElementById('landing');
+/* a shared link goes straight to the watch — judged by how the page was opened,
+   not by the hash we write ourselves as the design changes */
+(function(){
+  const L=document.getElementById('landing');
   if(typeof fromLink!=='undefined'&&fromLink){L.classList.add('gone');L.style.display='none';}
 }());
 
