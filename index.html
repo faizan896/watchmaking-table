@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AXIS — Watch Design Studio</title>
+<title>SEMI — Watch Design Studio</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Cg transform='translate(32 32)' fill='none' stroke='%23e9e4d8'%3E%3Cellipse rx='24' ry='11' transform='rotate(-32)' stroke-width='5'/%3E%3Cellipse rx='24' ry='11' transform='rotate(32)' stroke-width='5'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='3.4' fill='%23c9391b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Archivo+Narrow:wght@400;500;600&family=Barlow+Condensed:wght@300;400;500;600&family=Yuji+Syuku&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Archivo+Narrow:wght@400;500;600&family=Barlow+Condensed:wght@300;400;500;600&family=Yuji+Syuku&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
 :root{
   --stage:#0d0d0c;--paper:#f2efe8;--paper2:#e9e5db;--ink:#181713;--ink2:#5c574c;--ink3:#918a7c;
@@ -19,7 +19,8 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #app{display:grid;grid-template-columns:1fr 392px;height:100%}
 #stage{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:radial-gradient(120% 100% at 50% 38%,#16150f 0%,#0b0b0a 68%)}
-#cv{max-width:100%;max-height:100%;display:block}
+#cv{max-width:100%;max-height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none;will-change:transform}
 #brand{position:absolute;top:34px;left:44px;pointer-events:none;display:flex;align-items:center;gap:15px}
 #logo{width:50px;height:29px;flex:none}
 #logo path{fill:var(--cream)}
@@ -27,8 +28,22 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #kanjiLogo{font-family:'Yuji Syuku',serif;font-size:40px;line-height:1;color:var(--cream);display:none}
 #brand.k #logo{display:none}
 #brand.k #kanjiLogo{display:block}
-#brand b{font-size:19px;display:block;line-height:1;letter-spacing:.46em;font-weight:400;color:var(--cream)}
-#brand span{font-size:7.5px;letter-spacing:.30em;color:#7d7568;text-transform:uppercase;display:block;margin-top:7px}
+#brand b{font-family:'Pinyon Script',var(--serif);font-size:40px;display:block;line-height:.9;
+  letter-spacing:.01em;font-weight:400;color:var(--cream);text-transform:none}
+#brand span{font-size:7px;letter-spacing:.42em;color:#7d7568;text-transform:uppercase;display:block;margin-top:6px}
+/* the stage adapts: on a pale backdrop the maison turns to ink */
+#stage.light #brand b,#stage.light #kanjiLogo{color:#1b1a16}
+#stage.light #brand span{color:#6f6a5e}
+#stage.light #logo path{fill:#1b1a16}
+#stage.light #specName{color:#1b1a16}
+#stage.light #specRule{background:rgba(27,26,22,.34)}
+#stage.light #specText{color:#5f5a4f}
+#stage.light #specText b{color:#26241e}
+#stage.light .gbtn{color:#5f5a4f}
+#stage.light .gbtn:hover{color:#1b1a16}
+#stage.light #bgRow em{color:#7a7365}
+#stage.light .bgs{border-color:rgba(27,26,22,.3)}
+#stage.light .bgs:hover{border-color:rgba(27,26,22,.7)}
 #specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:430px}
 #specName{font-family:var(--serif);font-style:italic;font-size:23px;color:var(--cream);line-height:1;margin-bottom:12px;display:none}
 #specName.on{display:block}
@@ -47,7 +62,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .bgs.on{border-color:var(--gold);transform:scale(1.25)}
 #panel{background:var(--paper);display:grid;grid-template-columns:74px 1fr;min-height:0;position:relative}
 #panel:before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:rgba(0,0,0,.5)}
-#rail{border-right:1px solid var(--rule);padding:34px 0;overflow-y:auto}
+#rail{border-right:1px solid var(--rule);padding:34px 0;overflow-y:auto;overscroll-behavior:contain}
 #rail::-webkit-scrollbar{width:0}
 .rl{padding:11px 0;text-align:center;cursor:pointer;user-select:none;position:relative;
   font-size:10px;letter-spacing:.12em;color:var(--ink3);font-variant-numeric:tabular-nums;transition:color .4s var(--ease)}
@@ -60,7 +75,8 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #secNum{font-size:8.5px;letter-spacing:.34em;color:var(--gold);text-transform:uppercase;margin-bottom:11px}
 #secTitle{font-family:var(--serif);font-style:italic;font-weight:500;font-size:30px;line-height:1;color:var(--ink);margin-bottom:13px}
 #secHelp{font-size:12px;line-height:1.8;color:var(--ink2);max-width:33ch}
-#body{flex:1;overflow-y:auto;padding:26px 34px 34px}
+#body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;padding:26px 34px 34px}
 #body::-webkit-scrollbar{width:3px}
 #body::-webkit-scrollbar-thumb{background:var(--rule)}
 .grp{margin-bottom:30px}
@@ -109,8 +125,10 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #foot div:hover{color:var(--ink)}
 #foot .prime{margin-left:auto;color:var(--ink);font-weight:500}
 #foot .prime:hover{color:var(--gold)}
-#guide{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,.90);display:none;align-items:center;justify-content:center;padding:24px}
-#guide.on{display:flex}
+#guide{position:fixed;inset:0;z-index:60;background:rgba(8,8,7,.90);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .45s var(--ease)}
+#guide.on{display:flex;opacity:1}
+#guide .gcard{transform:translateY(12px) scale(.99);transition:transform .6s var(--ease)}
+#guide.on .gcard{transform:none}
 .gcard{max-width:470px;background:var(--paper);padding:46px 46px 26px;text-align:center}
 .gmark{height:40px;margin-bottom:22px}
 .gmark svg{height:40px}
@@ -125,9 +143,11 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .gdots{display:flex;gap:7px}
 .gdots i{width:4px;height:4px;border-radius:50%;background:rgba(24,23,19,.18);transition:background .4s var(--ease)}
 .gdots i.on{background:var(--gold)}
-#gloss{position:fixed;inset:0;z-index:61;background:rgba(8,8,7,.92);display:none;align-items:center;justify-content:center;padding:24px}
-#gloss.on{display:flex}
-.glossbox{max-width:600px;max-height:82vh;overflow-y:auto;background:var(--paper);padding:40px 46px 46px}
+#gloss{position:fixed;inset:0;z-index:61;background:rgba(8,8,7,.92);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .4s var(--ease)}
+#gloss.on{display:flex;opacity:1}
+#gloss .glossbox{transform:translateY(12px);transition:transform .55s var(--ease)}
+#gloss.on .glossbox{transform:none}
+.glossbox{max-width:600px;max-height:82vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--paper);padding:40px 46px 46px}
 .glossbox h3{font-family:var(--serif);font-style:italic;font-size:29px;color:var(--ink);margin-bottom:6px;
   display:flex;justify-content:space-between;align-items:baseline}
 .glossbox h3 span{cursor:pointer;font-family:var(--grot);font-style:normal;font-size:13px;color:var(--ink3)}
@@ -155,18 +175,123 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   .chip{padding:10px 14px;font-size:13px}
   .presets{grid-template-columns:1fr 1fr}
 }
+
+/* ————— THE FRONT PAGE ————— */
+#landing{position:fixed;inset:0;z-index:80;background:#efe9dc;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
+#landing.gone{opacity:0;transform:translateY(-3vh) scale(.985);pointer-events:none}
+#paper{position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:
+    radial-gradient(circle at 22% 18%,rgba(160,140,105,.10) 0,transparent 42%),
+    radial-gradient(circle at 78% 72%,rgba(150,130,95,.09) 0,transparent 46%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply}
+#lwrap{position:relative;max-width:1180px;margin:0 auto;padding:54px 56px 70px;
+  display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:auto 1fr auto;gap:0 62px;min-height:100%}
+#lbrand{grid-column:1/-1;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+#lmark{width:54px;height:31px;flex:none}
+#lmark path{fill:#22201a}
+#lmark circle{fill:var(--verm)}
+#lbrand b{font-family:'Pinyon Script',var(--serif);font-size:46px;line-height:.85;color:#22201a;display:block;font-weight:400}
+#lbrand span{font-size:7.5px;letter-spacing:.44em;text-transform:uppercase;color:#8b8271;display:block;margin-top:5px}
+#sketch{width:100%;height:auto;align-self:center;grid-row:2}
+#sk path,#sk line,#sk circle,#sk ellipse{fill:none;stroke:#2b2823;stroke-linecap:round;stroke-linejoin:round}
+#skFine path,#skFine line,#skFine circle{fill:none;stroke:#4d4740;stroke-linecap:round}
+#story{grid-row:2;align-self:center;max-width:460px;padding-bottom:10px}
+.skey{font-size:8px;letter-spacing:.42em;text-transform:uppercase;color:#a0977f;margin-bottom:22px}
+#story h1{font-family:var(--serif);font-style:italic;font-weight:500;font-size:40px;line-height:1.16;
+  color:#22201a;margin-bottom:26px;letter-spacing:-.005em}
+#story p{font-size:14px;line-height:1.95;color:#5b544a;margin-bottom:15px;max-width:44ch}
+.ssign{font-family:'Pinyon Script',var(--serif);font-size:34px;color:#22201a;margin-top:24px !important;line-height:1}
+.snote{margin-top:30px;padding-top:18px;border-top:1px solid rgba(34,32,26,.14);display:flex;gap:16px;align-items:flex-start}
+.snote b{font-family:'Yuji Syuku',serif;font-size:22px;color:#22201a;font-weight:400;white-space:nowrap;line-height:1.1}
+.snote span{font-size:11.5px;line-height:1.85;color:#7b7364;max-width:38ch}
+#enter{grid-column:1/-1;grid-row:3;margin-top:44px;display:flex;flex-direction:column;align-items:center;gap:14px}
+#enterLabel{font-size:8.5px;letter-spacing:.34em;text-transform:uppercase;color:#8b8271}
+#track{position:relative;width:min(420px,80vw);height:62px;border:1px solid rgba(34,32,26,.20);
+  border-radius:34px;background:rgba(255,255,255,.28);cursor:grab;user-select:none;touch-action:none;
+  transition:border-color .5s var(--ease),background .5s var(--ease)}
+#track:hover{border-color:rgba(34,32,26,.42)}
+#track.drag{cursor:grabbing}
+#trackFill{position:absolute;inset:1px;width:0;border-radius:34px;background:rgba(34,32,26,.055);transition:width .05s linear}
+#ghostPart{position:absolute;right:11px;top:11px;width:40px;height:40px;border-radius:50%;
+  border:1px dashed rgba(34,32,26,.32);transition:border-color .5s var(--ease),transform .5s var(--ease)}
+#track.near #ghostPart{border-color:var(--verm);transform:scale(1.1)}
+#part{position:absolute;left:11px;top:11px;width:40px;height:40px;
+  transition:transform .55s var(--ease);will-change:transform}
+#partSvg{width:40px;height:40px;display:block}
+#trackHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:8.5px;letter-spacing:.34em;text-transform:uppercase;color:#a0977f;pointer-events:none;
+  transition:opacity .4s var(--ease)}
+#track.drag #trackHint{opacity:0}
+#enterSkip{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:#a89f8b;cursor:pointer;transition:color .4s var(--ease)}
+#enterSkip:hover{color:#22201a}
+@media(max-width:980px){
+  #lwrap{grid-template-columns:1fr;gap:0;padding:34px 24px 46px}
+  #sketch{grid-row:auto;margin-bottom:26px}
+  #story{grid-row:auto;max-width:none}
+  #story h1{font-size:29px}
+  #enter{grid-row:auto;margin-top:34px}
+  #lbrand b{font-size:37px}
+}
 </style>
 </head>
 <body>
+<!-- ————— THE FRONT PAGE: a page from a sketchbook ————— -->
+<div id="landing">
+  <div id="paper"></div>
+  <div id="lwrap">
+    <div id="lbrand">
+      <svg id="lmark" viewBox="-60 -34 120 68"><g id="landMark"></g></svg>
+      <div><b>Semi</b><span>Watch design studio</span></div>
+    </div>
+    <svg id="sketch" viewBox="0 0 1000 620" aria-label="A boy assembling a watch beneath a tree">
+      <defs>
+        <filter id="pencil" x="-12%" y="-12%" width="124%" height="124%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="4" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="4.2" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="pencilSoft" x="-12%" y="-12%" width="124%" height="124%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="19" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <g id="sk" filter="url(#pencil)"></g>
+      <g id="skFine" filter="url(#pencilSoft)"></g>
+    </svg>
+    <div id="story">
+      <div class="skey">The reason this exists</div>
+      <h1>I loved watches long before<br>I could make anything.</h1>
+      <p>I read the histories. Every maison, every founder, every calibre that mattered — I knew the stories before I knew the words for what I was looking at.</p>
+      <p>Then I started watching the watchmakers. Hours of it. A pair of hands under a lamp, seating a bridge, driving a screw a quarter turn and stopping. I could tell you what an escapement does. I had never made one thing.</p>
+      <p>That is the gap this studio is for. I had the eye and no hands — no CAD, no drawing, no bench. So I built the bench instead: every real decision a watchmaker makes, laid out so that anyone who loves this can finally make something of their own.</p>
+      <p class="ssign">Faizan</p>
+      <div class="snote">
+        <b>蝉 · semi</b>
+        <span>The cicada waits underground for years and comes out exactly on time. Of every creature, it is the one that keeps a calendar.</span>
+      </div>
+    </div>
+    <div id="enter">
+      <div id="enterLabel">Swap the component to enter the studio</div>
+      <div id="track">
+        <div id="trackFill"></div>
+        <div id="ghostPart"></div>
+        <div id="part"><svg viewBox="-50 -50 100 100" id="partSvg"></svg></div>
+        <div id="trackHint">Drag →</div>
+      </div>
+      <div id="enterSkip">or press enter</div>
+    </div>
+  </div>
+</div>
 <div id="app">
   <div id="stage">
     <canvas id="cv"></canvas>
     <div id="brand">
-      <svg id="logo" viewBox="-60 -34 120 68" aria-label="Axis">
+      <svg id="logo" viewBox="-60 -34 120 68" aria-label="Semi">
         <g id="logoMark"></g>
       </svg>
-      <div id="kanjiLogo">軸</div>
-      <div><b>AXIS</b><span>Instruments of rotation</span></div>
+      <div id="kanjiLogo">蝉</div>
+      <div><b>Semi</b><span>Instruments of rotation</span></div>
     </div>
     <div id="specline">
       <div id="specName"></div>
@@ -225,7 +350,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 </div>
 <script>
 /* ============================================================
-   AXIS · PARAMETRIC WATCH STUDIO
+   SEMI · PARAMETRIC WATCH STUDIO
    Every control is a real design parameter, not a colour swap.
    ============================================================ */
 const cv=document.getElementById('cv'),X=cv.getContext('2d');
@@ -347,7 +472,7 @@ const DIALCOL={
 const STRAPCOL=['#8a5c34','#4d3524','#232120','#5a2c2e','#2f4034','#1f3550','#9d9a92','#c9b28a'];
 
 /* ============================================================
-   THE AXIS MARK
+   THE SEMI MARK
    Two orbits crossing on a shared pivot. Each ring swells at the
    flank and tapers at the tips — a stroke, not a hoop.
    ============================================================ */
@@ -1007,13 +1132,13 @@ function sigPlan(){
   if(botBusy && y > 0.20) y = -0.42;
   return {y,scale,variant};
 }
-/* the emblem: two orbits, or 軸 — the character that means axis */
+/* the emblem: two orbits, or 蝉 — semi, the cicada that keeps a calendar */
 function drawEmblem(c,size,ink){
   if(S.brand==='kanji'||S.brand==='both'){
     c.save();
     c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
     c.font=`400 ${size*2.05}px "Yuji Syuku", "Cormorant Garamond", serif`;
-    c.fillText('軸',0,size*.06);
+    c.fillText('蝉',0,size*.06);
     c.restore();
     if(S.brand==='both'){
       c.save();c.translate(0,size*1.55);drawMark(c,size*.62,ink,'#c9391b');c.restore();
@@ -1033,17 +1158,13 @@ function drawSignature(c,dR,ink){
   if(p.variant==='mark'){
     c.save();c.translate(0,yTop+dR*.045);drawEmblem(c,dR*.115*s,ink);c.restore();
   }else if(p.variant==='name'){
-    c.fillStyle=ink;c.font=`600 ${dR*.098*s}px ${FONTS.grot}`;
-    if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.052*s}px`;
-    c.fillText('AXIS',dR*.026*s,yTop+dR*.05);
-    if(c.letterSpacing!==undefined)c.letterSpacing='0px';
+    c.fillStyle=ink;c.font=`400 ${dR*.20*s}px "Pinyon Script", ${FONTS.serif}`;
+    c.fillText('Semi',0,yTop+dR*.05);
   }else{ /* full lockup: emblem above, wordmark below */
     const kan=(S.brand==='kanji');
     c.save();c.translate(0,yTop);drawEmblem(c,dR*.092*s,ink);c.restore();
-    c.fillStyle=ink;c.font=`600 ${dR*.076*s}px ${FONTS.grot}`;
-    if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.042*s}px`;
-    c.fillText('AXIS',dR*.021*s,yTop+dR*(kan?.155:.115)*s);
-    if(c.letterSpacing!==undefined)c.letterSpacing='0px';
+    c.fillStyle=ink;c.font=`400 ${dR*.165*s}px "Pinyon Script", ${FONTS.serif}`;
+    c.fillText('Semi',0,yTop+dR*(kan?.185:.145)*s);
   }
   /* the line at six, only where nothing else lives */
   if(!botBusySix()){
@@ -1839,7 +1960,7 @@ function build(){
     d.className='rl'+(t.k===tab?' on':'');
     d.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b>`;
     d.title=SECTION[t.k]?SECTION[t.k].n:t.n;
-    d.onclick=()=>{tab=t.k;build();};
+    d.onclick=()=>{tab=t.k;build();document.getElementById('body').scrollTop=0;};
     T.appendChild(d);
   });
   const sec=SECTION[tab]||{n:tab,h:''};
@@ -1889,7 +2010,7 @@ function build(){
     const b2=document.createElement('div');b2.className='bigbtn';b2.textContent='Download certificate';
     b2.onclick=certificate;add(b2);
     const b0=document.createElement('div');b0.className='bigbtn ghost';b0.textContent='The vocabulary';
-    b0.onclick=()=>{buildGlossary();document.getElementById('gloss').classList.add('on');};
+    b0.onclick=()=>{buildGlossary();const gx=document.getElementById('gloss');gx.style.display='flex';requestAnimationFrame(()=>gx.classList.add('on'));};
     add(b0);
     const b3=document.createElement('div');b3.className='bigbtn ghost';b3.textContent='Copy shareable link';
     b3.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
@@ -1919,7 +2040,7 @@ function build(){
     add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
     add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v));
     add(chips('Chapter ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v));
-    add(chips('Emblem',[{v:'orbit',n:'Orbit mark'},{v:'kanji',n:'軸 Jiku'},{v:'both',n:'Both'}],S.brand,v=>S.brand=v));
+    add(chips('Emblem',[{v:'orbit',n:'Orbit mark'},{v:'kanji',n:'蝉 Semi'},{v:'both',n:'Both'}],S.brand,v=>S.brand=v));
     add(chips('Signature',[{v:'auto',n:'Automatic'},{v:'full',n:'Mark + name'},{v:'mark',n:'Mark only'},{v:'name',n:'Name only'},{v:'none',n:'Unsigned'}],S.sig,v=>S.sig=v));
   }
   else if(tab==='index'){
@@ -1966,6 +2087,10 @@ function spec(){
     `<b>${dialName}</b> · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp].toLowerCase()}${S.date!=='none'?' · date at '+S.date:''}<br>`+
     `${HANDS[S.hands]} hands · ${BEZELS[S.bezel].toLowerCase()} bezel · ${STRAPN[S.strap].toLowerCase()}`;
   document.querySelectorAll('.bgs').forEach(b=>b.classList.toggle('on',b.dataset.bg===S.bg));
+  /* a pale backdrop must not swallow the maison */
+  const c=S.bg.replace('#','');
+  const lum=(parseInt(c.substr(0,2),16)*.299+parseInt(c.substr(2,2),16)*.587+parseInt(c.substr(4,2),16)*.114)/255;
+  document.getElementById('stage').classList.toggle('light',lum>0.5);
 }
 
 /* ————— shareable designs ————— */
@@ -2022,11 +2147,13 @@ function showGuide(i){
   document.getElementById('gBody').innerHTML=g.b;
   document.getElementById('gDots').innerHTML=GUIDE.map((_,k)=>`<i class="${k===gStep?'on':''}"></i>`).join('');
   document.getElementById('gNext').textContent=gStep===GUIDE.length-1?'Begin':'Next';
-  document.getElementById('guide').classList.add('on');
+  const gv=document.getElementById('guide');
+  gv.style.display='flex';requestAnimationFrame(()=>gv.classList.add('on'));
 }
 function closeGuide(){
-  document.getElementById('guide').classList.remove('on');
-  try{localStorage.setItem('axis.seen','1');}catch(e){}
+  const gv=document.getElementById('guide');
+  gv.classList.remove('on');setTimeout(()=>{if(!gv.classList.contains('on'))gv.style.display='';},500);
+  try{localStorage.setItem('semi.seen','1');}catch(e){}
 }
 function buildGlossary(){
   document.getElementById('glossList').innerHTML=
@@ -2220,10 +2347,8 @@ function certificate(){
   /* mark */
   x.save();x.translate(W/2,196);drawMark(x,86,'#211d16','#c9391b');x.restore();
   x.fillStyle='#211d16';x.textAlign='center';
-  x.font='600 46px "Archivo Narrow"';
-  if(x.letterSpacing!==undefined)x.letterSpacing='18px';
-  x.fillText('AXIS',W/2,320);
-  if(x.letterSpacing!==undefined)x.letterSpacing='6px';
+  x.font='400 92px "Pinyon Script", "Cormorant Garamond", serif';
+  x.fillText('Semi',W/2,328);
   x.fillStyle='#8d867a';x.font='400 17px "Archivo Narrow"';
   x.fillText('INSTRUMENTS OF ROTATION',W/2,352);
   /* the watch */
@@ -2261,14 +2386,14 @@ function certificate(){
     x.font='400 21px "Archivo Narrow"';
     y+=40;
   });
-  const serial='AX-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
+  const serial='SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
   x.textAlign='center';x.fillStyle='#8d867a';x.font='400 18px "Archivo Narrow"';
   if(x.letterSpacing!==undefined)x.letterSpacing='5px';
   x.fillText('DESIGN No. '+serial,W/2,y+34);
-  x.fillText('DESIGNED BY THE OWNER · AXIS STUDIO',W/2,y+66);
+  x.fillText('DESIGNED BY THE OWNER · SEMI STUDIO',W/2,y+66);
   const a=document.createElement('a');
   a.href=c.toDataURL('image/png');
-  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'axis')+'-certificate.png';
+  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'semi')+'-certificate.png';
   document.body.appendChild(a);a.click();a.remove();
 }
 function hashCode(s){let h=0;for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i);h|=0;}return h;}
@@ -2313,7 +2438,7 @@ function randomize(){
 function download(){
   const a=document.createElement('a');
   a.href=cv.toDataURL('image/png');
-  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'axis')+'-design.png';
+  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'semi')+'-design.png';
   document.body.appendChild(a);a.click();a.remove();
 }
 const DEFAULTS=JSON.parse(JSON.stringify(S));
@@ -2348,8 +2473,12 @@ document.querySelectorAll('.bgs').forEach(b=>b.onclick=()=>{S.bg=b.dataset.bg;pa
 })();
 
 /* ————— loop: base cached, hands live ————— */
-let dirty=true,baseDirty=true;
-function paint(){dirty=true;baseDirty=true;spec();syncHash();}
+let dirty=true,baseDirty=true,hashPending=0;
+function paint(){
+  dirty=true;baseDirty=true;spec();
+  /* writing the URL on every pixel of a drag is what makes a slider feel sticky */
+  clearTimeout(hashPending);hashPending=setTimeout(syncHash,220);
+}
 let last=0;
 function loop(t){
   if(dirty||t-last>200){render();dirty=false;last=t;}
@@ -2369,7 +2498,7 @@ document.getElementById('gNext').onclick=()=>{
 document.getElementById('gSkip').onclick=closeGuide;
 document.getElementById('guide').onclick=e=>{if(e.target.id==='guide')closeGuide();};
 document.getElementById('bHelp').onclick=()=>showGuide(0);
-document.getElementById('glossX').onclick=()=>document.getElementById('gloss').classList.remove('on');
+document.getElementById('glossX').onclick=()=>{const gx=document.getElementById('gloss');gx.classList.remove('on');setTimeout(()=>{if(!gx.classList.contains('on'))gx.style.display='';},450);};
 document.getElementById('gloss').onclick=e=>{if(e.target.id==='gloss')e.currentTarget.classList.remove('on');};
 (function(){
   const [r1,r2]=markPts(30);
@@ -2387,9 +2516,7 @@ addEventListener('resize',resize);
 const fromLink=decode();
 resize();build();
 /* first visit gets the guide; a shared design opens straight into the watch */
-try{
-  if(!fromLink&&!localStorage.getItem('axis.seen'))setTimeout(()=>showGuide(0),700);
-}catch(e){}
+/* the guide opens from enterStudio(), once the studio is on screen */
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{build();resize();});
 requestAnimationFrame(loop);
 setInterval(()=>{if(document.hidden)render();},400);
@@ -2397,6 +2524,151 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   renderBase:()=>{baseDirty=true;render();},
   png:()=>cv.toDataURL('image/png').length,
   link:()=>location.href};
+
+/* ============================================================
+   THE DRAWING — one page from a sketchbook. Every line is drawn
+   twice, slightly apart, the way a pencil never lands twice the same.
+   ============================================================ */
+(function(){
+  const SK=document.getElementById('sk'), FN=document.getElementById('skFine');
+  if(!SK)return;
+  const NS='http://www.w3.org/2000/svg';
+  let sd=20260816;
+  const rr=()=>{sd^=sd<<13;sd^=sd>>>17;sd^=sd<<5;return ((sd>>>0)%100000)/100000;};
+  const j=(a)=>(rr()-.5)*a;
+  function el(par,name,attrs){const e=document.createElementNS(NS,name);
+    for(const k in attrs)e.setAttribute(k,attrs[k]);par.appendChild(e);return e;}
+  function ink(par,d,w,passes,alpha){passes=passes||2;
+    for(let i=0;i<passes;i++){
+      el(par,'path',{d:d,'stroke-width':(w||1.5)*(i?0.72:1),
+        opacity:(alpha||1)*(i?0.5:0.92),
+        transform:'translate('+j(2.4).toFixed(2)+' '+j(2.4).toFixed(2)+')'});}}
+  function hatch(par,x,y,w,h,ang,gap,alpha){let d='';
+    const st=Math.max(gap||6,3), diag=(w+h);
+    for(let i=-h;i<diag;i+=st){
+      const x1=x+i,y1=y,x2=x+i-h*Math.tan(ang||0.5),y2=y+h;
+      d+='M'+(x1+j(1.6)).toFixed(1)+' '+(y1+j(1.6)).toFixed(1)+'L'+(x2+j(1.6)).toFixed(1)+' '+(y2+j(1.6)).toFixed(1);}
+    el(par,'path',{d:d,'stroke-width':.75,opacity:alpha||.22,
+      'clip-path':'inset(0 '+(1000-(x+w))+'px 0 '+x+'px)'});}
+  /* the tree */
+  ink(SK,'M243 470 C238 400 236 340 244 276 C248 245 246 218 238 196',3.1);
+  ink(SK,'M281 470 C288 398 292 336 286 274 C282 243 285 218 294 197',3.1);
+  ink(SK,'M262 300 C238 282 214 268 190 262',2.1);
+  ink(SK,'M268 258 C292 236 318 224 344 220',2.1);
+  ink(SK,'M258 226 C242 210 226 200 208 194',1.8);
+  for(let i=0;i<9;i++){const y=286+i*20;
+    ink(FN,'M'+(250+j(6)).toFixed(1)+' '+y+' C'+(258+j(4)).toFixed(1)+' '+(y+6)+' '+(262+j(4)).toFixed(1)+' '+(y+2)+' '+(272+j(6)).toFixed(1)+' '+(y+9),.9,1,.5);}
+  const CANOPY=[[262,170,150,62],[168,196,96,44],[366,196,96,44],[228,132,84,38],[330,148,74,34],[132,232,62,30],[416,236,60,30]];
+  CANOPY.forEach(c=>{let d='';
+    for(let a=0;a<=Math.PI*2+.2;a+=.24){
+      const w=c[2]*(0.86+rr()*0.3), h=c[3]*(0.84+rr()*0.34);
+      const x=c[0]+Math.cos(a)*w, y=c[1]+Math.sin(a)*h;
+      d+=(a?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
+    ink(SK,d+'Z',1.6,2,.8);});
+  [[452,300],[478,352],[430,392],[500,262],[150,318]].forEach(p=>{
+    ink(FN,'M'+p[0]+' '+p[1]+' q7 -6 13 1 q-7 6 -13 -1Z',1.1,1,.75);});
+  /* the ground and the cloth */
+  ink(SK,'M60 470 C260 462 620 466 940 470',2.2);
+  ink(SK,'M508 452 L742 452 L764 486 L486 486 Z',1.7);
+  hatch(FN,486,452,278,34,.35,9,.16);
+  /* the boy */
+  ink(SK,'M398 452 C392 404 398 366 414 342 C424 326 438 316 452 312',3.0);
+  ink(SK,'M452 312 C438 298 440 276 456 268 C474 259 494 268 496 286 C498 300 488 312 474 315',3.0);
+  ink(SK,'M448 288 C444 268 458 254 478 254 C494 254 504 264 504 276 C498 268 486 264 474 268 C462 272 452 280 448 288Z',2.0);
+  for(let i=0;i<7;i++)ink(FN,'M'+(452+i*7)+' '+(268-i*1.5)+' c4 -8 10 -12 17 -13',.9,1,.55);
+  ink(SK,'M494 292 m-11 0 a11 11 0 1 0 22 0 a11 11 0 1 0 -22 0',2.0);
+  ink(FN,'M494 292 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0',1.0,1,.7);
+  ink(SK,'M424 340 C446 336 470 344 486 358 C500 370 512 388 520 404',2.6);
+  ink(SK,'M520 404 C528 414 538 420 550 421',2.4);
+  ink(SK,'M550 421 l34 -13',1.7);
+  ink(SK,'M550 425 l34 -9',1.7);
+  ink(FN,'M420 366 C438 372 452 386 458 404 C462 416 466 424 474 430',2.0,2,.85);
+  ink(SK,'M398 452 C420 448 448 442 470 440 C492 438 512 442 526 452',2.6);
+  ink(SK,'M470 440 C466 424 470 410 480 400',2.0);
+  for(let i=0;i<4;i++)ink(FN,'M'+(408+i*5)+' '+(380+i*16)+' c14 -4 26 -2 36 4',.9,1,.5);
+  hatch(FN,372,452,190,26,.6,7,.2);
+  /* what he is building */
+  ink(SK,'M602 424 m-40 0 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0',2.4);
+  ink(FN,'M602 424 m-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0',1.1,1,.7);
+  ink(FN,'M580 408 C596 400 616 402 626 414 C632 422 630 434 622 440',1.3,1,.8);
+  ink(FN,'M602 424 m-13 0 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0',1.1,1,.8);
+  for(let i=0;i<14;i++){const a=i*Math.PI/7;
+    ink(FN,'M'+(602+Math.cos(a)*13).toFixed(1)+' '+(424+Math.sin(a)*13).toFixed(1)+' L'+(602+Math.cos(a)*16).toFixed(1)+' '+(424+Math.sin(a)*16).toFixed(1),1.0,1,.75);}
+  const PARTS=[[664,440,15],[700,428,10],[540,462,12],[726,452,7],[576,466,7]];
+  PARTS.forEach(p=>{
+    ink(SK,'M'+p[0]+' '+p[1]+' m-'+p[2]+' 0 a'+p[2]+' '+p[2]+' 0 1 0 '+(p[2]*2)+' 0 a'+p[2]+' '+p[2]+' 0 1 0 -'+(p[2]*2)+' 0',1.5);
+    const n=Math.max(7,Math.round(p[2]));
+    for(let i=0;i<n;i++){const a=i*Math.PI*2/n;
+      ink(FN,'M'+(p[0]+Math.cos(a)*p[2]).toFixed(1)+' '+(p[1]+Math.sin(a)*p[2]).toFixed(1)+' L'+(p[0]+Math.cos(a)*(p[2]+3)).toFixed(1)+' '+(p[1]+Math.sin(a)*(p[2]+3)).toFixed(1),.9,1,.7);}});
+  [[758,438],[772,448],[748,458]].forEach(p=>{
+    ink(FN,'M'+p[0]+' '+p[1]+' m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 M'+(p[0]-2)+' '+p[1]+' l4 0',1.0,1,.8);});
+  [[330,214],[386,246],[300,262],[424,214]].forEach(p=>{
+    ink(FN,'M'+p[0]+' '+p[1]+' l38 62',.8,1,.16);});
+})();
+
+/* ============================================================
+   THE COMPONENT YOU SWAP TO COME IN
+   ============================================================ */
+(function(){
+  const track=document.getElementById('track');
+  if(!track)return;
+  const part=document.getElementById('part'), fill=document.getElementById('trackFill'),
+        svg=document.getElementById('partSvg');
+  (function draw(){
+    const NS='http://www.w3.org/2000/svg';
+    const mk=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;};
+    mk('circle',{cx:0,cy:0,r:46,fill:'#e7e2d4',stroke:'#22201a','stroke-width':3});
+    mk('circle',{cx:0,cy:0,r:38,fill:'none',stroke:'#22201a','stroke-width':1,opacity:.4});
+    for(let m=0;m<60;m++){const a=m*Math.PI/30, maj=m%5===0;
+      const r1=maj?30:34,r2=38;
+      mk('line',{x1:Math.sin(a)*r1,y1:-Math.cos(a)*r1,x2:Math.sin(a)*r2,y2:-Math.cos(a)*r2,
+        stroke:'#22201a','stroke-width':maj?2.4:1,opacity:maj?.9:.55});}
+    mk('line',{x1:0,y1:6,x2:0,y2:-22,stroke:'#22201a','stroke-width':3.4,'stroke-linecap':'round'});
+    mk('line',{x1:0,y1:4,x2:17,y2:12,stroke:'#22201a','stroke-width':2.6,'stroke-linecap':'round'});
+    mk('circle',{cx:0,cy:0,r:3.4,fill:'#c9391b'});
+  })();
+  const W=()=>track.clientWidth-62;
+  let x=0, dragging=false, sx=0, done=false;
+  const set=v=>{x=Math.max(0,Math.min(W(),v));
+    part.style.transform='translateX('+x+'px) rotate('+(x*1.6)+'deg)';
+    fill.style.width=(x+40)+'px';
+    track.classList.toggle('near',x>W()*0.72);};
+  const finish=()=>{if(done)return;done=true;
+    part.style.transform='translateX('+W()+'px) rotate('+(W()*1.6)+'deg) scale(1.12)';
+    track.classList.remove('drag');enterStudio();};
+  const release=()=>{if(!dragging)return;dragging=false;track.classList.remove('drag');
+    if(x>W()*0.72)finish();
+    else{part.style.transition='transform .7s var(--ease)';set(0);
+      setTimeout(()=>part.style.transition='',700);}};
+  track.addEventListener('pointerdown',e=>{if(done)return;
+    dragging=true;sx=e.clientX-x;track.classList.add('drag');part.style.transition='none';
+    track.setPointerCapture&&track.setPointerCapture(e.pointerId);});
+  addEventListener('pointermove',e=>{if(dragging)set(e.clientX-sx);});
+  addEventListener('pointerup',release);
+  addEventListener('pointercancel',release);
+  track.addEventListener('click',e=>{if(dragging||done)return;
+    part.style.transition='transform .9s var(--ease)';set(W());setTimeout(finish,520);});
+  document.getElementById('enterSkip').onclick=()=>{part.style.transition='transform .8s var(--ease)';set(W());setTimeout(finish,420);};
+  addEventListener('keydown',e=>{
+    if(document.getElementById('landing').classList.contains('gone'))return;
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();part.style.transition='transform .8s var(--ease)';set(W());setTimeout(finish,420);}});
+})();
+function enterStudio(){
+  const L=document.getElementById('landing');
+  setTimeout(()=>{
+    L.classList.add('gone');
+    setTimeout(()=>{L.style.display='none';resize();},1100);
+    try{if(!localStorage.getItem('semi.seen'))setTimeout(()=>showGuide(0),1000);}catch(e){}
+  },260);
+}
+(function(){const g=document.getElementById('landMark');if(!g)return;
+  const p=markPts(30);
+  g.innerHTML='<path d="'+ptsToPath(p[0])+'" fill-rule="evenodd"/><path d="'+ptsToPath(p[1])+'" fill-rule="evenodd"/><circle cx="0" cy="0" r="2.6"/>';
+})();
+/* a shared link goes straight to the watch */
+(function(){const L=document.getElementById('landing');
+  if(typeof fromLink!=='undefined'&&fromLink){L.classList.add('gone');L.style.display='none';}
+}());
 
 </script>
 </body>
