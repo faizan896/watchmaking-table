@@ -650,6 +650,21 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   transition:color var(--dur2) var(--ease)}
 #enterSkip:hover{color:#22201a}
 
+/* a short window: the first screen still has to hold the movement, the
+   sentence and the way in, so the drawing gives up the room */
+@media(max-height:840px) and (min-width:1025px){
+  .lhero{min-height:0;padding:24px 0 34px;gap:0 52px}
+  #heroCv{max-width:min(100%,340px)}
+  .lstage{gap:16px}
+  .lstage figcaption{max-width:min(100%,340px)}
+  #heroSpec{gap:12px 16px}
+  #heroSpec dd{font-size:14px}
+  .lhead h1{font-size:clamp(28px,3vw,42px);margin-bottom:16px}
+  .skey{margin-bottom:18px}
+  .lsub{font-size:14px;line-height:1.7}
+  #enter{margin-top:0;gap:10px}
+  #track{height:54px}
+}
 @media(max-width:1024px){
   #lwrap{padding:0 34px}
   .lhero{grid-template-columns:1fr;gap:48px 0;min-height:0;padding:44px 0 56px}
