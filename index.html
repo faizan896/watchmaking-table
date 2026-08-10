@@ -308,7 +308,10 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   transition:opacity var(--dur1) var(--ease)}
 .shelf figure:hover .del,.shelf .del:focus-visible{opacity:1}
 
-#foot{border-top:1px solid var(--rule);padding:0 30px;display:flex;gap:22px;flex:none;align-items:center;min-width:0}
+/* opaque, or the chapter scrolling behind it shows straight through the buttons */
+#foot{border-top:1px solid var(--rule);padding:0 30px;display:flex;gap:22px;flex:none;
+  align-items:center;min-width:0;background:var(--paper);position:relative;z-index:2}
+#secHead{background:var(--paper);position:relative;z-index:2}
 #foot button{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;font-family:inherit;
   padding:19px 0;cursor:pointer;user-select:none;color:var(--ink3);background:none;border:0;
   transition:color var(--dur2) var(--ease)}
