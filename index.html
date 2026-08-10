@@ -28,20 +28,26 @@
    Hairlines, not boxes. Space, not decoration.
    ============================================================ */
 :root{
+  /* ——— five colours and one accent. a workshop has no palette. ——— */
   --stage:#0d0d0c;        /* the vitrine */
-  --paper:#f2efe8;        /* the catalogue page */
+  --paper:#f2efe8;        /* the catalogue page — warm ivory, never white */
   --paper2:#e9e5db;
-  --ink:#181713;          /* type on paper */
+  --ink:#181713;          /* deep charcoal, not black */
   --ink2:#5c574c;
-  --ink3:#918a7c;
-  --rule:rgba(24,23,19,.16);
-  --rule2:rgba(24,23,19,.08);
-  --gold:#8a6c32;         /* the only accent in the interface */
+  --ink3:#8a8375;
+  --rule:rgba(24,23,19,.15);
+  --rule2:rgba(24,23,19,.07);
+  --gold:#8a6c32;         /* brass. used for one thing at a time. */
+  --brass:#b08d44;
   --verm:#c9391b;         /* reserved for the watch itself */
   --cream:#efe9dc;        /* type on the stage */
   --serif:'Cormorant Garamond',Georgia,serif;
   --grot:'Archivo Narrow',sans-serif;
+  --mono:'Barlow Condensed','Archivo Narrow',sans-serif;  /* technical annotation */
+  /* mechanical easing: it starts, it settles, it does not bounce.
+     nothing in a watch overshoots. */
   --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-mech:cubic-bezier(.32,.06,.16,1);
 
   /* ——— type scale: one ratio (1.25), seven steps, nothing in between ———
      every font-size in this document is one of these. */
@@ -105,14 +111,26 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #stage.light .bgs{border-color:rgba(27,26,22,.34)}
 #stage.light .bgs:hover{border-color:rgba(27,26,22,.75)}
 
-/* the specification, set as a caption under a hairline */
-#specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:440px}
+/* ————— the specification, set the way a calibre sheet is set —————
+   label above, figure below, a hairline under each column. no boxes. */
+#specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:520px}
 #specName{font-family:var(--serif);font-style:italic;font-size:var(--fs4);color:var(--cream);
   line-height:1;margin-bottom:12px;display:none}
 #specName.on{display:block}
-#specRule{width:34px;height:1px;background:rgba(239,233,220,.36);margin-bottom:12px}
-#specText{font-size:var(--fs0);letter-spacing:.18em;color:#a8a193;text-transform:uppercase;line-height:2.1}
-#specText b{color:#ddd6c6;font-weight:400}
+#specRule{width:34px;height:1px;background:rgba(239,233,220,.36);margin-bottom:16px}
+#specSheet{display:grid;grid-template-columns:repeat(6,minmax(0,auto));gap:0 26px;margin-bottom:18px}
+#specSheet div{border-top:1px solid rgba(239,233,220,.22);padding-top:8px}
+#specSheet dt{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:#8b8477;margin-bottom:5px;white-space:nowrap}
+#specSheet dd{font-family:var(--mono);font-size:16px;letter-spacing:.03em;color:#e4ddcd;
+  font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1}
+#specSheet dd i{font-style:normal;font-size:10px;color:#8b8477;margin-left:2px}
+#specText{font-size:var(--fs0);letter-spacing:.18em;color:#9a9386;text-transform:uppercase;line-height:2.05}
+#specText b{color:#cfc7b6;font-weight:400}
+#stage.light #specSheet div{border-top-color:rgba(27,26,22,.20)}
+#stage.light #specSheet dt{color:#6b6558}
+#stage.light #specSheet dd{color:#1f1e19}
+#stage.light #specSheet dd i{color:#6b6558}
 
 #stageBtns{position:absolute;top:36px;right:44px;display:flex;gap:26px}
 .gbtn{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;color:#a8a193;
@@ -311,6 +329,79 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   color:var(--gold);margin-bottom:7px;font-weight:400}
 .gitem span{font-size:var(--fs2);line-height:1.8;color:var(--ink2)}
 
+/* ————— the presentation a shared link opens into ————— */
+#present{position:fixed;inset:0;z-index:90;background:#efe9dc;overflow-y:auto;
+  -webkit-overflow-scrolling:touch}
+#present[hidden]{display:none}
+.pwrap{max-width:1180px;margin:0 auto;padding:0 56px 80px}
+.phead{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;
+  padding:34px 0 18px;border-bottom:1px solid rgba(34,32,26,.22)}
+.phead b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs6);line-height:.85;
+  color:#22201a;display:block;font-weight:400}
+.phead span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
+  color:#655e4e;display:block;margin-top:7px}
+.pref{text-align:right}
+.pref b{font-family:var(--mono);font-size:26px;letter-spacing:.06em;color:#22201a;
+  font-variant-numeric:tabular-nums;margin:4px 0}
+.pref span{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;color:#7d7563;display:block}
+.pbody{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:0 70px;align-items:center;padding:60px 0 0}
+.pfig{text-align:center}
+#pCv{width:100%;max-width:560px;height:auto;
+  filter:drop-shadow(0 30px 60px rgba(40,32,18,.22))}
+.pfig figcaption{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;
+  color:#7d7563;margin-top:18px}
+.pinfo h1{font-family:var(--serif);font-style:italic;font-weight:600;
+  font-size:clamp(30px,3.6vw,48px);line-height:1.1;color:#22201a;margin-bottom:14px}
+.pinfo>p{font-size:var(--fs2);line-height:1.85;color:#514b41;margin-bottom:22px}
+#pSpec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 30px;margin-bottom:34px}
+#pSpec div{display:grid;grid-template-columns:118px 1fr;gap:14px;
+  border-top:1px solid rgba(34,32,26,.14);padding:12px 0}
+#pSpec dt{font-size:var(--fs0);letter-spacing:.22em;text-transform:uppercase;color:#7d7563}
+#pSpec dd{font-family:var(--mono);font-size:16px;color:#22201a;font-variant-numeric:tabular-nums}
+.prow{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.prow button:not(.lprime){background:none;border:0;font-family:inherit;cursor:pointer;
+  font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;color:#655e4e;padding:0 0 4px;
+  border-bottom:1px solid transparent;transition:color var(--dur2) var(--ease-mech)}
+.prow button:not(.lprime):hover{color:#22201a;border-bottom-color:var(--brass)}
+.pfoot{font-size:var(--fs0);letter-spacing:.22em;text-transform:uppercase;
+  color:#8a8172;margin-top:44px}
+@media(max-width:900px){
+  .pwrap{padding:0 24px 60px}
+  .pbody{grid-template-columns:1fr;gap:40px 0;padding-top:38px}
+  .pfig{order:-1}
+  #pSpec{grid-template-columns:1fr}
+}
+/* the exploration just made, stated plainly */
+#exp{position:absolute;top:36px;right:44px;max-width:330px;text-align:right;z-index:5;
+  pointer-events:none;opacity:0;transform:translateY(-6px);
+  transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
+#exp.on{opacity:1;transform:none}
+#exp b{display:block;font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);
+  text-transform:uppercase;color:var(--brass);font-weight:400;margin-bottom:8px;
+  border-bottom:1px solid rgba(176,141,68,.38);padding-bottom:7px}
+#exp p{font-size:var(--fs1);line-height:1.7;color:#a8a193}
+#exp span{color:#e4ddcd}
+#exp em{font-style:normal}
+#stage.light #exp p{color:#4f4b42}
+#stage.light #exp span{color:#1f1e19}
+@media(max-width:720px){#exp{top:auto;bottom:96px;left:12px;right:12px;max-width:none;text-align:left}}
+/* the part under the cursor, named at the top of the stage */
+#partRead{position:absolute;top:36px;left:50%;transform:translateX(-50%) translateY(-6px);
+  max-width:420px;text-align:center;pointer-events:none;z-index:5;
+  opacity:0;transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
+#partRead.on{opacity:1;transform:translateX(-50%)}
+#partRead figcaption{display:flex;align-items:baseline;justify-content:center;gap:12px;
+  border-bottom:1px solid rgba(176,141,68,.42);padding-bottom:7px;margin-bottom:9px}
+#partRead figcaption span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);
+  text-transform:uppercase;color:var(--brass)}
+#partRead figcaption em{font-style:normal;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;color:#7d7668;font-variant-numeric:tabular-nums}
+#partRead p{font-size:var(--fs1);line-height:1.7;color:#b8b1a2}
+#stage.light #partRead p{color:#4f4b42}
+#stage.light #partRead figcaption em{color:#6b6558}
+@media(max-width:720px){#partRead{top:auto;bottom:12px;left:12px;right:12px;transform:none;max-width:none}
+  #partRead.on{transform:none}}
 /* the studio's opinion: a card on the stage, never a wall */
 #tip{position:absolute;left:44px;bottom:150px;max-width:330px;z-index:6;
   background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
@@ -447,29 +538,81 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     radial-gradient(circle at 78% 72%,rgba(150,130,95,.09) 0,transparent 46%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   mix-blend-mode:multiply}
-#lwrap{position:relative;max-width:1180px;margin:0 auto;padding:54px 56px 70px;
-  display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:auto 1fr auto;
-  gap:0 62px;min-height:100%}
+#lwrap{position:relative;max-width:1240px;margin:0 auto;padding:0 56px 0}
 
-#lbrand{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-bottom:16px}
-#lbrand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs7);line-height:.85;color:#22201a;display:block;font-weight:400}
-#lbrand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#655e4e;display:block;margin-top:6px}
+/* ————— navigation: a name, three words, one door ————— */
+#lnav{position:sticky;top:0;z-index:20;display:flex;align-items:flex-end;
+  justify-content:space-between;gap:30px;padding:28px 0 16px;
+  background:linear-gradient(#efe9dc 68%,rgba(239,233,220,0));
+  border-bottom:1px solid rgba(34,32,26,.10)}
+#lbrand{display:block;text-decoration:none}
+#lbrand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs6);line-height:.85;
+  color:#22201a;display:block;font-weight:400}
+#lbrand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
+  color:#655e4e;display:block;margin-top:7px}
+#lnav nav{display:flex;align-items:center;gap:30px;padding-bottom:5px}
+#lnav nav a{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;
+  color:#655e4e;text-decoration:none;padding-bottom:4px;border-bottom:1px solid transparent;
+  transition:color var(--dur2) var(--ease-mech),border-color var(--dur2) var(--ease-mech)}
+#lnav nav a:hover{color:#22201a;border-bottom-color:var(--brass)}
+.lprime{font-family:inherit;font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;
+  color:#22201a;background:none;border:0;border-bottom:1px solid var(--brass);
+  padding:0 0 4px;cursor:pointer;transition:color var(--dur2) var(--ease-mech)}
+.lprime:hover{color:var(--gold)}
 
-#sketch{width:100%;height:auto;align-self:center;grid-row:2}
-#sk path,#sk line,#sk circle,#sk ellipse,#sk polyline{fill:none;stroke:#2b2823;stroke-linecap:round;stroke-linejoin:round}
-#skFine path,#skFine line,#skFine circle,#skFine polyline{fill:none;stroke:#4d4740;stroke-linecap:round}
+/* ————— first screen ————— */
+.lhero{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+  gap:0 70px;align-items:center;min-height:calc(100vh - 116px);padding:40px 0 56px}
+.lhead{max-width:30ch}
+.skey{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
+  color:#726a58;margin-bottom:26px}
+.lhead h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.4vw,60px);
+  line-height:1.08;color:#22201a;letter-spacing:-.012em;margin-bottom:24px}
+.lhead h1 i{font-style:italic;color:#3a352b}
+.lsub{font-size:var(--fs2);line-height:1.9;color:#514b41;max-width:38ch}
+.lstage{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
+#heroCv{width:100%;max-width:520px;height:auto;display:block;
+  filter:drop-shadow(0 30px 60px rgba(40,32,18,.22))}
+.lstage figcaption{width:100%;max-width:520px}
+#heroSpec{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 22px}
+#heroSpec div{border-top:1px solid rgba(34,32,26,.18);padding-top:8px}
+#heroSpec dt{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:#7d7563;margin-bottom:5px}
+#heroSpec dd{font-family:var(--mono);font-size:16px;color:#22201a;
+  font-variant-numeric:tabular-nums;line-height:1}
+#heroSpec dd i{font-style:normal;font-size:10px;color:#7d7563;margin-left:2px}
 
-#story{grid-row:2;align-self:center;max-width:460px;padding-bottom:10px}
-.skey{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#726a58;margin-bottom:22px}
-#story h1{font-family:var(--serif);font-style:italic;font-weight:600;font-size:var(--fs6);line-height:1.16;
-  color:#22201a;margin-bottom:26px;letter-spacing:-.005em}
-#story p{font-size:var(--fs2);line-height:1.9;color:#514b41;margin-bottom:15px;max-width:44ch}
-.ssign{font-family:'Pinyon Script',var(--serif);font-size:var(--fs5);color:#22201a;margin-top:24px !important;line-height:1}
-.snote{margin-top:30px;padding-top:18px;border-top:1px solid rgba(34,32,26,.16);display:flex;gap:16px;align-items:flex-start}
-.snote b{font-family:'Yuji Syuku',serif;font-size:var(--fs4);color:#22201a;font-weight:400;white-space:nowrap;line-height:1.1}
-.snote span{font-size:var(--fs1);line-height:1.8;color:#5f5849;max-width:38ch}
+/* ————— the sections ————— */
+.lsec{padding:110px 0;border-top:1px solid rgba(34,32,26,.12)}
+.lnum{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
+  color:#8a8172;margin-bottom:52px}
+.lgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 70px;align-items:center}
+.lgrid-r{align-items:start}
+.lsec h2{font-family:var(--serif);font-style:italic;font-weight:600;
+  font-size:clamp(26px,3.1vw,40px);line-height:1.16;color:#22201a;margin-bottom:26px}
+.lsec p{font-size:var(--fs2);line-height:1.9;color:#514b41;margin-bottom:16px;max-width:44ch}
+.lart{opacity:.92}
+.lspecs{align-self:start}
+.lspecs div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;
+  border-top:1px solid rgba(34,32,26,.14);padding:15px 0}
+.lspecs dt{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;color:#7d7563}
+.lspecs dd{font-size:var(--fs1);line-height:1.7;color:#3f3a31}
+.lsteps{list-style:none;counter-reset:step;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 34px}
+.lsteps li{counter-increment:step;border-top:1px solid rgba(34,32,26,.14);padding:18px 0 0}
+.lsteps li:before{content:counter(step,decimal-leading-zero);display:block;
+  font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--brass);margin-bottom:14px}
+.lsteps b{display:block;font-size:var(--fs2);color:#22201a;font-weight:600;
+  line-height:1.4;margin-bottom:9px}
+.lsteps span{display:block;font-size:var(--fs1);line-height:1.75;color:#5b544a}
+.lend{text-align:center}
+.lend h2{max-width:20ch;margin-left:auto;margin-right:auto}
+.lclose{margin:0 auto 40px;max-width:52ch}
+.lbig{font-size:var(--fs1);letter-spacing:.26em;padding-bottom:7px}
+.lfoot{font-size:var(--fs0);letter-spacing:.22em;text-transform:uppercase;
+  color:#8a8172;margin:72px auto 0}
 
-#enter{grid-column:1/-1;grid-row:3;margin-top:44px;display:flex;flex-direction:column;align-items:center;gap:14px}
+#enter{grid-column:1/-1;margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:14px}
 #enterLabel{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;color:#655e4e}
 #track{position:relative;width:min(420px,80vw);height:62px;border:1px solid rgba(34,32,26,.22);
   border-radius:34px;background:rgba(255,255,255,.28);cursor:grab;user-select:none;touch-action:none;
@@ -493,22 +636,35 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   transition:color var(--dur2) var(--ease)}
 #enterSkip:hover{color:#22201a}
 
-@media(max-width:980px){
-  #lwrap{grid-template-columns:1fr;gap:0;padding:34px 24px 46px}
-  #sketch{grid-row:auto;margin-bottom:26px}
-  #story{grid-row:auto;max-width:none}
-  #story h1{font-size:var(--fs5)}
-  #enter{grid-row:auto;margin-top:34px}
-  #lbrand b{font-size:var(--fs6)}
+@media(max-width:1024px){
+  #lwrap{padding:0 34px}
+  .lhero{grid-template-columns:1fr;gap:48px 0;min-height:0;padding:44px 0 56px}
+  .lhead{max-width:none}
+  .lstage{order:-1}
+  .lgrid{grid-template-columns:1fr;gap:44px 0}
+  .lart{order:1;max-width:560px}
+  .lsec{padding:80px 0}
+  .lnum{margin-bottom:36px}
 }
 @media(max-width:720px){
   #landing{-webkit-text-size-adjust:100%}
-  #lwrap{padding:26px 20px 40px}
-  #story h1{font-size:var(--fs4);margin-bottom:20px}
-  #story p{margin-bottom:13px}
-  #sketch{margin-bottom:18px}
-  #track{height:66px}
+  #lwrap{padding:0 20px}
+  #lnav{padding:18px 0 12px;align-items:center}
+  #lbrand b{font-size:var(--fs5)}
+  #lbrand span{display:none}
+  #lnav nav{gap:18px}
+  #lnav nav a{display:none}
+  .lhead h1{font-size:clamp(28px,8vw,38px)}
+  .lsub{font-size:var(--fs2)}
+  #heroSpec{grid-template-columns:repeat(3,1fr);gap:12px 14px}
+  #heroSpec dd{font-size:14px}
+  .lsec{padding:62px 0}
+  .lsec p{max-width:none}
+  .lsteps{gap:0}
+  .lsteps li{padding-top:16px}
   .snote{flex-direction:column;gap:10px}
+  #track{height:66px}
+  .lfoot{margin-top:48px}
 }
 
 </style>
@@ -522,59 +678,133 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   <div id="lwrap">
 
     <a class="skiplink" href="#enter">Skip to the studio</a>
-    <div id="lbrand">
-      <div>
+
+    <!-- the only navigation there is -->
+    <header id="lnav">
+      <a href="#top" id="lbrand">
         <b>Semi</b>
-        <span>Watch design studio · est. 2025, Lahore</span>
+        <span>Watch design studio · est. 2025</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#idea">The idea</a>
+        <a href="#calibre">The calibre</a>
+        <a href="#process">The process</a>
+        <button type="button" class="lprime" id="navCreate">Enter the atelier</button>
+      </nav>
+    </header>
+
+    <!-- ————— first screen: the movement, and one sentence ————— -->
+    <section id="top" class="lhero">
+      <div class="lhead">
+        <p class="skey">Semi · a digital atelier</p>
+        <h1>Design a mechanical watch.<br><i>Movement first.</i></h1>
+        <p class="lsub">Begin with the calibre. Everything else follows —
+          the case is sized around it, the dial is drawn over it, and the hands
+          are set by a wheel that turns once a minute.</p>
       </div>
-    </div>
-
-    <!-- the drawing -->
-    <svg id="sketch" viewBox="0 0 1000 620" aria-label="A boy assembling a watch beneath a tree">
-      <defs>
-        <filter id="pencil" x="-12%" y="-12%" width="124%" height="124%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="4" seed="7" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="4.2" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-        <filter id="pencilSoft" x="-12%" y="-12%" width="124%" height="124%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="19" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </defs>
-      <g id="sk" filter="url(#pencil)"></g>
-      <g id="skFine" filter="url(#pencilSoft)"></g>
-    </svg>
-
-    <!-- the story -->
-    <div id="story">
-      <div class="skey">The reason this exists</div>
-      <h1>I loved watches long before<br>I could make anything.</h1>
-      <p>I read the histories. Every maison, every founder, every calibre that mattered — I knew the stories before I knew the words for what I was looking at.</p>
-      <p>Then I started watching the watchmakers. Hours of it. A pair of hands under a lamp, seating a bridge, driving a screw a quarter turn and stopping. I could tell you what an escapement does. I had never made one thing.</p>
-      <p>That is the gap this studio is for. I had the eye and no hands — no CAD, no drawing, no bench. So I built the bench instead: every real decision a watchmaker makes, laid out so that anyone who loves this can finally make something of their own.</p>
-      <p>So it starts where a watch starts — with the movement. Everything after that is built on it.</p>
-      <p class="ssign">Faizan</p>
-      <div class="snote">
-        <b>蝉 · semi</b>
-        <span>The cicada waits underground for years and comes out exactly on time. Of every creature, it is the one that keeps a calendar.</span>
-      </div>
-    </div>
-
-    <!-- swap the component to enter -->
-    <div id="enter">
-      <div id="enterLabel" aria-hidden="true">Slide the balance across to open the calibre</div>
-      <div id="track" role="slider" tabindex="0" aria-label="Slide the balance wheel across to enter the studio"
-           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="closed">
-        <div id="trackFill"></div>
-        <div id="ghostPart"></div>
-        <div id="part">
-          <svg viewBox="-50 -50 100 100" id="partSvg" aria-hidden="true" focusable="false"></svg>
+      <figure class="lstage">
+        <canvas id="heroCv" width="900" height="900"
+                aria-label="A mechanical movement, turning"></canvas>
+        <figcaption>
+          <dl id="heroSpec"></dl>
+        </figcaption>
+      </figure>
+      <!-- swap the component to enter -->
+      <div id="enter">
+        <div id="enterLabel" aria-hidden="true">Slide the balance across to open the calibre</div>
+        <div id="track" role="slider" tabindex="0" aria-label="Slide the balance wheel across to enter the studio"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="closed">
+          <div id="trackFill"></div>
+          <div id="ghostPart"></div>
+          <div id="part">
+            <svg viewBox="-50 -50 100 100" id="partSvg" aria-hidden="true" focusable="false"></svg>
+          </div>
+          <div id="trackHint" aria-hidden="true">Drag &rarr;</div>
         </div>
-        <div id="trackHint" aria-hidden="true">Drag →</div>
+        <button id="enterSkip" type="button">or press enter</button>
       </div>
-      <button id="enterSkip" type="button">or press enter</button>
-    </div>
+    </section>
 
+    <!-- ————— the idea ————— -->
+    <section id="idea" class="lsec">
+      <p class="lnum">01 &mdash; The idea</p>
+      <div class="lgrid">
+        <div class="lart">
+          <svg id="sketch" viewBox="0 0 1000 620" aria-label="A boy assembling a watch beneath a tree">
+            <defs>
+              <filter id="pencil" x="-12%" y="-12%" width="124%" height="124%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="4" seed="7" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="4.2" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+              <filter id="pencilSoft" x="-12%" y="-12%" width="124%" height="124%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="19" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+            </defs>
+            <g id="sk" filter="url(#pencil)"></g>
+            <g id="skFine" filter="url(#pencilSoft)"></g>
+          </svg>
+        </div>
+        <div id="story">
+          <h2>I loved watches long before<br>I could make anything.</h2>
+          <p>I read the histories. Every maison, every founder, every calibre that mattered — I knew the stories before I knew the words for what I was looking at.</p>
+          <p>Then I started watching the watchmakers. Hours of it. A pair of hands under a lamp, seating a bridge, driving a screw a quarter turn and stopping. I could tell you what an escapement does. I had never made one thing.</p>
+          <p>That is the gap this studio is for. I had the eye and no hands — no CAD, no drawing, no bench. So I built the bench instead.</p>
+          <p class="ssign">Faizan</p>
+          <div class="snote">
+            <b>蝉</b>
+            <span>The cicada waits underground for years and comes out exactly on time. Of every creature, it is the one that keeps a calendar. The house took its name.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ————— the calibre ————— -->
+    <section id="calibre" class="lsec">
+      <p class="lnum">02 &mdash; The calibre</p>
+      <div class="lgrid lgrid-r">
+        <div class="lcol">
+          <h2>A watch is an argument<br>made in metal.</h2>
+          <p>Every dimension a collector asks for is decided before the dial exists.
+            A full rotor adds about a millimetre of height. A hand-wound calibre lets
+            the case be thin. The beat rate decides whether the seconds hand steps five
+            times a second or ten — and a smooth sweep means it is not mechanical at all.</p>
+          <p>So the studio refuses to start at the dial. Chapter 02 is the movement,
+            and the nine chapters after it are consequences.</p>
+        </div>
+        <dl class="lspecs">
+          <div><dt>Architecture</dt><dd>4 &mdash; bridges, three-quarter, full plate, skeletonised</dd></div>
+          <div><dt>Winding</dt><dd>4 &mdash; full, micro, peripheral, hand-wound</dd></div>
+          <div><dt>Frequency</dt><dd>18,000 &middot; 21,600 &middot; 28,800 &middot; 36,000 vph</dd></div>
+          <div><dt>Finishing</dt><dd>Côtes de Genève, perlage, frosted, graining</dd></div>
+          <div><dt>Derived</dt><dd>Thickness, lug-to-lug, water resistance</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ————— the process ————— -->
+    <section id="process" class="lsec">
+      <p class="lnum">03 &mdash; The process</p>
+      <ol class="lsteps">
+        <li><b>Choose the calibre.</b><span>Architecture, winding, beat, finishing. The height of the watch is now decided.</span></li>
+        <li><b>Size the case around it.</b><span>Shape, diameter, crystal. Watch the lug-to-lug figure — that is what decides fit.</span></li>
+        <li><b>Draw the dial over it.</b><span>Fifty-six of them: enamel, stone, marquetry, painted, or a sentence.</span></li>
+        <li><b>Set the hands.</b><span>The first thing anyone looks at, and the last thing you should decide.</span></li>
+        <li><b>Take the sheet.</b><span>A calibre presentation sheet, an image, or a link that rebuilds the exact watch.</span></li>
+      </ol>
+    </section>
+
+    <!-- ————— the atelier ————— -->
+    <section id="atelier" class="lsec lend">
+      <p class="lnum">04 &mdash; The atelier</p>
+      <h2>A place to try movements<br>that no one has ordered.</h2>
+      <p class="lclose">Nothing here is for sale. It is a bench: every real decision a
+        watchmaker makes, laid out so that anyone who loves this can finally make
+        something of their own — and be told, quietly, when a choice is not how
+        watches are built.</p>
+      <button type="button" class="lprime lbig" id="navCreate2">Enter the atelier</button>
+      <p class="lfoot">Semi &middot; designed and built by Faizan &middot; 2026</p>
+    </section>
   </div>
 </div>
 
@@ -594,6 +824,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <div id="specline">
       <div id="specName"></div>
       <div id="specRule" aria-hidden="true"></div>
+      <dl id="specSheet"></dl>
       <div id="specText"></div>
     </div>
     <div id="stageBtns">
@@ -603,6 +834,16 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <div id="bgRow" role="group" aria-label="Lighting">
       <em aria-hidden="true">Light</em>
     </div>
+    <!-- what was just explored, and why -->
+    <aside id="exp" role="status">
+      <b>Exploration</b>
+      <p><span id="expN"></span> — <em id="expD"></em></p>
+    </aside>
+    <!-- what the cursor is resting on -->
+    <figure id="partRead" aria-live="polite">
+      <figcaption><span id="partN"></span><em id="partR"></em></figcaption>
+      <p id="partD"></p>
+    </figure>
     <!-- the studio's opinion, offered and never enforced -->
     <div id="tip" role="status">
       <b>A note on this piece</b>
@@ -632,6 +873,33 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   </nav>
 </div>
 <div id="live" class="sr" role="status" aria-live="polite"></div>
+
+<!-- ————— a shared design arrives as a sheet, not a screenshot ————— -->
+<div id="present" hidden>
+  <div class="pwrap">
+    <header class="phead">
+      <div><b>Semi</b><span>Watch design studio</span></div>
+      <div class="pref"><span>Calibre</span><b id="pCal"></b><span id="pRef"></span></div>
+    </header>
+    <div class="pbody">
+      <figure class="pfig">
+        <canvas id="pCv" width="900" height="900" aria-label="The movement"></canvas>
+        <figcaption id="pFace">Movement · caseback</figcaption>
+      </figure>
+      <div class="pinfo">
+        <p class="skey">A design shared with you</p>
+        <h1 id="pName"></h1>
+        <p id="pArch"></p>
+        <dl id="pSpec"></dl>
+        <div class="prow">
+          <button type="button" class="lprime" id="pOpen">Open it in the studio</button>
+          <button type="button" id="pFlip">Show the dial</button>
+        </div>
+        <p class="pfoot">Designed with Semi &middot; <span id="pDate"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ————— guide: for anyone who loves watches but has never designed one ————— -->
 <div id="guide" role="dialog" aria-modal="true" aria-labelledby="gTitle">
@@ -3043,6 +3311,19 @@ function mvPlan(R){
 }
 function drawMovement(c,R,fam,M){
   seed(1301+Math.round(S.size*7)+S.vph/1000+S.jewels);
+  /* the hit map is rebuilt with the drawing, so it can never drift out of step */
+  const PL=mvPlan(R);
+  PARTHIT=[
+    {k:'barrel',x:PL.barr.x,y:PL.barr.y,r:PL.barr.r},
+    {k:'centre',x:PL.tr[0].x,y:PL.tr[0].y,r:PL.tr[0].r},
+    {k:'fourth',x:PL.tr[1].x,y:PL.tr[1].y,r:PL.tr[1].r},
+    {k:'escape',x:PL.esc.x,y:PL.esc.y,r:PL.esc.r*1.25},
+    {k:'balance',x:PL.bal.x,y:PL.bal.y,r:PL.bal.r},
+    {k:'lever',x:(PL.esc.x+PL.bal.x)/2,y:(PL.esc.y+PL.bal.y)/2,r:R*.10},
+    {k:'bridge',x:0,y:0,r:PL.plate}
+  ];
+  if(S.rotor==='micro')PARTHIT.push({k:'rotor',x:-R*.30,y:-R*.36,r:R*.38});
+  else if(S.rotor==='full')PARTHIT.unshift({k:'rotor',x:0,y:R*.40,r:R*.42});
   const warm=(S.metal==='yellow'||S.metal==='rose');
   const P=mvPlan(R);
   const sunk=(S.screws==='blued'&&S.arch!=='skeleton'&&S.jewels>=25);
@@ -3199,6 +3480,29 @@ function drawMovement(c,R,fam,M){
     c.restore();
     anglage(c,()=>{c.beginPath();c.arc(0,0,P.plate*.94,0,TAU);},R);
   }
+  /* ————— the part under the cursor, marked without shouting —————
+     a thin brass ring and a leader line. no glow, no fill, no scale. */
+  if(HOVER.k){
+    const h=PARTHIT.filter(p=>p.k===HOVER.k)[0];
+    if(h){
+      c.save();
+      c.strokeStyle='rgba(176,141,68,.85)';
+      c.lineWidth=Math.max(R*.007,1);
+      c.setLineDash&&c.setLineDash([Math.max(R*.03,2),Math.max(R*.022,1.6)]);
+      c.beginPath();c.arc(h.x,h.y,h.r*1.10,0,TAU);c.stroke();
+      c.setLineDash&&c.setLineDash([]);
+      /* four ticks, the way a part is called out on a drawing */
+      c.strokeStyle='rgba(176,141,68,.95)';c.lineWidth=Math.max(R*.009,1.1);
+      for(let i=0;i<4;i++){
+        const a=i*TAU/4+Math.PI/4;
+        c.beginPath();
+        c.moveTo(h.x+Math.cos(a)*h.r*1.10,h.y+Math.sin(a)*h.r*1.10);
+        c.lineTo(h.x+Math.cos(a)*h.r*1.26,h.y+Math.sin(a)*h.r*1.26);
+        c.stroke();
+      }
+      c.restore();
+    }
+  }
   c.restore(); /* sapphire clip */
   c.restore(); /* case back */
 }
@@ -3283,6 +3587,41 @@ function palletFork(c,ex,ey,er,bx,by,br,tilt,warm){
   /* the lever's own pivot jewel */
   jewel(c,er*.55,0,Math.max(er*.16,1),false);
   c.restore();
+}
+/* ————— the parts, and what each one is for —————
+   A movement is not a picture; it is an argument in metal. Hovering over any
+   part should tell you what it is doing, in the fewest words that are true. */
+const PARTS={
+  balance:{n:'Balance wheel',
+    d:'The oscillator. A weighted wheel on a hairspring, swinging about 260° each way. Its rate is the watch’s accuracy, and it is the only part that never stops.'},
+  escape :{n:'Escape wheel',
+    d:'Released one tooth at a time by the lever. It is the last wheel of the train and the first part of the escapement — the point where continuous power becomes a count.'},
+  lever  :{n:'Pallet lever',
+    d:'Two ruby stones on an arm. It locks the escape wheel, then unlocks it and passes the impulse to the balance. Everything a mechanical watch is arguing for happens here.'},
+  barrel :{n:'Mainspring barrel',
+    d:'A coiled spring in a toothed drum. It is the entire power source, and how big it is decides the power reserve.'},
+  centre :{n:'Centre wheel',
+    d:'One turn an hour. The minute hand is fixed to it, which is why it sits at the middle of the plate.'},
+  fourth :{n:'Fourth wheel',
+    d:'One turn a minute. Where the seconds are read from — at the centre for a sweep, or off-axis for small seconds.'},
+  rotor  :{n:'Winding rotor',
+    d:'A weight that winds the mainspring as the wrist moves. A full rotor hides half the movement; a micro-rotor keeps the calibre thin and visible.'},
+  bridge :{n:'Bridges',
+    d:'The metal that carries the upper pivots. Their outline is the single largest aesthetic decision in a movement, and the chamfered edges are where finishing is judged.'},
+  jewel  :{n:'Jewel',
+    d:'A synthetic ruby bearing where steel would otherwise wear steel. Hard, smooth, and it holds oil exactly where it is needed.'},
+  screw  :{n:'Screw',
+    d:'Blued by heat to about 290°C. The colour is an oxide film a few atoms thick — decoration and rust-proofing at once.'}
+};
+/* where each part sits on screen, rebuilt whenever the movement is drawn */
+let PARTHIT=[];
+function partAt(x,y){
+  /* smallest match wins, so a jewel beats the bridge underneath it */
+  let best=null;
+  PARTHIT.forEach(h=>{
+    if(Math.hypot(x-h.x,y-h.y)<=h.r&&(!best||h.r<best.r))best=h;
+  });
+  return best;
 }
 function drawBalance(c,R,t){
   const P=mvPlan(R), warm=(S.metal==='yellow'||S.metal==='rose');
@@ -3812,8 +4151,8 @@ function build(){
     add(chips('Lighting',Object.keys(LIGHT).map(k=>({v:k,n:LIGHT[k].n})),S.light,v=>S.light=v,false,
       Object.fromEntries(Object.keys(LIGHT).map(k=>[k,LIGHT[k].d]))));
     shelfBlock(add);
-    add(bigbtn('Download image',download));
-    add(bigbtn('Download certificate',certificate));
+    add(bigbtn('Download the calibre sheet',certificate));
+    add(bigbtn('Download a high-resolution image',download));
     add(bigbtn('Save to my shelf',()=>{shelveCurrent();build();}));
     add(bigbtn('The vocabulary',()=>openGloss(),true));
     const b3=bigbtn('Copy shareable link',()=>{
@@ -4048,11 +4387,21 @@ function spec(){
   nm.classList.toggle('on',!!S.name);
   const dialName=ARTDIAL[S.texture]?TEXTURES[S.texture]:`${DIALCOL[S.dialCol].name} ${TEXTURES[S.texture].toLowerCase()}`;
   const d=dims();
+  /* every figure here is calculated from the design — none of it is decoration */
+  const sheet=[
+    ['Calibre',   calibre(),''],
+    ['Diameter',  d.d,'mm'],
+    ['Thickness', d.thick,'mm'],
+    ['Jewels',    String(S.jewels),''],
+    ['Reserve',   String(S.pr),'h'],
+    ['Frequency', S.vph.toLocaleString('en-US'),'vph']
+  ];
+  document.getElementById('specSheet').innerHTML=
+    sheet.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}${r[2]?'<i>'+r[2]+'</i>':''}</dd></div>`).join('');
   document.getElementById('specText').innerHTML=
-    `<b>${calibre()}</b> · ${S.jewels} jewels · ${S.vph.toLocaleString('en-US')} A/h · ${S.pr} h · ${ROTORS[S.rotor].n.toLowerCase()}<br>`+
-    `<b>${F.n}</b> · ${d.d} × ${d.thick} mm · ${d.l2l} mm lug to lug · ${METAL[S.metal].name} ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')} · ${d.wr} m<br>`+
-    `<b>${dialName}</b> · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp].toLowerCase()}${S.date!=='none'?' · date at '+S.date:''}<br>`+
-    `${HANDS[S.hands]} hands · ${BEZELS[S.bezel].toLowerCase()} bezel · ${STRAPN[S.strap].toLowerCase()}`;
+    `<b>${ARCH[S.arch].n}</b> · ${ROTORS[S.rotor].n.toLowerCase()} · ${MVFIN[S.mvFinish].n}<br>`+
+    `<b>${F.n}</b> · ${d.l2l} mm lug to lug · ${METAL[S.metal].name} ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')} · ${d.wr} m<br>`+
+    `<b>${dialName}</b> · ${LAYOUTS[S.layout].toLowerCase()} indices · ${COMPN[S.comp].toLowerCase()}${S.date!=='none'?' · date at '+S.date:''} · ${HANDS[S.hands]} hands`;
   /* the canvas describes itself to anyone who cannot see it */
   cv.setAttribute('aria-label',(S.name?S.name+': ':'')+specPlain().replace(/\n/g,'. '));
   document.querySelectorAll('.bgs').forEach(b=>b.setAttribute('aria-pressed',b.dataset.light===S.light?'true':'false'));
@@ -4089,6 +4438,7 @@ function buildIfTab(k){if(tab===k)build();}
    with the reason and a one-click correction. It is never a block: "Keep it
    as it is" dismisses that particular note for good. This is the whole
    difference between a tool with taste and a tool with rules. */
+const HOVER={k:null};
 const TIP={dismissed:{},shown:null};
 function tipKey(a){return a.t;}
 function refreshTip(){
@@ -4296,16 +4646,16 @@ function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
    designed one. No jargon without an explanation.
    ============================================================ */
 const GUIDE=[
-  {t:'Five decisions make a watch',
-   b:'You do not need to know anything to start. There are five decisions that settle what a watch <i>is</i> — the movement, the case, the dial, the hands, the strap — and everything else is refinement. This tour is those five, in order.'},
-  {t:'One · the movement',
-   b:'Open <b>Chapter 02</b> first. This is the calibre, and it decides the rest: a full rotor adds a millimetre of height, a hand-wound movement lets the watch be thin, and the <b>beat rate</b> decides whether the seconds hand steps or glides. Then switch the view to <b>Movement</b> and watch the balance actually beat.'},
-  {t:'Two and three · case and dial',
-   b:'<b>Chapter 03</b> is shape, size and metal — watch the <b>lug-to-lug</b> figure, because that is what decides whether a watch fits, not the diameter. <b>Chapter 05</b> is the face. Dark dials make hands loud; enamel and guilloché change with the light.'},
-  {t:'Four and five · hands and strap',
-   b:'<b>Chapter 08</b> is the first thing anyone actually looks at, and <b>Chapter 09</b> is what the watch feels like all day. If a choice is not how watches are built, a note appears at the top of the panel telling you why — and offering to fix it.'},
-  {t:'Then keep it',
-   b:'Name the design, press <b>S</b> to put it on your shelf, and it survives a refresh. <b>Chapter 10</b> exports an image, a certificate with the full specification, or a link that rebuilds your exact watch for anyone who opens it. <b>R</b> for a surprise, <b>⌘Z</b> to undo, <b>?</b> for this tour.'}
+  {t:'Start with the movement',
+   b:'A watch is built outward from its calibre. The rotor decides a millimetre of case height, the beat rate decides whether the seconds hand steps or glides, and the architecture decides whether the caseback is worth opening. <b>Chapter 02</b> is where you begin.'},
+  {t:'Place the essential parts',
+   b:'Switch the view to <b>Movement</b> and hover anything — balance, lever, escape wheel, barrel, rotor. Each part says what it is for. The balance beats at exactly the rate you chose; count it against a second hand.'},
+  {t:'Establish the architecture',
+   b:'Separate bridges, a three-quarter plate, a full plate, or skeletonised. Then the finishing: <b>Côtes de Genève</b>, perlage, frosted, graining. This is the decision a collector judges first.'},
+  {t:'Refine the proportions',
+   b:'<b>Chapters 03 to 09</b> size the case, draw the dial, set the hands. Thickness, lug-to-lug and water resistance are calculated, never typed. If a choice is not how watches are built, a note appears — with the reason, and a way out. You may ignore it.'},
+  {t:'Export the calibre',
+   b:'<b>Chapter 10</b> gives you a presentation sheet, a high-resolution image, or a link that rebuilds the exact watch. Press <b>R</b> to explore an architecture, <b>M</b> for the movement, <b>S</b> to save, <b>⌘Z</b> to undo.'}
 ];
 const GLOSSARY=[
   ['Movement','The mechanism. Also called the calibre. Everything else on the watch — height, diameter, where the seconds sit — is decided by it first.'],
@@ -4565,92 +4915,281 @@ function drawProfile(c,R,fam,M){
   c.restore();
 }
 /* ————— certificate ————— */
-function certificate(){
-  const W=1400,H=1900,c=document.createElement('canvas');
-  c.width=W;c.height=H;const x=c.getContext('2d');
-  x.fillStyle='#f2ede2';x.fillRect(0,0,W,H);
-  /* border */
-  x.strokeStyle='#c3bba6';x.lineWidth=2;x.strokeRect(56,56,W-112,H-112);
-  x.strokeStyle='#e0d9c6';x.lineWidth=1;x.strokeRect(70,70,W-140,H-140);
-  /* mark */
-  x.fillStyle='#211d16';x.textAlign='center';
-  x.font='400 92px "Pinyon Script", "Cormorant Garamond", serif';
-  x.fillText('Semi',W/2,328);
-  x.fillStyle='#8d867a';x.font='400 17px "Archivo Narrow"';
-  x.fillText('INSTRUMENTS OF ROTATION',W/2,352);
-  /* the watch */
-  const keepBg=S.bg,kx=S.tiltX,ky=S.tiltY;S.bg='#f2ede2';S.tiltX=0;S.tiltY=0;
-  const prev=cv.width;renderBase();
-  x.drawImage(base,(W-1000)/2,400,1000,1000*(base.height/base.width));
-  S.bg=keepBg;S.tiltX=kx;S.tiltY=ky;baseDirty=true;
-  /* text block */
-  let y=H-620;
-  x.textAlign='center';x.fillStyle='#211d16';
-  if(x.letterSpacing!==undefined)x.letterSpacing='0px';
-  x.font='600 54px "Cormorant Garamond"';
-  x.fillText(S.name||'Unnamed design',W/2,y);y+=52;
-  x.strokeStyle='#c3bba6';x.beginPath();x.moveTo(W/2-90,y-14);x.lineTo(W/2+90,y-14);x.stroke();
-  y+=26;
-  const d=dims();
-  const rows=[
-    ['CALIBRE',`${calibre()} · ${ARCH[S.arch].n.toLowerCase()}`],
-    ['WINDING',`${ROTORS[S.rotor].n} · ${S.pr} h reserve`],
-    ['FREQUENCY',`${S.vph.toLocaleString('en-US')} A/h · ${d.hz} Hz · ${S.jewels} jewels`],
-    ['FINISHING',`${MVFIN[S.mvFinish].n} · ${S.screws==='blued'?'blued':'polished steel'} screws`],
-    ['CASE',`${FAMILY[S.family].n} · ${d.d} × ${d.thick} mm · ${d.l2l} mm lug to lug`],
-    ['MATERIAL',`${METAL[S.metal].name}, ${S.finish==='polish'?'polished':(S.finish==='brush'?'brushed':'sandblasted')}`],
-    ['CRYSTAL',`${CRYSTN[S.crystal]} sapphire · water resistant to ${d.wr} m`],
-    ['BEZEL',`${BEZELS[S.bezel]}`],
-    ['DIAL',`${ARTDIAL[S.texture]?TEXTURES[S.texture]:DIALCOL[S.dialCol].name+' · '+TEXTURES[S.texture]}`],
-    ['INDICES',`${LAYOUTS[S.layout]} · ${S.indexMat==='applied'?'applied':'printed'}${S.lume?' · luminous':''}`],
-    ['FUNCTION',`${COMPN[S.comp]}${S.date!=='none'?', date at '+S.date:''}`],
-    ['HANDS',`${HANDS[S.hands]}${S.handMat==='blued'?', flame blued':''}`],
-    ['STRAP',`${STRAPN[S.strap]}${d.lugW?' · '+d.lugW+' mm':''}${['link3','link5','linkR','mesh'].includes(S.strap)?'':' · '+BUCKLE[S.buckle].toLowerCase()}`]
-  ];
-  /* the specification is set as a table with its own rule, not a list of pairs */
-  const LX=190, MX=560, RX=W-190;
-  let group='';
-  rows.forEach((r,i)=>{
-    const g=i<4?'MOVEMENT':(i<8?'CASE':'DIAL & FITTING');
-    if(g!==group){
-      group=g;
-      y+=i?30:0;
-      x.textAlign='left';x.fillStyle='#a79d88';
-      x.font='400 17px "Archivo Narrow"';
-      if(x.letterSpacing!==undefined)x.letterSpacing='6px';
-      x.fillText(g,LX,y);
-      x.strokeStyle='#ddd5c2';x.lineWidth=1;
-      x.beginPath();x.moveTo(LX,y+14);x.lineTo(RX,y+14);x.stroke();
-      y+=44;
+/* ============================================================
+   THE CALIBRE SHEET
+   The artefact you keep. Set like a specification sheet from a
+   maison: one rendering, one rule, and figures that were all
+   calculated from the design rather than typed in.
+   ============================================================ */
+const SHEET_INK='#211d16', SHEET_GREY='#8a8272', SHEET_RULE='#d8d0bd',
+      SHEET_PAPER='#f4f1e8', SHEET_BRASS='#9a7b3f';
+function sheetText(x,s,f,col,tr,al){
+  x.font=f;x.fillStyle=col;x.textAlign=al||'left';
+  if(x.letterSpacing!==undefined)x.letterSpacing=(tr||0)+'px';
+}
+/* the parts actually present in this design — a real bill of materials */
+function componentList(){
+  const L=[];
+  L.push(['Main plate',        ARCH[S.arch].n]);
+  L.push(['Finishing',         MVFIN[S.mvFinish].n]);
+  L.push(['Balance',           'Screwed rim · '+S.vph.toLocaleString('en-US')+' A/h']);
+  L.push(['Escapement',        'Swiss lever · 15-tooth escape wheel']);
+  L.push(['Mainspring barrel', S.pr+' hours']);
+  L.push(['Winding',           ROTORS[S.rotor].n]);
+  L.push(['Jewelling',         S.jewels+' synthetic ruby']);
+  L.push(['Screws',            S.screws==='blued'?'Flame blued':'Polished steel']);
+  L.push(['Case',              FAMILY[S.family].n+' · '+METAL[S.metal].name]);
+  L.push(['Crystal',           CRYSTN[S.crystal]+' sapphire']);
+  L.push(['Bezel',             BEZELS[S.bezel]]);
+  L.push(['Dial',              ARTDIAL[S.texture]?TEXTURES[S.texture]:DIALCOL[S.dialCol].name+' '+TEXTURES[S.texture].toLowerCase()]);
+  L.push(['Indices',           LAYOUTS[S.layout]+(S.indexMat==='applied'?' · applied':' · printed')]);
+  L.push(['Hands',             HANDS[S.hands]+(S.handMat==='blued'?' · blued':'')]);
+  if(S.comp!=='none')L.push(['Complication',COMPN[S.comp]]);
+  if(S.date!=='none')L.push(['Calendar','Date at '+S.date]);
+  L.push([['link3','link5','linkR','mesh'].includes(S.strap)?'Bracelet':'Strap',
+          STRAPN[S.strap]+(['link3','link5','linkR','mesh'].includes(S.strap)?'':' · '+BUCKLE[S.buckle].toLowerCase())]);
+  return L;
+}
+function designRef(){return 'SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);}
+/* one renderer for both faces of the sheet */
+function sheetRender(target,px,view){
+  const keep=JSON.parse(JSON.stringify(S));
+  S.view=view;S.tiltX=0;S.tiltY=0;S.light='daylight';
+  const cvs=document.createElement('canvas');cvs.width=px;cvs.height=px;
+  const cx=cvs.getContext('2d');
+  const R=px*.185*(S.size/38)*(1000/px)*(px/1000);
+  cx.setTransform(1,0,0,1,0,0);
+  cx.fillStyle=SHEET_PAPER;cx.fillRect(0,0,px,px);
+  cx.save();cx.translate(px/2,px/2);
+  const rr=px*.34;
+  try{
+    if(view==='movement'){drawMovement(cx,rr,FAMILY[S.family],METAL[S.metal]);drawBalance(cx,rr,Date.now());}
+    else{
+      drawStrap(cx,rr,FAMILY[S.family]);drawLugs(cx,rr,FAMILY[S.family],METAL[S.metal]);
+      drawCrown(cx,rr,FAMILY[S.family],METAL[S.metal]);drawPushers(cx,rr,FAMILY[S.family],METAL[S.metal]);
+      drawCase(cx,rr,FAMILY[S.family],METAL[S.metal]);drawBezel(cx,rr,FAMILY[S.family],METAL[S.metal]);
+      const dR=rr*FAMILY[S.family].ap*(1-S.bezelW)-rr*.006;
+      cx.save();cx.beginPath();cx.arc(0,0,dR,0,TAU);cx.clip();
+      const INK=dialInk();
+      cx.fillStyle=ARTDIAL[S.texture]?ARTDIAL[S.texture].base:DIALCOL[S.dialCol].base;
+      cx.fillRect(-dR,-dR,dR*2,dR*2);
+      dialTexture(cx,dR,S.texture,S.dialCol);drawTrack(cx,dR,INK);
+      if(S.chapter){cx.strokeStyle=INK;cx.globalAlpha=.35;cx.lineWidth=1;
+        cx.beginPath();cx.arc(0,0,dR*.70,0,TAU);cx.stroke();cx.globalAlpha=1;}
+      drawIndices(cx,dR,DIALCOL[S.dialCol],METAL[S.metal]);
+      drawComp(cx,dR,INK,METAL[S.metal]);drawQuote(cx,dR,INK);drawSignature(cx,dR,INK);
+      const nw=new Date();
+      cx.save();cx.rotate(((nw.getHours()%12)+nw.getMinutes()/60)*TAU/12);
+      drawHand(cx,S.hands,dR*.52,dR*.055,METAL[S.metal],S.lume,S.handMat==='blued');cx.restore();
+      cx.save();cx.rotate(nw.getMinutes()*TAU/60);
+      drawHand(cx,S.hands,dR*.80,dR*.042,METAL[S.metal],S.lume,S.handMat==='blued');cx.restore();
+      cx.restore();
+      drawCrystal(cx,dR);
     }
-    x.textAlign='left';x.fillStyle='#8d867a';
-    x.font='400 19px "Archivo Narrow"';
-    if(x.letterSpacing!==undefined)x.letterSpacing='3px';
-    x.fillText(r[0],LX,y);
-    x.fillStyle='#211d16';
-    if(x.letterSpacing!==undefined)x.letterSpacing='0px';
-    x.font='400 23px "Archivo Narrow"';
-    x.fillText(r[1],MX,y);
-    x.strokeStyle='#eae3d2';x.lineWidth=1;
-    x.beginPath();x.moveTo(LX,y+13);x.lineTo(RX,y+13);x.stroke();
-    y+=38;
+  }catch(e){}
+  cx.restore();
+  Object.assign(S,keep);baseDirty=true;
+  return cvs;
+}
+function certificate(){
+  const W=1600,H=2263;                 /* √2, so it prints on A-series paper */
+  const c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');
+  const M=132;                          /* the margin does most of the work */
+  x.fillStyle=SHEET_PAPER;x.fillRect(0,0,W,H);
+  /* the faintest paper tooth, so it is not a flat fill */
+  seed(20260810);
+  for(let i=0;i<26000;i++){
+    x.fillStyle=rnd()>.5?'rgba(120,108,84,.030)':'rgba(255,255,255,.030)';
+    x.fillRect(rnd()*W,rnd()*H,2,2);
+  }
+  /* ————— the head: name left, reference right, one rule under both ————— */
+  sheetText(x,'','400 74px "Pinyon Script","Cormorant Garamond",serif',SHEET_INK,0,'left');
+  x.fillText('Semi',M,M+62);
+  sheetText(x,'','400 17px "Archivo Narrow"',SHEET_GREY,5,'left');
+  x.fillText('WATCH DESIGN STUDIO',M+4,M+92);
+  sheetText(x,'','400 17px "Archivo Narrow"',SHEET_GREY,5,'right');
+  x.fillText('CALIBRE SPECIFICATION',W-M,M+30);
+  sheetText(x,'','400 30px "Barlow Condensed","Archivo Narrow"',SHEET_INK,2,'right');
+  x.fillText(calibre(),W-M,M+72);
+  sheetText(x,'','400 17px "Archivo Narrow"',SHEET_GREY,4,'right');
+  x.fillText('REF. '+designRef(),W-M,M+98);
+  x.strokeStyle=SHEET_INK;x.lineWidth=1.4;
+  x.beginPath();x.moveTo(M,M+126);x.lineTo(W-M,M+126);x.stroke();
+
+  /* ————— the piece, named ————— */
+  let y=M+206;
+  sheetText(x,'','italic 600 68px "Cormorant Garamond",serif',SHEET_INK,0,'left');
+  x.fillText(S.name||'Unnamed calibre',M,y);
+  y+=34;
+  sheetText(x,'','400 20px "Archivo Narrow"',SHEET_GREY,3,'left');
+  x.fillText(ARCH[S.arch].n+' · '+ROTORS[S.rotor].n+' · '+MVFIN[S.mvFinish].n,M,y);
+
+  /* ————— the movement, large, and the dial beside it ————— */
+  const big=sheetRender(null,1100,'movement');
+  const bw=W-M*2-320;
+  x.drawImage(big,M-40,y+40,bw+80,bw+80);
+  const small=sheetRender(null,520,'studio');
+  x.drawImage(small,W-M-300,y+150,300,300);
+  sheetText(x,'','400 15px "Archivo Narrow"',SHEET_GREY,4,'center');
+  x.fillText('DIAL SIDE',W-M-150,y+474);
+  sheetText(x,'','400 15px "Archivo Narrow"',SHEET_GREY,4,'left');
+  x.fillText('MOVEMENT · CASEBACK',M,y+bw+70);
+
+  /* ————— the specification ————— */
+  y=y+bw+140;
+  const d=dims();
+  const specs=[
+    ['DIAMETER',d.d,'mm'],['THICKNESS',d.thick,'mm'],['LUG TO LUG',d.l2l,'mm'],
+    ['JEWELS',String(S.jewels),''],['RESERVE',String(S.pr),'h'],['FREQUENCY',S.vph.toLocaleString('en-US'),'vph'],
+    ['AMPLITUDE','260','°'],['WATER RESIST.',String(d.wr),'m']
+  ];
+  const colW=(W-M*2)/4;
+  specs.forEach((sp,i)=>{
+    const cx0=M+(i%4)*colW, cy0=y+Math.floor(i/4)*112;
+    x.strokeStyle=SHEET_RULE;x.lineWidth=1;
+    x.beginPath();x.moveTo(cx0,cy0);x.lineTo(cx0+colW-28,cy0);x.stroke();
+    sheetText(x,'','400 15px "Archivo Narrow"',SHEET_GREY,4,'left');
+    x.fillText(sp[0],cx0,cy0+30);
+    sheetText(x,'','400 42px "Barlow Condensed","Archivo Narrow"',SHEET_INK,0,'left');
+    x.fillText(sp[1],cx0,cy0+78);
+    const wdt=x.measureText(sp[1]).width;
+    sheetText(x,'','400 19px "Archivo Narrow"',SHEET_GREY,1,'left');
+    x.fillText(sp[2],cx0+wdt+9,cy0+78);
   });
-  y+=16;
-  /* a design reference, not a serial number — a serial belongs to a made object */
-  const ref='SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
-  x.textAlign='center';x.fillStyle='#8d867a';x.font='400 18px "Archivo Narrow"';
-  if(x.letterSpacing!==undefined)x.letterSpacing='5px';
-  x.fillText('DESIGN REFERENCE '+ref,W/2,y+34);
-  x.fillText('DESIGNED BY THE OWNER · SEMI STUDIO',W/2,y+66);
+
+  /* ————— the component list ————— */
+  y=y+250;
+  x.strokeStyle=SHEET_INK;x.lineWidth=1.4;
+  x.beginPath();x.moveTo(M,y);x.lineTo(W-M,y);x.stroke();
+  sheetText(x,'','400 15px "Archivo Narrow"',SHEET_GREY,5,'left');
+  x.fillText('COMPONENTS',M,y+30);
+  y+=62;
+  const list=componentList();
+  const half=Math.ceil(list.length/2);
+  list.forEach((r,i)=>{
+    const col=i<half?0:1, row=i<half?i:i-half;
+    const cx0=M+col*((W-M*2)/2), cy0=y+row*40;
+    sheetText(x,'','400 16px "Archivo Narrow"',SHEET_GREY,3,'left');
+    x.fillText(r[0].toUpperCase(),cx0,cy0);
+    sheetText(x,'','400 20px "Archivo Narrow"',SHEET_INK,0,'left');
+    x.fillText(r[1],cx0+215,cy0);
+    x.strokeStyle='rgba(120,108,84,.16)';x.lineWidth=1;
+    x.beginPath();x.moveTo(cx0,cy0+13);x.lineTo(cx0+(W-M*2)/2-40,cy0+13);x.stroke();
+  });
+
+  /* ————— the foot ————— */
+  const fy=H-M;
+  x.strokeStyle=SHEET_INK;x.lineWidth=1.4;
+  x.beginPath();x.moveTo(M,fy-52);x.lineTo(W-M,fy-52);x.stroke();
+  sheetText(x,'','400 16px "Archivo Narrow"',SHEET_GREY,4,'left');
+  x.fillText('DESIGNED WITH SEMI',M,fy-18);
+  sheetText(x,'','400 16px "Archivo Narrow"',SHEET_GREY,4,'center');
+  const dt=new Date();
+  x.fillText(dt.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase(),W/2,fy-18);
+  sheetText(x,'','400 16px "Archivo Narrow"',SHEET_GREY,4,'right');
+  x.fillText('REF. '+designRef(),W-M,fy-18);
+  /* the house character, small, where a stamp would be */
+  sheetText(x,'','400 40px "Yuji Syuku",serif','rgba(154,123,63,.5)',0,'center');
+  x.fillText('蝉',W/2,fy-84);
+
   const a=document.createElement('a');
   a.href=c.toDataURL('image/png');
-  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'semi')+'-certificate.png';
+  a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'semi')+'-calibre-sheet.png';
   document.body.appendChild(a);a.click();a.remove();
+  announce('Calibre sheet downloaded');
 }
 function hashCode(s){let h=0;for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i);h|=0;}return h;}
 
 /* ————— actions ————— */
 const pick=a=>a[Math.floor(Math.random()*a.length)];
+/* ————— exploration, not randomisation —————
+   A dice roll produces noise. A designer explores along an axis: a school, a
+   constraint, a question. Each of these fixes the decisions that carry the
+   idea, and leaves the rest free — so every result is arguable. */
+const EXPLORE=[
+  {n:'Traditional Swiss',
+   d:'Separate bridges, Côtes de Genève, a full rotor and 28,800 A/h. The layout nearly every Swiss house settled on, and the one everything else is measured against.',
+   m:{arch:'bridges',mvFinish:'geneva',rotor:'full',vph:28800,screws:'blued',jewels:27,pr:48},
+   c:{thick:'std',family:'round',metal:'steel',finish:'polish'},
+   dial:['sunray','matte','guilloche'],hands:['dauphine','baton','leaf']},
+  {n:'Glashütte school',
+   d:'A three-quarter plate, frosted and gilt, hand-wound. Rigid, austere, and much harder to regulate than it looks.',
+   m:{arch:'threeq',mvFinish:'frosted',rotor:'manual',vph:21600,screws:'blued',jewels:19,pr:44},
+   c:{thick:'slim',family:'round',metal:'white',finish:'polish'},
+   dial:['enamel','matte','sector'],hands:['alpha','leaf','breguet']},
+  {n:'Thin as possible',
+   d:'A micro-rotor sunk into the plate so the calibre stays visible and the case stays under 8 mm. The most difficult constraint in watchmaking that is not a complication.',
+   m:{arch:'bridges',mvFinish:'geneva',rotor:'micro',vph:21600,screws:'blued',jewels:29,pr:40},
+   c:{thick:'slim',family:'round',metal:'rose',finish:'polish',bezelW:.06,crystal:'flat'},
+   dial:['guilloche','sunray','flinque'],hands:['baton','leaf','dauphine']},
+  {n:'Open architecture',
+   d:'Skeletonised: every plate cut back to the load path, then engraved. Structural jewellery, and it gives up water resistance to get there.',
+   m:{arch:'skeleton',mvFinish:'grained',rotor:'peri',vph:28800,screws:'steel',jewels:33,pr:55},
+   c:{thick:'std',family:'tonneau',metal:'titan',finish:'sand'},
+   dial:['carbon','circuit','matte'],hands:['sword','syringe','baton']},
+  {n:'High beat',
+   d:'36,000 A/h — ten steps a second, nearly a sweep. It spends the mainspring faster and asks for servicing sooner, which is the trade.',
+   m:{arch:'bridges',mvFinish:'perlage',rotor:'full',vph:36000,screws:'steel',jewels:31,pr:42},
+   c:{thick:'std',family:'cushion',metal:'steel',finish:'brush'},
+   dial:['grain','matte','tapestry'],hands:['baton','sword','syringe']},
+  {n:'Central seconds',
+   d:'The fourth wheel driven to the centre so the seconds hand shares the axis. Everything is symmetrical, and the dial has nothing to hide behind.',
+   m:{arch:'bridges',mvFinish:'geneva',rotor:'full',vph:28800,screws:'blued',jewels:25,pr:50},
+   c:{thick:'std',family:'round',metal:'steel',finish:'polish'},
+   comp:'none',dial:['sunray','matte','linen'],hands:['dauphine','baton','alpha']},
+  {n:'Small seconds',
+   d:'The seconds left where the fourth wheel actually sits, off-axis. An artefact of the train, kept for a century because it looks right.',
+   m:{arch:'threeq',mvFinish:'geneva',rotor:'manual',vph:18000,screws:'blued',jewels:18,pr:42},
+   c:{thick:'slim',family:'round',metal:'yellow',finish:'polish',crystal:'box'},
+   comp:'small',dial:['sector','enamel','guilloche'],hands:['leaf','breguet','alpha']},
+  {n:'Instrument',
+   d:'Built to be read in bad light and survive being knocked. Matte everything, a sealed case, and no ornament that is not information.',
+   m:{arch:'bridges',mvFinish:'perlage',rotor:'full',vph:28800,screws:'steel',jewels:25,pr:50},
+   c:{thick:'sport',family:'round',metal:'black',finish:'sand',bezel:'dive',bezelW:.13,crystal:'flat'},
+   dial:['matte','grain'],hands:['circlebar','syringe','sword'],lume:true},
+  {n:'The house style',
+   d:'Blue ceramic, an integrated case, a milled dial grid. The 1970s idea that a sports watch could cost more than a dress watch.',
+   m:{arch:'bridges',mvFinish:'geneva',rotor:'peri',vph:21600,screws:'blued',jewels:38,pr:40},
+   c:{thick:'slim',family:'octagon',metal:'cerBlue',finish:'polish',bezel:'screws',bezelW:.13,crystal:'flat'},
+   dial:['tapestry','linen'],hands:['baton'],strap:'link3'},
+  {n:'Métier d’art',
+   d:'The calibre steps back and the dial becomes the whole piece — enamel, stone or marquetry, and a movement quiet enough to let it.',
+   m:{arch:'bridges',mvFinish:'geneva',rotor:'micro',vph:21600,screws:'blued',jewels:29,pr:45},
+   c:{thick:'slim',family:'cushion',metal:'white',finish:'polish',crystal:'domed'},
+   dial:['owlWhite','owlBrown','pintail','kingfisher','crane','koi','fuji','marquetry','straw','tigereye','jade'],
+   hands:['leaf','breguet','dauphine'],layout:'none',lume:false}
+];
+let exIdx=-1;
+function explore(which){
+  const E=(which!=null)?EXPLORE[which]:EXPLORE[exIdx=(exIdx+1)%EXPLORE.length];
+  snapshot();
+  Object.assign(S,E.m);
+  Object.assign(S,E.c);
+  S.texture=pick(E.dial);
+  S.hands=pick(E.hands);
+  if(E.comp!==undefined)S.comp=E.comp; else S.comp=pick(['none','none','small','gmt','moon','power']);
+  if(E.layout!==undefined)S.layout=E.layout;
+  else S.layout=ARTDIAL[S.texture]?'none':pick(['baton','arabic','roman','mixed','explorer','bar']);
+  if(E.lume!==undefined)S.lume=E.lume; else S.lume=!ARTDIAL[S.texture]&&Math.random()>.5;
+  if(E.strap)S.strap=E.strap;
+  else if(FAMILY[S.family].slab)S.strap=pick(['link3','link5','mesh']);
+  else S.strap=pick(['leather','leather','link3','canvas','rubber']);
+  S.strapCol=pick(STRAPCOL);
+  S.size=FAMILY[S.family].slab?41:(36+Math.round(Math.random()*8));
+  S.lugW=FAMILY[S.family].slab?0:(18+Math.round(Math.random()*4));
+  S.dialCol=ARTDIAL[S.texture]?S.dialCol:pick(Object.keys(DIALCOL));
+  S.indexMat=pick(['applied','printed']);
+  S.track=ARTDIAL[S.texture]?'none':pick(['railroad','ticks','dots']);
+  S.handMat=pick(['steel','steel','blued']);
+  S.name=E.n;
+  /* the rules still apply — an exploration is not an excuse */
+  for(let i=0;i<8;i++){const a=advisories();if(!a.length)break;a.forEach(x=>x.act());}
+  build();paint();
+  announce(E.n+'. '+E.d);
+  const el=document.getElementById('tipBody');
+  return E;
+}
 function randomize(){
   S.family=pick(Object.keys(FAMILY));
   S.size=34+Math.round(Math.random()*20)/2;
@@ -4710,7 +5249,17 @@ function download(){
   document.body.appendChild(a);a.click();a.remove();
 }
 const DEFAULTS=JSON.parse(JSON.stringify(S));
-document.getElementById('bRand').onclick=randomize;
+document.getElementById('bRand').onclick=()=>{
+  const E=explore();
+  /* say what was explored and why, on the stage */
+  const box=document.getElementById('exp');
+  if(box){
+    document.getElementById('expN').textContent=E.n;
+    document.getElementById('expD').textContent=E.d;
+    box.classList.add('on');
+    clearTimeout(box._t);box._t=setTimeout(()=>box.classList.remove('on'),9000);
+  }
+};
 document.getElementById('bPng').onclick=download;
 document.getElementById('bUndo').onclick=undo;
 document.getElementById('bSave').onclick=()=>{
@@ -4733,6 +5282,60 @@ document.getElementById('bReset').onclick=()=>{snapshot();Object.assign(S,DEFAUL
     b.appendChild(i);
     b.onclick=()=>{snapshot();S.light=k;paint();buildIfTab('finish');announce(LIGHT[k].n+' lighting')};
     row.appendChild(b);
+  });
+})();
+
+/* ————— reading the movement —————
+   Hovering names the part and says what it is for. Nothing moves, nothing
+   scales; the drawing simply admits which piece you are looking at. */
+(function(){
+  const box=document.getElementById('partRead');
+  const nEl=document.getElementById('partN'), dEl=document.getElementById('partD'),
+        rEl=document.getElementById('partR');
+  let raf=0;
+  function ref(k){
+    /* the reference figure a drawing would carry beside a callout */
+    const d=dims();
+    return {balance:S.vph.toLocaleString('en-US')+' vph',
+            escape:'15 teeth',
+            lever:'2 pallet stones',
+            barrel:S.pr+' h reserve',
+            centre:'1 turn / hour',
+            fourth:'1 turn / minute',
+            rotor:ROTORS[S.rotor].n,
+            bridge:ARCH[S.arch].n,
+            jewel:S.jewels+' total',
+            screw:S.screws==='blued'?'blued':'polished'}[k]||'';
+  }
+  function show(k){
+    if(HOVER.k===k)return;
+    HOVER.k=k;dirty=true;baseDirty=true;
+    if(!k){box.classList.remove('on');return;}
+    nEl.textContent=PARTS[k].n;
+    rEl.textContent=ref(k);
+    dEl.textContent=PARTS[k].d;
+    box.classList.add('on');
+  }
+  window.__showPart=show;
+  cv.addEventListener('pointermove',e=>{
+    if(S.view!=='movement'){show(null);return;}
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{
+      raf=0;
+      const r=cv.getBoundingClientRect();
+      const x=(e.clientX-r.left)-r.width/2, y=(e.clientY-r.top)-r.height/2;
+      const h=partAt(x,y);
+      show(h?h.k:null);
+      cv.style.cursor=h?'crosshair':'default';
+    });
+  });
+  cv.addEventListener('pointerleave',()=>show(null));
+  /* touch: a tap names the part and keeps it named */
+  cv.addEventListener('click',e=>{
+    if(S.view!=='movement')return;
+    const r=cv.getBoundingClientRect();
+    const h=partAt((e.clientX-r.left)-r.width/2,(e.clientY-r.top)-r.height/2);
+    if(h){show(h.k);announce(PARTS[h.k].n+'. '+PARTS[h.k].d);}
   });
 })();
 
@@ -5100,12 +5703,70 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   });
 })();
 
+/* ————— the hero: a real movement, turning, on the front page —————
+   It is the same engine the studio uses, rendered into its own canvas at a
+   fixed specification, so the first thing on the page is the actual product. */
+const HERO={
+  arch:'bridges',mvFinish:'geneva',vph:28800,jewels:31,pr:60,rotor:'micro',screws:'blued',
+  family:'round',size:39,thick:'slim',metal:'steel',finish:'polish',
+  view:'movement',light:'softbox',tiltX:0,tiltY:0,name:''
+};
+(function(){
+  const hc=document.getElementById('heroCv');
+  if(!hc)return;
+  const hx=hc.getContext('2d');
+  const spec=document.getElementById('heroSpec');
+  let running=true;
+  function sizeIt(){
+    const w=Math.min(hc.clientWidth||520,560);
+    const dpr=Math.min(devicePixelRatio||1,2);
+    hc.width=w*dpr;hc.height=w*dpr;
+    hc._d=dpr;hc._w=w;
+  }
+  function frame(){
+    if(!running)return;
+    const L=document.getElementById('landing');
+    if(L&&!L.classList.contains('gone')&&hc._w){
+      const keep=JSON.parse(JSON.stringify(S));
+      Object.assign(S,HERO);
+      const R=hc._w*.40;
+      hx.setTransform(hc._d,0,0,hc._d,0,0);
+      hx.clearRect(0,0,hc._w,hc._w);
+      hx.save();hx.translate(hc._w/2,hc._w/2);
+      try{drawMovement(hx,R,FAMILY[S.family],METAL[S.metal]);drawBalance(hx,R,Date.now());}catch(e){}
+      hx.restore();
+      Object.assign(S,keep);
+    }
+    requestAnimationFrame(frame);
+  }
+  function fillSpec(){
+    const keep=JSON.parse(JSON.stringify(S));
+    Object.assign(S,HERO);
+    const d=dims();
+    const rows=[['Calibre',calibre(),''],['Jewels',String(S.jewels),''],
+                ['Frequency',S.vph.toLocaleString('en-US'),'vph'],
+                ['Reserve',String(S.pr),'h'],['Diameter',d.d,'mm'],['Thickness',d.thick,'mm']];
+    Object.assign(S,keep);
+    if(spec)spec.innerHTML=rows.map(r=>
+      `<div><dt>${r[0]}</dt><dd>${r[1]}${r[2]?'<i>'+r[2]+'</i>':''}</dd></div>`).join('');
+  }
+  sizeIt();fillSpec();requestAnimationFrame(frame);
+  addEventListener('resize',()=>{sizeIt();});
+  /* once the studio is open the hero stops drawing — nothing runs unseen */
+  window.__heroStop=()=>{running=false;};
+})();
+/* both doors lead to the same room */
+['navCreate','navCreate2'].forEach(id=>{
+  const b=document.getElementById(id);
+  if(b)b.onclick=()=>enterStudio();
+});
 function enterStudio(){
   const L=document.getElementById('landing');
   setTimeout(()=>{
     L.classList.add('gone');
     try{sessionStorage.setItem('semi.entered','1');}catch(e){}
     setTimeout(()=>{L.style.display='none';resize();
+      if(window.__heroStop)window.__heroStop();
       /* a first visit lands on the calibre, because that is the argument */
       try{
         if(!localStorage.getItem('semi.seen')&&!(typeof fromLink!=='undefined'&&fromLink)){
@@ -5121,11 +5782,90 @@ function enterStudio(){
     }catch(e){}
   },260);
 }
-/* a shared link goes straight to the watch — judged by how the page was opened,
-   not by the hash we write ourselves as the design changes */
+/* ————— a shared design arrives as a sheet —————
+   Someone opening your link has not asked for a design tool. They have been
+   handed a watch, so they are shown the watch: the movement, its calibre, its
+   specification, and one door into the studio if they want it. */
 (function(){
-  const L=document.getElementById('landing');
-  if(typeof fromLink!=='undefined'&&fromLink){L.classList.add('gone');L.style.display='none';}
+  const L=document.getElementById('landing'), P=document.getElementById('present');
+  if(!(typeof fromLink!=='undefined'&&fromLink))return;
+  L.classList.add('gone');L.style.display='none';
+  if(window.__heroStop)window.__heroStop();
+  P.hidden=false;
+
+  const d=dims();
+  document.getElementById('pCal').textContent=calibre();
+  document.getElementById('pRef').textContent='Ref. '+designRef();
+  document.getElementById('pName').textContent=S.name||'Unnamed calibre';
+  document.getElementById('pArch').textContent=
+    ARCH[S.arch].n+' · '+ROTORS[S.rotor].n.toLowerCase()+' · '+MVFIN[S.mvFinish].n+
+    ' · '+FAMILY[S.family].n.toLowerCase()+' case in '+METAL[S.metal].name.toLowerCase()+'.';
+  const rows=[['Diameter',d.d+' mm'],['Thickness',d.thick+' mm'],
+    ['Lug to lug',d.l2l+' mm'],['Jewels',String(S.jewels)],
+    ['Reserve',S.pr+' h'],['Frequency',S.vph.toLocaleString('en-US')+' vph'],
+    ['Water resist.',d.wr+' m'],['Dial',ARTDIAL[S.texture]?TEXTURES[S.texture]:TEXTURES[S.texture]]];
+  document.getElementById('pSpec').innerHTML=
+    rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join('');
+  document.getElementById('pDate').textContent=
+    new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+
+  /* the movement turns here too — the balance does not stop for a guest */
+  const pc=document.getElementById('pCv'), px=pc.getContext('2d');
+  let face='movement', live=true;
+  function size(){
+    const w=Math.min(pc.clientWidth||560,600), dpr=Math.min(devicePixelRatio||1,2);
+    pc.width=w*dpr;pc.height=w*dpr;pc._d=dpr;pc._w=w;
+  }
+  function frame(){
+    if(!live)return;
+    if(pc._w){
+      const keep=JSON.parse(JSON.stringify(S));
+      S.view=face;S.tiltX=0;S.tiltY=0;
+      px.setTransform(pc._d,0,0,pc._d,0,0);
+      px.clearRect(0,0,pc._w,pc._w);
+      px.save();px.translate(pc._w/2,pc._w/2);
+      const R=pc._w*.34;
+      try{
+        if(face==='movement'){drawMovement(px,R,FAMILY[S.family],METAL[S.metal]);drawBalance(px,R,Date.now());}
+        else{
+          drawStrap(px,R,FAMILY[S.family]);drawLugs(px,R,FAMILY[S.family],METAL[S.metal]);
+          drawCrown(px,R,FAMILY[S.family],METAL[S.metal]);drawPushers(px,R,FAMILY[S.family],METAL[S.metal]);
+          drawCase(px,R,FAMILY[S.family],METAL[S.metal]);drawBezel(px,R,FAMILY[S.family],METAL[S.metal]);
+          const dR=R*FAMILY[S.family].ap*(1-S.bezelW)-R*.006;
+          px.save();px.beginPath();px.arc(0,0,dR,0,TAU);px.clip();
+          const INK=dialInk();
+          px.fillStyle=ARTDIAL[S.texture]?ARTDIAL[S.texture].base:DIALCOL[S.dialCol].base;
+          px.fillRect(-dR,-dR,dR*2,dR*2);
+          dialTexture(px,dR,S.texture,S.dialCol);drawTrack(px,dR,INK);
+          drawIndices(px,dR,DIALCOL[S.dialCol],METAL[S.metal]);
+          drawComp(px,dR,INK,METAL[S.metal]);drawQuote(px,dR,INK);drawSignature(px,dR,INK);
+          const nw=new Date(), bps=S.vph/3600;
+          const sec=Math.floor((nw.getSeconds()+nw.getMilliseconds()/1000)*bps)/bps;
+          px.save();px.rotate(((nw.getHours()%12)+nw.getMinutes()/60)*TAU/12);
+          drawHand(px,S.hands,dR*.52,dR*.055,METAL[S.metal],S.lume,S.handMat==='blued');px.restore();
+          px.save();px.rotate((nw.getMinutes()+sec/60)*TAU/60);
+          drawHand(px,S.hands,dR*.80,dR*.042,METAL[S.metal],S.lume,S.handMat==='blued');px.restore();
+          px.restore();drawCrystal(px,dR);
+        }
+      }catch(e){}
+      px.restore();
+      Object.assign(S,keep);
+    }
+    requestAnimationFrame(frame);
+  }
+  size();requestAnimationFrame(frame);
+  addEventListener('resize',size);
+
+  document.getElementById('pFlip').onclick=e=>{
+    face=(face==='movement')?'studio':'movement';
+    e.target.textContent=(face==='movement')?'Show the dial':'Show the movement';
+    document.getElementById('pFace').textContent=
+      (face==='movement')?'Movement · caseback':'Dial side';
+  };
+  document.getElementById('pOpen').onclick=()=>{
+    live=false;P.hidden=true;resize();
+    const first=document.querySelector('#rail .rl');if(first&&first.focus)first.focus();
+  };
 }());
 
 </script>
