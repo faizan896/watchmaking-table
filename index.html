@@ -15,9 +15,12 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='%23e9e4d8' stroke-width='3'/%3E%3Cpath d='M32 18v14l9 5' fill='none' stroke='%23e9e4d8' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- the interface fonts block; the two display faces do not, so the page paints
+     before they land and swaps them in when they do -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500;1,600&family=Archivo+Narrow:wght@400;600&family=Barlow+Condensed:wght@400;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&text=SemiFaizan&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E8%9D%89%C2%B7semi&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&text=SemiFaizan&display=swap" onload="this.rel='stylesheet'">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E8%9D%89%C2%B7semi&display=swap" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&text=SemiFaizan&display=swap"></noscript>
 <style>
 /* ============================================================
    SEMI — interface in the language of the maison:
@@ -222,6 +225,10 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .advice button{background:none;border:0;font-family:inherit;font-size:var(--fs1);color:var(--ink);
   text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0;margin-left:4px}
 
+.advmore{display:block;width:100%;text-align:left;background:none;border:0;font-family:inherit;
+  font-size:var(--fs1);color:var(--ink2);cursor:pointer;padding:6px 0 6px 2px;margin:-10px 0 var(--s4);
+  text-decoration:underline;text-underline-offset:3px}
+.advmore:hover{color:var(--ink)}
 /* a term you can ask about, inline in a label */
 .term{border-bottom:1px dotted rgba(24,23,19,.42);cursor:help;background:none;border-left:0;border-right:0;
   border-top:0;font:inherit;color:inherit;padding:0}
@@ -304,13 +311,50 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   color:var(--gold);margin-bottom:7px;font-weight:400}
 .gitem span{font-size:var(--fs2);line-height:1.8;color:var(--ink2)}
 
+/* the studio's opinion: a card on the stage, never a wall */
+#tip{position:absolute;left:44px;bottom:150px;max-width:330px;z-index:6;
+  background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
+  border-left:2px solid var(--gold);padding:16px 18px 14px;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity var(--dur2) var(--ease),transform var(--dur2) var(--ease)}
+#tip.on{opacity:1;transform:none;pointer-events:auto}
+#tip b{display:block;font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);
+  text-transform:uppercase;color:var(--gold);font-weight:400;margin-bottom:9px}
+#tip p{font-size:var(--fs1);line-height:1.75;color:#d8d2c4;margin-bottom:13px}
+#tip p b{display:inline;color:#f2efe6;letter-spacing:0;text-transform:none;font-size:inherit}
+.tiprow{display:flex;gap:16px;align-items:center}
+.tiprow button{background:none;border:0;font-family:inherit;cursor:pointer;
+  font-size:var(--fs0);letter-spacing:.22em;text-transform:uppercase;color:#8b8477;
+  padding:5px 0;transition:color var(--dur2) var(--ease)}
+.tiprow button:hover{color:#efe9dc}
+.tipprime{color:#efe9dc !important;border-bottom:1px solid var(--gold) !important}
+#stage.light #tip{background:rgba(246,243,236,.92)}
+#stage.light #tip p{color:#4f4b42}
+#stage.light #tip p b{color:#1b1a16}
+#stage.light .tiprow button{color:#6b6558}
+#stage.light .tiprow button:hover{color:#1b1a16}
+#stage.light .tipprime{color:#1b1a16 !important}
+@media(max-width:720px){
+  #tip{left:12px;right:12px;bottom:auto;top:64px;max-width:none;padding:13px 14px 11px}
+}
 /* the A/B plate */
-#cmp{position:absolute;inset:0;display:none;pointer-events:none}
+#cmp{position:absolute;inset:0;display:none}
 #cmp.on{display:block}
-#cmpCv{position:absolute;left:0;top:0;width:50%;height:100%;object-fit:cover;object-position:right center}
-#cmpLine{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(239,233,220,.4)}
-#cmpTag{position:absolute;left:22px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left center;
-  font-size:var(--fs0);letter-spacing:.28em;text-transform:uppercase;color:#a8a193}
+#cmpCv{position:absolute;left:0;top:0;height:100%;object-fit:cover;object-position:right center;
+  clip-path:inset(0 calc(100% - var(--seam,50%)) 0 0);width:100%}
+#cmpLine{position:absolute;left:var(--seam,50%);top:0;bottom:0;width:1px;
+  background:rgba(239,233,220,.45);cursor:ew-resize;touch-action:none}
+#cmpLine:before{content:'';position:absolute;left:-14px;right:-14px;top:0;bottom:0}
+#cmpLine i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:34px;height:34px;border-radius:50%;border:1px solid rgba(239,233,220,.5);
+  background:rgba(12,12,11,.55);backdrop-filter:blur(2px)}
+#cmpLine i:after{content:'‹ ›';position:absolute;inset:0;display:grid;place-items:center;
+  font-size:12px;color:#e9e4d8;letter-spacing:2px}
+#cmpTag,#cmpTagB{position:absolute;top:50%;font-size:var(--fs0);letter-spacing:.28em;
+  text-transform:uppercase;color:#a8a193;pointer-events:none}
+#cmpTag{left:22px;transform:translateY(-50%) rotate(-90deg);transform-origin:left center}
+#cmpTagB{right:22px;transform:translateY(-50%) rotate(90deg);transform-origin:right center}
+#stage.light #cmpTag,#stage.light #cmpTagB{color:#4f4b42}
 
 
 /* ————— tablet: the catalogue slides under the vitrine ————— */
@@ -508,6 +552,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <p>I read the histories. Every maison, every founder, every calibre that mattered — I knew the stories before I knew the words for what I was looking at.</p>
       <p>Then I started watching the watchmakers. Hours of it. A pair of hands under a lamp, seating a bridge, driving a screw a quarter turn and stopping. I could tell you what an escapement does. I had never made one thing.</p>
       <p>That is the gap this studio is for. I had the eye and no hands — no CAD, no drawing, no bench. So I built the bench instead: every real decision a watchmaker makes, laid out so that anyone who loves this can finally make something of their own.</p>
+      <p>So it starts where a watch starts — with the movement. Everything after that is built on it.</p>
       <p class="ssign">Faizan</p>
       <div class="snote">
         <b>蝉 · semi</b>
@@ -517,7 +562,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 
     <!-- swap the component to enter -->
     <div id="enter">
-      <div id="enterLabel" aria-hidden="true">Swap the component to enter the studio</div>
+      <div id="enterLabel" aria-hidden="true">Slide the balance across to open the calibre</div>
       <div id="track" role="slider" tabindex="0" aria-label="Slide the balance wheel across to enter the studio"
            aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="closed">
         <div id="trackFill"></div>
@@ -538,8 +583,9 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <canvas id="cv" role="img" aria-label="Watch design preview"></canvas>
     <div id="cmp" aria-hidden="true">
       <canvas id="cmpCv"></canvas>
-      <div id="cmpLine"></div>
+      <div id="cmpLine"><i></i></div>
       <div id="cmpTag">Saved</div>
+      <div id="cmpTagB">This design</div>
     </div>
     <div id="brand" aria-hidden="true">
       <div id="kanjiLogo">蝉</div>
@@ -556,6 +602,15 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     </div>
     <div id="bgRow" role="group" aria-label="Lighting">
       <em aria-hidden="true">Light</em>
+    </div>
+    <!-- the studio's opinion, offered and never enforced -->
+    <div id="tip" role="status">
+      <b>A note on this piece</b>
+      <p id="tipBody"></p>
+      <div class="tiprow">
+        <button id="tipFix" type="button" class="tipprime"></button>
+        <button id="tipKeep" type="button">Keep it as it is</button>
+      </div>
     </div>
   </main>
   <nav id="panel" aria-label="Design controls">
@@ -622,6 +677,8 @@ const S={
   hands:'dauphine', handMat:'steel', lume:true,
   /* strap */
   strap:'leather', strapCol:'#8a5c34', stitch:'tonal', buckle:'pin',
+  /* the text dial */
+  quoteA:'SLOW DOWN', quoteB:'YOU HAVE TIME', quoteFont:'grot', quoteSize:1,
   /* meta */
   name:'', view:'studio', tiltX:0, tiltY:0,
   /* stage */
@@ -721,7 +778,40 @@ const PRESETS=[
     hands:'baton',handMat:'steel',lume:true,strap:'rubber',strapCol:'#232120'}},
   {n:'Meteorite',w:'Gibeon iron',p:'Cooled at one degree per million years. The Widmanstätten pattern cannot be manufactured.',s:{arch:'bridges',mvFinish:'geneva',vph:28800,jewels:31,pr:70,rotor:'full',crystal:'ddomed',buckle:'deploy',lugW:20,family:'round',size:40,thick:'std',lug:'twisted',bezel:'fluted',bezelW:.10,metal:'white',finish:'polish',
     layout:'baton',dialCol:'slate',texture:'lava',track:'ticks',indexMat:'applied',comp:'none',date:'3',
-    hands:'dauphine',handMat:'steel',lume:false,strap:'linkR'}}
+    hands:'dauphine',handMat:'steel',lume:false,strap:'linkR'}},
+  {n:'Nocturne',w:'cloisonné, Geneva',p:'Gold wire bent by hand around every feather, then fired. A dial like this is a year of one person\'s work and about ten pieces exist.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:29,pr:45,rotor:'micro',crystal:'domed',buckle:'deploy',lugW:19,
+    family:'cushion',size:39,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'white',finish:'polish',
+    layout:'none',dialCol:'white',texture:'owlBrown',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'leaf',handMat:'steel',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
+  {n:'Pintail',w:'cloisonné, Geneva',p:'A northern pintail on the water. Every colour is a separate firing, and each firing can take the one before it with it.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:29,pr:45,rotor:'micro',crystal:'domed',buckle:'deploy',lugW:19,
+    family:'cushion',size:38,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.07,metal:'white',finish:'polish',
+    layout:'none',dialCol:'white',texture:'pintail',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#2f4034',stitch:'tonal'}},
+  {n:'Kingfisher',w:'cloisonné, Geneva',p:'The bird that sits still for an hour and then does one thing perfectly. Reasonable ambition for a watch.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:27,pr:50,rotor:'micro',crystal:'ddomed',buckle:'pin',lugW:19,
+    family:'round',size:38,thick:'slim',lug:'horn',bezel:'smooth',bezelW:.07,metal:'rose',finish:'polish',
+    layout:'none',dialCol:'white',texture:'kingfisher',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'breguet',handMat:'blued',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}},
+  {n:'Fuji',w:'enamel, after Hokusai',p:'Thirty-six views, and the mountain is the same in all of them. The dial takes the one at dawn.',s:{arch:'threeq',mvFinish:'frosted',vph:21600,jewels:19,pr:42,rotor:'manual',crystal:'box',buckle:'pin',lugW:18,
+    family:'round',size:37,thick:'slim',lug:'wire',bezel:'smooth',bezelW:.08,metal:'yellow',finish:'polish',
+    layout:'none',dialCol:'white',texture:'fuji',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'baton',handMat:'blued',lume:false,strap:'leather',strapCol:'#8a5c34',stitch:'tonal'}},
+  {n:'Blue ceramic',w:'Le Brassus, ceramic era',p:'Zirconia sintered at 1400°C and then diamond-polished — coloured all the way through, so a scratch shows the same blue.',s:{arch:'bridges',mvFinish:'geneva',vph:21600,jewels:38,pr:40,rotor:'peri',crystal:'flat',buckle:'deploy',lugW:0,
+    family:'octagon',size:41,thick:'slim',lug:'none',bezel:'screws',bezelW:.13,metal:'cerBlue',finish:'polish',
+    layout:'baton',dialCol:'blue',texture:'tapestry',track:'ticks',indexMat:'applied',comp:'moon',date:'3',
+    hands:'baton',handMat:'steel',lume:true,strap:'link3'}},
+  {n:'Slow down',w:'a dial with an opinion',p:'The words are the whole design. Nothing else is allowed on the dial, which is harder than it sounds.',s:{arch:'threeq',mvFinish:'grained',vph:21600,jewels:17,pr:42,rotor:'manual',crystal:'flat',buckle:'pin',lugW:20,
+    family:'round',size:39,thick:'slim',lug:'straight',bezel:'smooth',bezelW:.06,metal:'cerBlack',finish:'polish',
+    layout:'none',dialCol:'black',texture:'quote',track:'none',indexMat:'printed',comp:'none',date:'none',
+    quoteA:'SLOW DOWN',quoteB:'YOU HAVE TIME',quoteFont:'grot',quoteSize:1,
+    hands:'baton',handMat:'steel',lume:false,strap:'rubber',strapCol:'#232120'}},
+  {n:'Tiger eye',w:'chatoyance',p:'Crocidolite replaced by quartz fibre by fibre. Turn it and one band of light travels across the dial.',s:{arch:'bridges',mvFinish:'perlage',vph:28800,jewels:25,pr:50,rotor:'full',crystal:'domed',buckle:'pin',lugW:20,
+    family:'round',size:39,thick:'std',lug:'twisted',bezel:'smooth',bezelW:.07,metal:'yellow',finish:'polish',
+    layout:'baton',dialCol:'champ',texture:'tigereye',track:'none',indexMat:'applied',comp:'none',date:'none',
+    hands:'dauphine',handMat:'steel',lume:false,strap:'leather',strapCol:'#4d3524',stitch:'tonal'}},
+  {n:'Deco',w:'Paris, 1925',p:'The Exposition that named the style. Symmetry, rays, and gold on black — nothing accidental anywhere.',s:{arch:'bridges',mvFinish:'geneva',vph:18000,jewels:18,pr:40,rotor:'manual',crystal:'box',buckle:'deploy',lugW:16,
+    family:'rect',size:36,thick:'slim',lug:'none',bezel:'smooth',bezelW:.09,metal:'yellow',finish:'polish',
+    layout:'none',dialCol:'black',texture:'deco',track:'none',indexMat:'printed',comp:'none',date:'none',
+    hands:'baton',handMat:'steel',lume:false,strap:'leather',strapCol:'#232120',stitch:'tonal'}}
 ];
 
 /* ————— materials ————— */
@@ -734,7 +824,13 @@ const METAL={
   /* titanium: lower lustre, and warm-grey rather than blue-grey */
   titan :{lo:'#5f6058',mid:'#9d9c93',hi:'#bfbeb4',ink:'#3c3d38',name:'Titanium',   gloss:0.52},
   /* DLC over steel: the coating is near-matte, but the metal underneath still shows at the edges */
-  black :{lo:'#141414',mid:'#2e3032',hi:'#4b4f52',ink:'#0b0c0c',name:'Black DLC',  gloss:0.34}
+  black :{lo:'#141414',mid:'#2e3032',hi:'#4b4f52',ink:'#0b0c0c',name:'Black DLC',  gloss:0.34},
+  /* ceramic is not a metal. it is sintered zirconia — coloured all the way
+     through, so a scratch shows the same colour, and it takes a glass-hard
+     polish that reads as one tight specular rather than a metallic sheen. */
+  cerBlue :{lo:'#122a63',mid:'#20458f',hi:'#7ea0dd',ink:'#0b1a3f',name:'Blue ceramic', gloss:0.80,ceramic:1},
+  cerBlack:{lo:'#0d0f12',mid:'#1c2026',hi:'#6a727c',ink:'#080a0c',name:'Black ceramic',gloss:0.78,ceramic:1},
+  cerWhite:{lo:'#b9bcc0',mid:'#eceef0',hi:'#ffffff',ink:'#4a4e52',name:'White ceramic',gloss:0.76,ceramic:1}
 };
 const DIALCOL={
   silver:{base:'#cfcdc6',ink:'#1d1b17',name:'Silver'},
@@ -868,6 +964,23 @@ const LIGHT={
     d:'A north-facing window at midday. The one setup that tells you what the watch will look like on a wrist.'}
 };
 const BUCKLE={pin:'Pin buckle',deploy:'Deployant clasp'};
+/* ————— the dial that says something —————
+   A line above, a line below, both set around the rim so the hands have the
+   middle to themselves. Type your own, or start from one of these. */
+const QUOTES=[
+  ['SLOW DOWN','YOU HAVE TIME'],
+  ['NOT NOW','MAYBE LATER'],
+  ['ALWAYS LATE','NEVER SORRY'],
+  ['ONE LIFE','NO SPARE PARTS'],
+  ['BORROWED TIME','SPEND IT WELL'],
+  ['THE TIME IS NOW','IT ALWAYS WAS'],
+  ['DO NOT ASK','JUST BE HERE'],
+  ['PATIENCE','IS A MOVEMENT'],
+  ['STILL BEATING','STILL HERE'],
+  ['MADE BY HAND','WORN BY YOU'],
+  ['NO RUSH','NO REGRET'],
+  ['LATER IS FINE','NOW IS BETTER']
+];
 /* ————— the numbers a collector actually asks for ————— */
 function dims(){
   const f=FAMILY[S.family];
@@ -910,6 +1023,17 @@ const BEZELS={smooth:'Smooth',coin:'Coin edge',fluted:'Fluted',dive:'Dive 60',gm
 /* ————— metal shading: the whole illusion lives here ————— */
 function metalFill(c,R,m,finish,ang){
   const M=METAL[m], gl=M.gloss===undefined?1:M.gloss;
+  /* ceramic: an even body colour with one hard, narrow highlight, and no
+     directional grain at all — brushing zirconia is not a thing */
+  if(M.ceramic){
+    const g=c.createLinearGradient(-R*.7,-R*.9,R*.5,R*.9);
+    g.addColorStop(0,   shade(M.mid,.06));
+    g.addColorStop(.30, M.hi);
+    g.addColorStop(.42, M.mid);
+    g.addColorStop(.78, M.lo);
+    g.addColorStop(1,   shade(M.mid,-.06));
+    return g;
+  }
   /* a low-gloss metal never reaches its own highlight: pull the bright stop
      back toward the mid tone rather than faking it with opacity */
   if(gl<.9){
@@ -919,6 +1043,7 @@ function metalFill(c,R,m,finish,ang){
   return metalFillCore(c,R,M,finish,ang,gl);
 }
 function metalFillCore(c,R,M,finish,ang,gl){
+  if(M.ceramic)finish='polish';
   if(finish==='brush'){
     const g=c.createLinearGradient(-R,-R,R,R);
     g.addColorStop(0,shade(M.mid,.10));g.addColorStop(.28,M.lo);g.addColorStop(.5,M.mid);
@@ -957,7 +1082,22 @@ const TEXTURES={sunray:'Sunray',matte:'Matte',enamel:'Grand feu',guilloche:'Guil
   mondrian:'Composition',klimt:'Gold leaf',circuit:'Circuit',synth:'Grid horizon',
   nebula:'Nebula',carbon:'Carbon',topo:'Topographic',lava:'Meteorite',
   aventurine:'Aventurine',malachite:'Malachite',lapis:'Lapis lazuli',
-  mop:'Mother of pearl',damascus:'Damascus',marble:'Marble'};
+  mop:'Mother of pearl',damascus:'Damascus',marble:'Marble',
+  /* cloisonné enamel — gold wire laid on the dial, each cell filled and fired */
+  owlWhite:'White owl',owlBrown:'Brown owl',pintail:'Northern pintail',
+  kingfisher:'Kingfisher',crane:'Red-crowned crane',koi:'Koi',
+  tiger:'Tiger',hummingbird:'Hummingbird',
+  /* enamel landscapes */
+  fuji:'Fuji',dune:'Dune',lighthouse:'Lighthouse',pines:'Pine forest',alps:'Alpine',
+  /* the dial as a painting */
+  kandinsky:'Circles',rothko:'Colour field',matisse:'Cut-outs',deco:'Art deco',memphis:'Memphis',
+  /* métiers d'art in metal and wood */
+  marquetry:'Wood marquetry',straw:'Straw marquetry',hobnail:'Clous de Paris',
+  barleycorn:'Barleycorn',flinque:'Flinqué',
+  /* more stone */
+  tigereye:'Tiger eye',onyx:'Onyx',jade:'Jade',obsidian:'Obsidian',turquoise:'Turquoise',
+  /* the dial as a sentence */
+  quote:'Text dial'};
 /* art dials carry their own palette — the colour chip steps aside */
 const ARTDIAL={
   clay :{base:'#b4573a',ink:'#f6efe4'}, grass:{base:'#2f5c33',ink:'#f6f4e8'},
@@ -968,7 +1108,24 @@ const ARTDIAL={
   topo:{base:'#e6ddc6',ink:'#2f2a20'}, lava:{base:'#2a2724',ink:'#e8e2d4'},
   aventurine:{base:'#0d1b3f',ink:'#e6e2d2'}, malachite:{base:'#1d5340',ink:'#eef2e6'},
   lapis:{base:'#17347a',ink:'#f0e7c4'}, mop:{base:'#e9e6e0',ink:'#2b2822'},
-  damascus:{base:'#3a3b3d',ink:'#eceae2'}, marble:{base:'#efece4',ink:'#2b2822'}
+  damascus:{base:'#3a3b3d',ink:'#eceae2'}, marble:{base:'#efece4',ink:'#2b2822'},
+  owlWhite:{base:'#efe9dc',ink:'#2a2620'}, owlBrown:{base:'#e8e2d2',ink:'#2a2620'},
+  pintail:{base:'#e7dfc8',ink:'#2a2620'}, kingfisher:{base:'#dfe8ea',ink:'#22282c'},
+  crane:{base:'#f0ece0',ink:'#2a2620'}, koi:{base:'#12303a',ink:'#f0ece0'},
+  tiger:{base:'#e6d9b8',ink:'#2a2016'}, hummingbird:{base:'#e9eee2',ink:'#22301f'},
+  fuji:{base:'#e8dfd0',ink:'#26303c'}, dune:{base:'#e3c88e',ink:'#3a2a18'},
+  lighthouse:{base:'#123048',ink:'#f2ece0'}, pines:{base:'#16281f',ink:'#e8eee4'},
+  alps:{base:'#dfe9f2',ink:'#22303c'},
+  kandinsky:{base:'#efe7d6',ink:'#1a1a1a'}, rothko:{base:'#7a1f14',ink:'#f6e9d8'},
+  matisse:{base:'#f2ece0',ink:'#123044'}, deco:{base:'#141414',ink:'#d9b45c'},
+  memphis:{base:'#f4f1e8',ink:'#141414'},
+  marquetry:{base:'#6a4a2a',ink:'#f2e8d8'}, straw:{base:'#c9a44e',ink:'#2a2216'},
+  hobnail:{base:'#d8d4cb',ink:'#26241e'}, barleycorn:{base:'#c8c3b6',ink:'#26241e'},
+  flinque:{base:'#1d4a7a',ink:'#eef2f6'},
+  tigereye:{base:'#6a4213',ink:'#f4e6cc'}, onyx:{base:'#0e0e0f',ink:'#eceae2'},
+  jade:{base:'#2f6b52',ink:'#f0f4ec'}, obsidian:{base:'#141418',ink:'#e2e2e6'},
+  turquoise:{base:'#3fa6a8',ink:'#123032'},
+  quote:{base:'#121212',ink:'#f2efe6'}
 };
 function dialTexture(c,R,tex,col){
   const D=DIALCOL[col],base=D.base;
@@ -1045,8 +1202,613 @@ function dialTexture(c,R,tex,col){
 /* ============================================================
    ART DIALS — the dial treated as a canvas
    ============================================================ */
+/* ============================================================
+   THE DIAL AS A CANVAS — part two
+   Cloisonné is gold wire bent by hand, laid on the dial, and each
+   cell filled with powdered enamel and fired. So everything here is
+   drawn the same way: shapes first, then the wire over the seams.
+   ============================================================ */
+const WIRE='rgba(198,158,74,.95)', WIRE2='rgba(120,90,32,.55)';
+function cloison(c,pts,fill,close){
+  /* one cell: the enamel, then the gold wire that holds it */
+  c.beginPath();
+  pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));
+  if(close!==false)c.closePath();
+  if(fill){c.fillStyle=fill;c.fill();}
+  c.strokeStyle=WIRE2;c.lineWidth=Math.max(c._w*1.6,1.4);c.stroke();
+  c.strokeStyle=WIRE;c.lineWidth=Math.max(c._w,.9);c.stroke();
+}
+function cloisonArc(c,x,y,r,a0,a1,fill){
+  c.beginPath();c.arc(x,y,r,a0,a1);c.closePath();
+  if(fill){c.fillStyle=fill;c.fill();}
+  c.strokeStyle=WIRE2;c.lineWidth=Math.max(c._w*1.6,1.4);c.stroke();
+  c.strokeStyle=WIRE;c.lineWidth=Math.max(c._w,.9);c.stroke();
+}
+/* the fired-glass surface: enamel is never flat, it pools and it shines */
+function enamelGlaze(c,R,warm){
+  const g=c.createRadialGradient(-R*.34,-R*.42,R*.04,0,0,R*1.25);
+  g.addColorStop(0,warm?'rgba(255,246,222,.30)':'rgba(255,255,255,.26)');
+  g.addColorStop(.55,'rgba(255,255,255,.03)');
+  g.addColorStop(1,'rgba(20,14,6,.28)');
+  c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+  seed(9001);
+  for(let i=0;i<220;i++){
+    c.fillStyle='rgba(255,255,255,.05)';
+    c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*R*.02,0,TAU);c.fill();
+  }
+}
+function feather(c,x,y,len,ang,w,col,n){
+  /* a run of overlapping barbs — the thing that takes a painter a week */
+  c.save();c.translate(x,y);c.rotate(ang);
+  for(let i=0;i<n;i++){
+    const k=i/n;
+    c.fillStyle=col;
+    c.beginPath();
+    c.ellipse(len*.10+k*len*.82,0,len*.20,w*(1-k*.45),0,0,TAU);
+    c.fill();
+    c.strokeStyle='rgba(0,0,0,.10)';c.lineWidth=Math.max(c._w||.6,.5);c.stroke();
+  }
+  c.restore();
+}
+function artDial2(c,R,k){
+  const A=ARTDIAL[k]; if(!A)return false;
+  c._w=Math.max(R*.006,.7);
+  const F=(x,y)=>[R*x,R*y];
+  const P=(...a)=>a.map(p=>F(p[0],p[1]));
+
+  /* ————— cloisonné: the birds ————— */
+  if(k==='owlWhite'){
+    c.fillStyle='#efe9dc';c.fillRect(-R,-R,2*R,2*R);
+    cloison(c,P([-1,.28],[1,.28],[1,1],[-1,1]),'#b9b3a2');           /* the rock */
+    cloison(c,P([-.30,-.72],[.10,-.66],[.30,-.20],[.26,.30],[-.02,.34],[-.30,.10],[-.36,-.34]),'#f6f2e8'); /* body */
+    cloison(c,P([.02,-.30],[.34,-.10],[.30,.26],[.02,.30]),'#e4dccb'); /* the folded wing */
+    for(let i=0;i<7;i++)feather(c,R*(.06+i*.03),R*(-.20+i*.075),R*.24,0.32,R*.030,'rgba(206,196,176,.80)',4);
+    cloisonArc(c,-R*.13,-R*.72,R*.20,0,TAU,'#fbf8f0');                /* head */
+    cloison(c,P([-.30,-.86],[-.20,-.98],[-.10,-.86]),'#f2eee2');      /* ear tuft */
+    cloison(c,P([-.06,-.86],[.06,-.98],[.14,-.84]),'#f2eee2');
+    c.fillStyle='#2a2620';c.beginPath();c.arc(-R*.21,-R*.74,R*.036,0,TAU);c.fill();
+    c.beginPath();c.arc(-R*.04,-R*.74,R*.036,0,TAU);c.fill();
+    c.fillStyle='#c8a24a';c.beginPath();
+    c.moveTo(-R*.13,-R*.68);c.lineTo(-R*.09,-R*.58);c.lineTo(-R*.17,-R*.58);c.closePath();c.fill();
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='owlBrown'){
+    c.fillStyle='#e8e2d2';c.fillRect(-R,-R,2*R,2*R);
+    seed(311);                                                        /* the nest */
+    for(let i=0;i<150;i++){
+      const a=rnd()*TAU,rr=R*(.42+rnd()*.55);
+      c.strokeStyle=`rgba(${140+rnd()*50|0},${112+rnd()*40|0},${64+rnd()*30|0},.85)`;
+      c.lineWidth=Math.max(R*.012,1);
+      c.beginPath();c.moveTo(Math.cos(a)*rr,Math.sin(a)*rr*.8+R*.18);
+      c.lineTo(Math.cos(a+.5)*rr*1.15,Math.sin(a+.5)*rr*.8+R*.22);c.stroke();
+    }
+    cloison(c,P([-.36,-.14],[.36,-.14],[.30,.52],[-.30,.52]),'#8a6a3e');
+    for(let i=0;i<24;i++){
+      const x=(i%6-2.5)*R*.11, y=Math.floor(i/6)*R*.14-R*.06;
+      feather(c,x,y,R*.16,1.35,R*.026,'rgba(196,158,96,.85)',3);
+    }
+    cloisonArc(c,0,-R*.34,R*.34,0,TAU,'#9c7a48');                     /* head */
+    cloison(c,P([-.40,-.60],[-.26,-.80],[-.12,-.56]),'#8a6a3e');
+    cloison(c,P([.12,-.56],[.26,-.80],[.40,-.60]),'#8a6a3e');
+    [[-.15,-.36],[.15,-.36]].forEach(e=>{
+      cloisonArc(c,R*e[0],R*e[1],R*.115,0,TAU,'#e8a81c');
+      c.fillStyle='#181410';c.beginPath();c.arc(R*e[0],R*e[1],R*.052,0,TAU);c.fill();
+      c.fillStyle='rgba(255,255,255,.75)';c.beginPath();c.arc(R*e[0]-R*.02,R*e[1]-R*.024,R*.018,0,TAU);c.fill();
+    });
+    c.fillStyle='#d8b46a';c.beginPath();
+    c.moveTo(0,-R*.30);c.lineTo(R*.05,-R*.19);c.lineTo(-R*.05,-R*.19);c.closePath();c.fill();
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='pintail'){
+    const g=c.createLinearGradient(0,-R,0,R);
+    g.addColorStop(0,'#e9dcae');g.addColorStop(.52,'#d8c48c');g.addColorStop(.55,'#b8894a');g.addColorStop(1,'#8a5c2c');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    cloison(c,P([-.72,.10],[.62,.10],[.50,.42],[-.60,.40]),'#f2ece0');   /* body on the water */
+    cloison(c,P([-.60,.10],[.30,.06],[.44,.24],[-.50,.30]),'#cdc4b2');
+    cloison(c,P([.10,.02],[.62,-.16],[.78,-.02],[.34,.14]),'#2f6a4a');   /* speculum */
+    cloison(c,P([-.66,.02],[-.22,-.06],[-.20,.16],[-.62,.18]),'#f6f2e8'); /* the white neck stripe */
+    cloisonArc(c,-R*.60,-R*.30,R*.24,0,TAU,'#7a3a24');                   /* head */
+    cloison(c,P([-.82,-.28],[-1.00,-.20],[-.80,-.14]),'#3a4a58');        /* bill */
+    c.fillStyle='#141210';c.beginPath();c.arc(-R*.66,-R*.34,R*.032,0,TAU);c.fill();
+    cloison(c,P([.44,.16],[1.00,.42],[.86,.50],[.40,.30]),'#c9c0ae');    /* the tail pin */
+    seed(77);                                                            /* water */
+    for(let i=0;i<70;i++){
+      c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=Math.max(R*.008,.8);
+      const y=R*(.42+rnd()*.55);
+      c.beginPath();c.moveTo(-R+rnd()*R*.6,y);c.lineTo(-R*.2+rnd()*R,y+R*.02);c.stroke();
+    }
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='kingfisher'){
+    const g=c.createLinearGradient(0,-R,0,R);
+    g.addColorStop(0,'#cfe4ea');g.addColorStop(1,'#7fa6ae');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    cloison(c,P([-1,.62],[1,.50],[1,1],[-1,1]),'#2d6a72');               /* the water below */
+    cloison(c,P([-.90,.20],[.60,-.10]),null,false);                      /* the branch */
+    c.strokeStyle='#5a3d22';c.lineWidth=R*.055;
+    c.beginPath();c.moveTo(-R*.95,R*.28);c.lineTo(R*.70,-R*.04);c.stroke();
+    cloison(c,P([-.22,-.60],[.18,-.44],[.24,.02],[-.02,.20],[-.28,-.04],[-.32,-.36]),'#1a7fb8');
+    cloison(c,P([-.02,-.40],[.26,-.20],[.20,.10],[-.04,.14]),'#0f5f92');
+    for(let i=0;i<6;i++)feather(c,R*(.00+i*.032),R*(-.28+i*.06),R*.20,0.42,R*.024,'rgba(90,190,235,.75)',4);
+    cloison(c,P([-.26,-.06],[.12,.06],[.06,.36],[-.20,.26]),'#e08a3c');  /* the orange breast */
+    cloisonArc(c,-R*.30,-R*.62,R*.20,0,TAU,'#1668a8');                   /* head */
+    cloison(c,P([-.48,-.62],[-.96,-.52],[-.46,-.44]),'#171a1e');         /* bill */
+    c.fillStyle='#0c0e10';c.beginPath();c.arc(-R*.34,-R*.66,R*.030,0,TAU);c.fill();
+    enamelGlaze(c,R,false);return true;
+  }
+  if(k==='crane'){
+    c.fillStyle='#f0ece0';c.fillRect(-R,-R,2*R,2*R);
+    seed(404);
+    for(let i=0;i<3;i++){
+      const y=R*(-.5+i*.42);
+      c.fillStyle='rgba(198,190,168,.35)';
+      c.beginPath();c.ellipse(-R*.2+i*R*.2,y,R*(.8-i*.14),R*.05,0,0,TAU);c.fill();
+    }
+    c.fillStyle='#c9302c';                                              /* the rising sun */
+    c.beginPath();c.arc(R*.42,-R*.50,R*.26,0,TAU);c.fill();
+    cloison(c,P([-.44,.06],[.28,-.06],[.36,.26],[-.36,.34]),'#fbfaf6');  /* body */
+    cloison(c,P([-.28,-.02],[.30,-.16],[.40,.06],[-.18,.18]),'#efece2'); /* wing */
+    cloison(c,P([.18,.02],[.62,.10],[.54,.24],[.16,.16]),'#1c1a18');     /* black trailing edge */
+    c.strokeStyle='#f6f4ee';c.lineWidth=R*.05;
+    c.beginPath();c.moveTo(-R*.36,R*.10);c.quadraticCurveTo(-R*.62,-R*.30,-R*.50,-R*.62);c.stroke();
+    c.strokeStyle=WIRE;c.lineWidth=Math.max(c._w,.9);
+    c.beginPath();c.moveTo(-R*.36,R*.10);c.quadraticCurveTo(-R*.62,-R*.30,-R*.50,-R*.62);c.stroke();
+    cloisonArc(c,-R*.52,-R*.70,R*.12,0,TAU,'#fbfaf6');
+    c.fillStyle='#c9302c';c.beginPath();c.arc(-R*.52,-R*.78,R*.055,0,TAU);c.fill();
+    c.strokeStyle='#2a2620';c.lineWidth=R*.022;
+    c.beginPath();c.moveTo(-R*.10,R*.32);c.lineTo(-R*.06,R*.86);
+    c.moveTo(R*.10,R*.30);c.lineTo(R*.16,R*.86);c.stroke();
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='koi'){
+    const g=c.createRadialGradient(0,-R*.2,R*.05,0,0,R*1.2);
+    g.addColorStop(0,'#1d4a58');g.addColorStop(1,'#0b2028');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(88);
+    for(let i=0;i<9;i++){
+      c.strokeStyle='rgba(180,220,230,.14)';c.lineWidth=Math.max(R*.012,1);
+      const rr=R*(.2+i*.10);
+      c.beginPath();c.arc(-R*.1,-R*.1,rr,0,TAU);c.stroke();
+    }
+    const fish=(x,y,rot,c1,c2)=>{
+      c.save();c.translate(x,y);c.rotate(rot);
+      cloison(c,[[-R*.34,0],[-R*.10,-R*.16],[R*.20,-R*.10],[R*.34,0],[R*.20,R*.10],[-R*.10,R*.16]],c1);
+      cloison(c,[[R*.30,0],[R*.56,-R*.18],[R*.50,0],[R*.56,R*.18]],c2);
+      cloison(c,[[-R*.16,-R*.10],[R*.02,-R*.13],[-R*.02,-R*.02]],c2);
+      c.fillStyle='#141210';c.beginPath();c.arc(-R*.24,-R*.03,R*.028,0,TAU);c.fill();
+      c.restore();
+    };
+    fish(-R*.22,-R*.30,-0.42,'#f2ede2','#e2622c');
+    fish(R*.20,R*.34,2.75,'#e2622c','#f2ede2');
+    seed(12);
+    for(let i=0;i<26;i++){
+      c.fillStyle='rgba(210,236,240,.13)';
+      c.beginPath();c.ellipse((rnd()-.5)*1.8*R,(rnd()-.5)*1.8*R,R*.07,R*.02,rnd()*TAU,0,TAU);c.fill();
+    }
+    enamelGlaze(c,R,false);return true;
+  }
+  if(k==='tiger'){
+    const g=c.createRadialGradient(0,-R*.1,R*.05,0,0,R*1.2);
+    g.addColorStop(0,'#e8c98a');g.addColorStop(1,'#b08840');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    cloisonArc(c,0,R*.02,R*.66,0,TAU,'#d9932c');                        /* the face */
+    cloison(c,P([-.66,-.30],[-.34,-.76],[-.26,-.36]),'#d9932c');
+    cloison(c,P([.26,-.36],[.34,-.76],[.66,-.30]),'#d9932c');
+    cloison(c,P([-.40,-.06],[.40,-.06],[.30,.48],[-.30,.48]),'#f4ecdc'); /* muzzle */
+    seed(717);                                                           /* the stripes */
+    for(let i=0;i<16;i++){
+      const a=(i/16)*TAU, rr=R*.62;
+      c.strokeStyle='#1e1a16';c.lineWidth=R*(.030+rnd()*.030);c.lineCap='round';
+      c.beginPath();
+      c.moveTo(Math.cos(a)*rr,Math.sin(a)*rr*.98+R*.02);
+      c.lineTo(Math.cos(a)*rr*.58,Math.sin(a)*rr*.58+R*.02);c.stroke();
+    }
+    [[-.26,-.10],[.26,-.10]].forEach(e=>{
+      cloisonArc(c,R*e[0],R*e[1],R*.115,0,TAU,'#e8c23a');
+      c.fillStyle='#141210';c.beginPath();c.ellipse(R*e[0],R*e[1],R*.030,R*.062,0,0,TAU);c.fill();
+      c.fillStyle='rgba(255,255,255,.7)';c.beginPath();c.arc(R*e[0]-R*.03,R*e[1]-R*.03,R*.018,0,TAU);c.fill();
+    });
+    c.fillStyle='#c4736a';c.beginPath();
+    c.moveTo(0,R*.22);c.lineTo(R*.09,R*.08);c.lineTo(-R*.09,R*.08);c.closePath();c.fill();
+    c.strokeStyle='#1e1a16';c.lineWidth=Math.max(R*.010,1);
+    c.beginPath();c.moveTo(0,R*.22);c.lineTo(0,R*.34);c.stroke();
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='hummingbird'){
+    const g=c.createLinearGradient(-R,-R,R,R);
+    g.addColorStop(0,'#eef3e6');g.addColorStop(1,'#c9d8bc');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    c.strokeStyle='#4a6a3a';c.lineWidth=R*.034;
+    c.beginPath();c.moveTo(R*.95,R*.90);c.quadraticCurveTo(R*.30,R*.40,R*.34,-R*.30);c.stroke();
+    [[.34,-.34,.20],[.62,.10,.15]].forEach(f=>{                          /* the trumpet flowers */
+      c.save();c.translate(R*f[0],R*f[1]);
+      for(let i=0;i<6;i++){c.save();c.rotate(i*TAU/6);
+        cloison(c,[[0,0],[R*f[2]*.5,-R*f[2]*.5],[R*f[2],0],[R*f[2]*.5,R*f[2]*.4]],'#d94f7a');
+        c.restore();}
+      c.fillStyle='#f2c94c';c.beginPath();c.arc(0,0,R*f[2]*.28,0,TAU);c.fill();
+      c.restore();
+    });
+    cloison(c,P([-.52,-.20],[-.16,-.30],[-.02,-.06],[-.20,.16],[-.50,.06]),'#1f8f6a'); /* body */
+    cloison(c,P([-.44,-.24],[-.16,-.32],[-.22,-.08],[-.44,-.04]),'#c9403a');           /* gorget */
+    cloison(c,P([-.34,-.10],[.10,-.62],[.16,-.34],[-.20,.04]),'#2aa07c');              /* wing up */
+    cloison(c,P([-.34,.02],[.06,.44],[.10,.20],[-.22,.10]),'#1c7a5e');                 /* wing down */
+    cloisonArc(c,-R*.56,-R*.26,R*.14,0,TAU,'#166a52');
+    c.strokeStyle='#1a1614';c.lineWidth=R*.024;
+    c.beginPath();c.moveTo(-R*.66,-R*.28);c.lineTo(-R*.14,-R*.40);c.stroke();
+    c.fillStyle='#0e0c0a';c.beginPath();c.arc(-R*.58,-R*.31,R*.028,0,TAU);c.fill();
+    enamelGlaze(c,R,false);return true;
+  }
+
+  /* ————— enamel landscapes ————— */
+  if(k==='fuji'){
+    const g=c.createLinearGradient(0,-R,0,R*.3);
+    g.addColorStop(0,'#f2d8b0');g.addColorStop(.6,'#e8c9a2');g.addColorStop(1,'#d7b088');
+    c.fillStyle='#ecd6b4';c.fillRect(-R,-R,2*R,2*R);
+    c.fillStyle='#d8452e';c.beginPath();c.arc(R*.46,-R*.54,R*.20,0,TAU);c.fill();
+    cloison(c,P([-.95,.34],[-.20,-.52],[.20,-.52],[.95,.34]),'#5a6f86');
+    cloison(c,P([-.28,-.44],[-.14,-.54],[0,-.44],[.10,-.56],[.24,-.44],[.16,-.30],[-.18,-.30]),'#f6f4ee');
+    cloison(c,P([-1,.34],[1,.34],[1,.62],[-1,.62]),'#3d5a4a');
+    cloison(c,P([-1,.62],[1,.62],[1,1],[-1,1]),'#2a4438');
+    seed(202);
+    for(let i=0;i<5;i++){
+      c.fillStyle='rgba(255,255,255,.55)';
+      const y=R*(-.30+i*.10);
+      c.beginPath();c.ellipse((rnd()-.5)*R*1.2,y,R*(.34-i*.04),R*.032,0,0,TAU);c.fill();
+    }
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='dune'){
+    c.fillStyle='#e3c88e';c.fillRect(-R,-R,2*R,2*R);
+    const sky=c.createLinearGradient(0,-R,0,0);
+    sky.addColorStop(0,'#f0d0a0');sky.addColorStop(1,'#e8b878');
+    c.fillStyle=sky;c.fillRect(-R,-R,2*R,R);
+    c.fillStyle='#f6e2b8';c.beginPath();c.arc(-R*.42,-R*.46,R*.18,0,TAU);c.fill();
+    const bands=[['#d8a862',-.02],['#c08a44',.22],['#a06c30',.48],['#7c4e20',.78]];
+    bands.forEach((b,i)=>{
+      c.beginPath();c.moveTo(-R,R*b[1]);
+      for(let x=-1;x<=1;x+=.05)c.lineTo(R*x,R*(b[1]+Math.sin(x*2.2+i*1.4)*.10));
+      c.lineTo(R,R);c.lineTo(-R,R);c.closePath();
+      c.fillStyle=b[0];c.fill();
+      c.strokeStyle='rgba(255,235,200,.35)';c.lineWidth=Math.max(R*.008,.8);c.stroke();
+    });
+    enamelGlaze(c,R,true);return true;
+  }
+  if(k==='lighthouse'){
+    const g=c.createLinearGradient(0,-R,0,R*.2);
+    g.addColorStop(0,'#0b2036');g.addColorStop(1,'#2a5878');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(55);
+    for(let i=0;i<90;i++){c.fillStyle='rgba(255,250,230,.75)';
+      c.beginPath();c.arc((rnd()-.5)*2*R,-rnd()*R,rnd()*R*.012,0,TAU);c.fill();}
+    cloison(c,P([-1,.22],[1,.16],[1,1],[-1,1]),'#0e2c3e');
+    seed(9);
+    for(let i=0;i<40;i++){
+      c.strokeStyle='rgba(190,225,240,.30)';c.lineWidth=Math.max(R*.008,.8);
+      const y=R*(.24+rnd()*.72);
+      c.beginPath();c.moveTo(-R+rnd()*R,y);c.lineTo(-R*.2+rnd()*R*1.2,y);c.stroke();
+    }
+    cloison(c,P([-.14,-.66],[.14,-.66],[.24,.24],[-.24,.24]),'#f2ece0');
+    [[-.60],[-.34],[-.08]].forEach((b,i)=>{
+      cloison(c,P([-.16-i*.026,b[0]],[.16+i*.026,b[0]],[.18+i*.026,b[0]+.13],[-.18-i*.026,b[0]+.13]),'#c9302c');
+    });
+    cloison(c,P([-.16,-.80],[.16,-.80],[.12,-.66],[-.12,-.66]),'#f2d04a');
+    c.fillStyle='rgba(255,232,150,.28)';
+    c.beginPath();c.moveTo(0,-R*.73);c.lineTo(R*1.1,-R*1.0);c.lineTo(R*1.1,-R*.30);c.closePath();c.fill();
+    enamelGlaze(c,R,false);return true;
+  }
+  if(k==='pines'){
+    const g=c.createLinearGradient(0,-R,0,R);
+    g.addColorStop(0,'#26404c');g.addColorStop(1,'#0e1c16');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(313);
+    [['#1c3a2a',.55,7],['#163022',.42,9],['#0f241a',.30,11]].forEach((L,li)=>{
+      for(let i=0;i<L[2];i++){
+        const x=-R+ (i+ (li*.4))*(2*R/L[2]);
+        const h=R*(L[1]+rnd()*.30), w=R*(.10+rnd()*.05);
+        c.fillStyle=li===1?'#163022':L[0];
+        c.beginPath();
+        c.moveTo(x,R*1.0);c.lineTo(x-w,R*1.0);
+        for(let s=0;s<4;s++){
+          const yy=R*1.0-h*(s+1)/4;
+          c.lineTo(x-w*(1-s*.22),yy);c.lineTo(x-w*(1-s*.22)*.6,yy);
+        }
+        c.lineTo(x,R*1.0-h);
+        for(let s=3;s>=0;s--){
+          const yy=R*1.0-h*(s+1)/4;
+          c.lineTo(x+w*(1-s*.22)*.6,yy);c.lineTo(x+w*(1-s*.22),yy);
+        }
+        c.closePath();c.fill();
+      }
+    });
+    c.fillStyle='rgba(240,246,236,.60)';
+    c.beginPath();c.arc(R*.44,-R*.56,R*.15,0,TAU);c.fill();
+    enamelGlaze(c,R,false);return true;
+  }
+  if(k==='alps'){
+    const g=c.createLinearGradient(0,-R,0,R*.4);
+    g.addColorStop(0,'#9fc6e4');g.addColorStop(1,'#e6f0f8');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    const peak=(x,w,h,f1,f2)=>{
+      cloison(c,[[R*(x-w),R*.46],[R*x,-R*h],[R*(x+w),R*.46]],f1);
+      cloison(c,[[R*(x-w*.34),R*(.46-h*1.0*.34)],[R*x,-R*h],[R*(x+w*.34),R*(.46-h*1.0*.34)]],f2);
+    };
+    peak(-.46,.52,.30,'#7d94ad','#f4f8fc');
+    peak(.44,.56,.46,'#5f7a94','#f8fbfe');
+    peak(0,.44,.62,'#6d84a0','#fbfdff');
+    cloison(c,P([-1,.46],[1,.46],[1,1],[-1,1]),'#dfe9f2');
+    seed(600);
+    for(let i=0;i<50;i++){c.fillStyle='rgba(255,255,255,.7)';
+      c.beginPath();c.arc((rnd()-.5)*2*R,(rnd()-.5)*2*R,rnd()*R*.010,0,TAU);c.fill();}
+    enamelGlaze(c,R,false);return true;
+  }
+
+  /* ————— the dial as a painting ————— */
+  if(k==='kandinsky'){
+    c.fillStyle='#efe7d6';c.fillRect(-R,-R,2*R,2*R);
+    seed(1912);
+    const cols=['#c9302c','#1f5fa8','#e8a81c','#2f7a4a','#7a3a8a','#1a1a1a'];
+    for(let i=0;i<11;i++){
+      const x=(rnd()-.5)*1.5*R,y=(rnd()-.5)*1.5*R,r0=R*(.10+rnd()*.26);
+      for(let j=3;j>=1;j--){
+        c.globalAlpha=.9;
+        c.fillStyle=cols[(i+j)%cols.length];
+        c.beginPath();c.arc(x,y,r0*j/3,0,TAU);c.fill();
+      }
+      c.globalAlpha=1;
+      c.strokeStyle='rgba(20,20,20,.55)';c.lineWidth=Math.max(R*.008,.8);
+      c.beginPath();c.arc(x,y,r0,0,TAU);c.stroke();
+    }
+    return true;
+  }
+  if(k==='rothko'){
+    c.fillStyle='#7a1f14';c.fillRect(-R,-R,2*R,2*R);
+    const band=(y,h,col,a)=>{
+      seed(Math.round(y*97)+11);
+      for(let i=0;i<70;i++){
+        c.globalAlpha=a*(.5+rnd()*.5);
+        c.fillStyle=col;
+        c.fillRect(-R*.78+(rnd()-.5)*R*.08, R*y+(rnd()-.5)*R*.04, R*1.56, R*h/70*2.4);
+      }
+      c.globalAlpha=1;
+    };
+    band(-.46,.36,'#d9541f',.10);
+    band(.06,.46,'#e8912c',.09);
+    band(.60,.22,'#5a1410',.10);
+    return true;
+  }
+  if(k==='matisse'){
+    c.fillStyle='#f2ece0';c.fillRect(-R,-R,2*R,2*R);
+    const leaf=(x,y,r0,rot,col)=>{
+      c.save();c.translate(x,y);c.rotate(rot);
+      c.fillStyle=col;c.beginPath();
+      c.moveTo(0,-r0);
+      c.quadraticCurveTo(r0*.8,-r0*.2,0,r0);
+      c.quadraticCurveTo(-r0*.8,-r0*.2,0,-r0);
+      c.fill();c.restore();
+    };
+    leaf(-R*.40,-R*.34,R*.42,-0.5,'#123044');
+    leaf(R*.34,-R*.44,R*.34,0.7,'#1f7a5e');
+    leaf(R*.44,R*.30,R*.44,-0.3,'#d9541f');
+    leaf(-R*.36,R*.44,R*.36,0.4,'#e8b41c');
+    c.fillStyle='#c9302c';c.beginPath();c.arc(0,0,R*.14,0,TAU);c.fill();
+    return true;
+  }
+  if(k==='deco'){
+    c.fillStyle='#141414';c.fillRect(-R,-R,2*R,2*R);
+    for(let i=0;i<36;i++){
+      c.fillStyle=i%2?'rgba(217,180,92,.85)':'rgba(217,180,92,.35)';
+      c.beginPath();c.moveTo(0,0);
+      c.arc(0,0,R,i*TAU/36,(i+1)*TAU/36);c.closePath();c.fill();
+    }
+    c.fillStyle='#141414';c.beginPath();c.arc(0,0,R*.56,0,TAU);c.fill();
+    c.strokeStyle='#d9b45c';c.lineWidth=Math.max(R*.016,1.4);
+    [.56,.46,.30].forEach(r0=>{c.beginPath();c.arc(0,0,R*r0,0,TAU);c.stroke();});
+    for(let i=0;i<12;i++){
+      const a=i*TAU/12;
+      c.save();c.rotate(a);
+      c.fillStyle='#d9b45c';
+      c.beginPath();c.moveTo(0,-R*.46);c.lineTo(R*.05,-R*.34);c.lineTo(-R*.05,-R*.34);c.closePath();c.fill();
+      c.restore();
+    }
+    return true;
+  }
+  if(k==='memphis'){
+    c.fillStyle='#f4f1e8';c.fillRect(-R,-R,2*R,2*R);
+    seed(1981);
+    const cols=['#e8455f','#1fa5c9','#f2c94c','#141414','#2f9e6a'];
+    const pal=['#e8455f','#1fa5c9','#f2c94c','#141414','#2f9e6a'];
+    for(let i=0;i<26;i++){
+      const x=(rnd()-.5)*1.8*R,y=(rnd()-.5)*1.8*R,r0=R*(.05+rnd()*.14);
+      c.fillStyle=pal[Math.floor(rnd()*pal.length)];
+      const t=Math.floor(rnd()*3);
+      c.save();c.translate(x,y);c.rotate(rnd()*TAU);
+      if(t===0){c.beginPath();c.arc(0,0,r0,0,TAU);c.fill();}
+      else if(t===1){c.fillRect(-r0,-r0*.35,r0*2,r0*.7);}
+      else{c.beginPath();c.moveTo(0,-r0);c.lineTo(r0,r0);c.lineTo(-r0,r0);c.closePath();c.fill();}
+      c.restore();
+    }
+    seed(7);
+    c.strokeStyle='rgba(20,20,20,.5)';c.lineWidth=Math.max(R*.010,1);
+    for(let i=0;i<7;i++){
+      c.beginPath();
+      let x=-R,y=(rnd()-.5)*1.6*R;
+      c.moveTo(x,y);
+      for(let j=0;j<8;j++){x+=R*.26;y+=(rnd()-.5)*R*.22;c.lineTo(x,y);}
+      c.stroke();
+    }
+    return true;
+  }
+
+  /* ————— métiers d'art ————— */
+  if(k==='marquetry'){
+    c.fillStyle='#6a4a2a';c.fillRect(-R,-R,2*R,2*R);
+    seed(1701);
+    const woods=['#8a5f30','#6a4020','#a37a44','#4e2f18','#c09a5e','#7a5326'];
+    for(let i=0;i<15;i++){
+      c.save();c.rotate(i*TAU/15);
+      c.fillStyle=woods[i%woods.length];
+      c.beginPath();c.moveTo(0,0);c.arc(0,0,R,-TAU/30,TAU/30);c.closePath();c.fill();
+      /* the grain runs along each piece */
+      c.strokeStyle='rgba(30,18,8,.30)';c.lineWidth=Math.max(R*.006,.6);
+      for(let g=0;g<7;g++){
+        const rr=R*(.20+g*.12);
+        c.beginPath();c.arc(0,0,rr,-TAU/30,TAU/30);c.stroke();
+      }
+      c.strokeStyle='rgba(20,12,4,.6)';c.lineWidth=Math.max(R*.008,.8);
+      c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(-TAU/30)*R,Math.sin(-TAU/30)*R);c.stroke();
+      c.restore();
+    }
+    c.fillStyle='#3a2410';c.beginPath();c.arc(0,0,R*.12,0,TAU);c.fill();
+    return true;
+  }
+  if(k==='straw'){
+    c.fillStyle='#c9a44e';c.fillRect(-R,-R,2*R,2*R);
+    seed(1740);
+    /* split rye straw, flattened and laid one piece at a time */
+    for(let band=0;band<6;band++){
+      const a0=band*TAU/6;
+      c.save();c.rotate(a0);
+      for(let i=-14;i<14;i++){
+        const t=i/14;
+        const g=c.createLinearGradient(0,t*R*.9,R,t*R*.9);
+        const warm=band%2? '#e8c874':'#b8892e';
+        g.addColorStop(0,warm);g.addColorStop(.5,band%2?'#f4dfa0':'#cfa244');g.addColorStop(1,warm);
+        c.fillStyle=g;
+        c.save();c.rotate(t*.10);
+        c.fillRect(0,t*R*.9,R,R*.055);
+        c.restore();
+      }
+      c.restore();
+    }
+    c.strokeStyle='rgba(80,54,14,.5)';c.lineWidth=Math.max(R*.012,1);
+    for(let i=0;i<6;i++){c.save();c.rotate(i*TAU/6);
+      c.beginPath();c.moveTo(0,0);c.lineTo(R,0);c.stroke();c.restore();}
+    return true;
+  }
+  if(k==='hobnail'){
+    c.fillStyle='#d8d4cb';c.fillRect(-R,-R,2*R,2*R);
+    /* clous de Paris: a field of tiny four-sided pyramids */
+    const step=Math.max(R*.075,3);
+    for(let y=-R;y<R;y+=step)for(let x=-R;x<R;x+=step){
+      const h=step*.5;
+      c.fillStyle='rgba(255,255,255,.55)';
+      c.beginPath();c.moveTo(x,y);c.lineTo(x+h,y+h);c.lineTo(x,y+step);c.closePath();c.fill();
+      c.fillStyle='rgba(0,0,0,.22)';
+      c.beginPath();c.moveTo(x+step,y+step);c.lineTo(x+h,y+h);c.lineTo(x+step,y);c.closePath();c.fill();
+      c.fillStyle='rgba(0,0,0,.10)';
+      c.beginPath();c.moveTo(x,y+step);c.lineTo(x+h,y+h);c.lineTo(x+step,y+step);c.closePath();c.fill();
+    }
+    return true;
+  }
+  if(k==='barleycorn'){
+    c.fillStyle='#c8c3b6';c.fillRect(-R,-R,2*R,2*R);
+    /* grain d'orge: two crossed sets of fine waves, cut on a rose engine */
+    [0,Math.PI/2].forEach(rot=>{
+      c.save();c.rotate(rot);
+      const step=Math.max(R*.042,2);
+      for(let y=-R*1.2;y<R*1.2;y+=step){
+        c.beginPath();
+        for(let x=-R*1.2;x<=R*1.2;x+=Math.max(R*.02,1)){
+          const yy=y+Math.sin(x/R*22)*step*.30;
+          x===-R*1.2?c.moveTo(x,yy):c.lineTo(x,yy);
+        }
+        c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=Math.max(R*.010,.8);c.stroke();
+        c.beginPath();
+        for(let x=-R*1.2;x<=R*1.2;x+=Math.max(R*.02,1)){
+          const yy=y+step*.45+Math.sin(x/R*22)*step*.30;
+          x===-R*1.2?c.moveTo(x,yy):c.lineTo(x,yy);
+        }
+        c.strokeStyle='rgba(0,0,0,.24)';c.lineWidth=Math.max(R*.010,.8);c.stroke();
+      }
+      c.restore();
+    });
+    return true;
+  }
+  if(k==='flinque'){
+    /* guilloché first, then translucent enamel fired over it */
+    c.fillStyle='#12365c';c.fillRect(-R,-R,2*R,2*R);
+    const step=Math.max(R*.030,2);
+    for(let rr=step;rr<R*1.3;rr+=step){
+      c.strokeStyle='rgba(150,205,255,.30)';c.lineWidth=Math.max(R*.010,.9);
+      c.beginPath();c.arc(0,0,rr,0,TAU);c.stroke();
+      c.strokeStyle='rgba(0,10,30,.35)';c.lineWidth=Math.max(R*.008,.7);
+      c.beginPath();c.arc(0,0,rr+step*.45,0,TAU);c.stroke();
+    }
+    const g=c.createRadialGradient(-R*.3,-R*.4,R*.02,0,0,R*1.25);
+    g.addColorStop(0,'rgba(120,190,255,.42)');
+    g.addColorStop(.55,'rgba(20,70,130,.30)');
+    g.addColorStop(1,'rgba(4,18,40,.55)');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    enamelGlaze(c,R,false);
+    return true;
+  }
+
+  /* ————— more stone ————— */
+  if(k==='tigereye'||k==='onyx'||k==='jade'||k==='obsidian'||k==='turquoise'){
+    const cfg={
+      tigereye :{a:'#6a4213',b:'#c9903a',c:'#f0c76a',fib:1},
+      onyx     :{a:'#0e0e0f',b:'#232326',c:'#3a3a3e',fib:0},
+      jade     :{a:'#2f6b52',b:'#5aa07e',c:'#9fd4b4',fib:0},
+      obsidian :{a:'#141418',b:'#26262e',c:'#4a4a58',fib:0},
+      turquoise:{a:'#3fa6a8',b:'#7fd0cc',c:'#e8f4f0',fib:0}
+    }[k];
+    c.fillStyle=cfg.a;c.fillRect(-R,-R,2*R,2*R);
+    seed(k.length*977+13);
+    if(cfg.fib){
+      /* chatoyancy: the cat's eye, parallel fibres catching one band of light */
+      for(let i=0;i<420;i++){
+        const y=(rnd()-.5)*2.2*R;
+        const g=c.createLinearGradient(-R,y,R,y);
+        g.addColorStop(0,cfg.a);g.addColorStop(.35+rnd()*.3,cfg.c);g.addColorStop(1,cfg.b);
+        c.strokeStyle=g;c.globalAlpha=.16+rnd()*.30;
+        c.lineWidth=Math.max(R*.012,1);
+        c.beginPath();c.moveTo(-R*1.2,y);c.lineTo(R*1.2,y+(rnd()-.5)*R*.06);c.stroke();
+      }
+      c.globalAlpha=1;
+    }else{
+      for(let i=0;i<170;i++){
+        const x=(rnd()-.5)*2*R,y=(rnd()-.5)*2*R,r0=R*(.06+rnd()*.34);
+        const g=c.createRadialGradient(x,y,0,x,y,r0);
+        g.addColorStop(0,rnd()>.6?cfg.c:cfg.b);g.addColorStop(1,'rgba(0,0,0,0)');
+        c.globalAlpha=.28+rnd()*.36;c.fillStyle=g;
+        c.beginPath();c.arc(x,y,r0,0,TAU);c.fill();
+      }
+      c.globalAlpha=1;
+      if(k==='turquoise'){                       /* the matrix veining */
+        c.strokeStyle='rgba(60,44,26,.62)';
+        for(let i=0;i<16;i++){
+          c.lineWidth=Math.max(R*(.006+rnd()*.014),.8);
+          c.beginPath();
+          let x=(rnd()-.5)*2*R,y=(rnd()-.5)*2*R;c.moveTo(x,y);
+          for(let j=0;j<7;j++){x+=(rnd()-.5)*R*.44;y+=(rnd()-.5)*R*.44;c.lineTo(x,y);}
+          c.stroke();
+        }
+      }
+    }
+    const sh=c.createRadialGradient(-R*.32,-R*.40,R*.02,0,0,R*1.2);
+    sh.addColorStop(0,'rgba(255,255,255,.22)');sh.addColorStop(1,'rgba(0,0,0,.30)');
+    c.fillStyle=sh;c.fillRect(-R,-R,2*R,2*R);
+    return true;
+  }
+
+  /* ————— the dial as a sentence ————— */
+  if(k==='quote'){
+    const g=c.createRadialGradient(-R*.3,-R*.4,R*.05,0,0,R*1.2);
+    g.addColorStop(0,'#232323');g.addColorStop(1,'#0c0c0c');
+    c.fillStyle=g;c.fillRect(-R,-R,2*R,2*R);
+    seed(4242);
+    for(let i=0;i<1400;i++){
+      c.fillStyle=rnd()>.5?'rgba(255,255,255,.022)':'rgba(0,0,0,.05)';
+      c.fillRect((rnd()-.5)*2*R,(rnd()-.5)*2*R,R*.010,R*.010);
+    }
+    return true;
+  }
+  return false;
+}
+
 function artDial(c,R,k){
   const A=ARTDIAL[k];
+  if(artDial2(c,R,k))return;
   c.fillStyle=A.base;c.fillRect(-R,-R,2*R,2*R);
   const line='rgba(246,240,228,.92)';
   if(k==='clay'){
@@ -1494,6 +2256,21 @@ function drawSignature(c,dR,ink){
     if(c.letterSpacing!==undefined)c.letterSpacing=`${dR*.012}px`;
     c.fillText(S.comp==='none'?'SWISS MADE':'AUTOMATIC',0,dR*.815);
   }
+  c.restore();
+}
+/* the text dial: the words are the whole design, so nothing else may crowd them */
+function drawQuote(c,dR,ink){
+  if(S.texture!=='quote')return;
+  const f=FONTS[S.quoteFont]||FONTS.grot;
+  const size=dR*.085*(S.quoteSize||1);
+  c.save();
+  c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
+  c.font=`400 ${size}px ${f}`;
+  const a=(S.quoteA||'').toUpperCase(), b=(S.quoteB||'').toUpperCase();
+  /* the top line reads along the rim; the bottom line reads the other way,
+     the way a caseback is engraved — you turn the watch to read it */
+  if(a)arcText(c,a,dR*.80,-Math.PI/2, 1,size);
+  if(b)arcText(c,b,dR*.80, Math.PI/2,-1,size);
   c.restore();
 }
 function botBusySix(){
@@ -2251,13 +3028,17 @@ function wheel(c,x,y,r,teeth,spokes,warm){
   c.restore();
 }
 /* the layout of the calibre: where the balance, barrel and train sit */
+/* The train meshes: each wheel's pitch circle touches the next, barrel through
+   to escape wheel. The balance is the one thing set clear of everything, because
+   the lever has to live in the gap between it and the escape wheel. */
 function mvPlan(R){
   return {
     plate:R*.855,
     bal  :{x:-R*.34,y: R*.34,r:R*.235},   /* balance, lower left */
-    esc  :{x:-R*.08,y: R*.44,r:R*.085},   /* escape wheel */
+    esc  :{x: R*.10,y: R*.40,r:R*.085},   /* escape wheel, a lever's length away */
     barr :{x: R*.30,y:-R*.30,r:R*.28},    /* mainspring barrel, upper right */
-    tr   :[{x:R*.06,y:-R*.02,r:R*.16},{x:-R*.12,y:R*.14,r:R*.13}]
+    tr   :[{x:R*.06,y:-R*.02,r:R*.16},    /* centre wheel */
+           {x:R*.02,y: R*.26,r:R*.13}]    /* fourth wheel, meshing with the escape */
   };
 }
 function drawMovement(c,R,fam,M){
@@ -2310,8 +3091,9 @@ function drawMovement(c,R,fam,M){
   /* the going train, seen through whatever the architecture leaves open */
   if(S.arch!=='full'){
     wheel(c,P.barr.x,P.barr.y,P.barr.r*.92,64,0,warm);
-    P.tr.forEach((t,i)=>wheel(c,t.x,t.y,t.r,52-i*8,4,warm));
-    wheel(c,P.esc.x,P.esc.y,P.esc.r,15,3,warm);
+    /* the third wheel is effectively static; the fourth wheel and the whole
+       escapement are drawn live, over the cached base */
+    wheel(c,P.tr[0].x,P.tr[0].y,P.tr[0].r,52,4,warm);
   }
 
   /* ————— bridges ————— */
@@ -2434,12 +3216,96 @@ function arcText(c,str,r,mid,dir,size){
 }
 /* the balance: the only part of a watch that is always moving.
    it does not glide — it beats, at exactly the rate chosen. */
+/* ————— the escapement —————
+   The gate between the mainspring and the balance. One tooth of the escape
+   wheel is released per beat, alternately by the entry and exit pallet, and
+   each release gives the balance a push through the fork. Everything here is
+   driven by one clock: the beat count. */
+const ESC_TEETH=15;
+function escapePhase(t){
+  const bps=S.vph/3600;                 /* beats a second */
+  const beats=t/1000*bps;
+  return {beats, i:Math.floor(beats), f:beats-Math.floor(beats), bps};
+}
+/* the club-tooth escape wheel: each tooth has an impulse face and a locking corner */
+function escapeWheel(c,r,warm,ang){
+  c.save();c.rotate(ang);
+  c.fillStyle=warm?'#b8912f':'#b3b7bb';
+  c.beginPath();
+  for(let i=0;i<ESC_TEETH;i++){
+    const a=i*TAU/ESC_TEETH;
+    const p=(k,rr)=>[Math.cos(a+k)*rr,Math.sin(a+k)*rr];
+    const s0=p(0,r*.62), s1=p(.30,r*.99), s2=p(.40,r*.94), s3=p(.42,r*.62);
+    i?c.lineTo(s0[0],s0[1]):c.moveTo(s0[0],s0[1]);
+    c.lineTo(s1[0],s1[1]);c.lineTo(s2[0],s2[1]);c.lineTo(s3[0],s3[1]);
+  }
+  c.closePath();c.fill();
+  c.strokeStyle='rgba(0,0,0,.34)';c.lineWidth=Math.max(r*.04,.4);c.stroke();
+  /* crossings-out */
+  c.fillStyle='rgba(0,0,0,.28)';
+  for(let i=0;i<3;i++){c.save();c.rotate(i*TAU/3);
+    c.beginPath();c.moveTo(r*.18,-r*.075);c.lineTo(r*.60,-r*.045);
+    c.lineTo(r*.60,r*.045);c.lineTo(r*.18,r*.075);c.closePath();c.fill();c.restore();}
+  c.fillStyle=warm?'#8f7433':'#8a8e92';
+  c.beginPath();c.arc(0,0,r*.16,0,TAU);c.fill();
+  c.restore();
+}
+/* the lever, with two ruby pallet stones and a slotted fork */
+function palletFork(c,ex,ey,er,bx,by,br,tilt,warm){
+  const dx=bx-ex, dy=by-ey;
+  const ang=Math.atan2(dy,dx);
+  const L=Math.hypot(dx,dy);
+  c.save();c.translate(ex,ey);c.rotate(ang);
+  /* the lever pivots between the escape wheel and the balance */
+  c.rotate(tilt*.11);
+  const arm=L*.62;
+  c.strokeStyle=warm?'#c9c3b4':'#c6cacd';
+  c.lineWidth=Math.max(er*.20,1.4);c.lineCap='round';
+  c.beginPath();c.moveTo(er*.55,0);c.lineTo(arm,0);c.stroke();
+  c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=Math.max(er*.07,.5);
+  c.beginPath();c.moveTo(er*.55,0);c.lineTo(arm,0);c.stroke();
+  /* the two pallet arms, straddling the escape wheel */
+  [-1,1].forEach(d=>{
+    c.save();c.rotate(d*.62);
+    c.strokeStyle=warm?'#c9c3b4':'#c6cacd';c.lineWidth=Math.max(er*.17,1.2);
+    c.beginPath();c.moveTo(er*.35,0);c.lineTo(er*1.02,0);c.stroke();
+    /* the jewelled stone at the tip — this is what the tooth lands on */
+    c.fillStyle=JEWEL;
+    c.fillRect(er*.92,-er*.13,er*.22,er*.26);
+    c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=Math.max(er*.04,.4);
+    c.strokeRect(er*.92,-er*.13,er*.22,er*.26);
+    c.restore();
+  });
+  /* the fork horns and the notch the roller jewel passes through */
+  c.strokeStyle=warm?'#c9c3b4':'#c6cacd';c.lineWidth=Math.max(er*.13,1);
+  c.beginPath();c.moveTo(arm,-er*.30);c.lineTo(arm+er*.30,-er*.34);c.stroke();
+  c.beginPath();c.moveTo(arm,er*.30);c.lineTo(arm+er*.30,er*.34);c.stroke();
+  /* the lever's own pivot jewel */
+  jewel(c,er*.55,0,Math.max(er*.16,1),false);
+  c.restore();
+}
 function drawBalance(c,R,t){
   const P=mvPlan(R), warm=(S.metal==='yellow'||S.metal==='rose');
-  const b=P.bal;
+  const b=P.bal, E=P.esc;
+  const ph=escapePhase(t);
   const hz=S.vph/7200;                       /* full oscillations per second */
   const amp=Math.PI*1.45;                    /* ±260°, a healthy amplitude */
-  const ang=Math.sin(t/1000*TAU*hz)*amp;
+  const phase=t/1000*TAU*hz;
+  const ang=Math.sin(phase)*amp;
+  /* the fork follows the balance, but snaps: it is locked, then unlocked */
+  const dir=Math.cos(phase)>=0?1:-1;
+  const snap=Math.max(-1,Math.min(1,Math.cos(phase)*6));
+  /* one tooth is released every beat, and the wheel is stationary in between */
+  const escAng=Math.floor(ph.beats)*TAU/ESC_TEETH*0.5
+             + Math.min(ph.f*7,1)*TAU/ESC_TEETH*0.5;
+
+  /* ————— the escape wheel and its lever ————— */
+  c.save();c.translate(E.x,E.y);
+  escapeWheel(c,E.r,warm,escAng);
+  c.restore();
+  jewel(c,E.x,E.y,Math.max(E.r*.16,1.1),false);
+  palletFork(c,E.x,E.y,E.r,b.x,b.y,b.r,snap,warm);
+
   c.save();c.translate(b.x,b.y);
   /* the cock that carries it */
   c.save();
@@ -2448,7 +3314,7 @@ function drawBalance(c,R,t){
   c.fillStyle=mvMetal(c,b.r,warm);c.fill();
   c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=Math.max(b.r*.05,1);c.stroke();
   c.restore();
-  /* hairspring: a breguet overcoil, turning with the wheel */
+  /* hairspring: a breguet overcoil, breathing with the wheel */
   c.save();c.rotate(ang*.32);
   c.strokeStyle='rgba(220,225,232,.85)';c.lineWidth=Math.max(b.r*.026,.7);
   c.beginPath();
@@ -2468,15 +3334,20 @@ function drawBalance(c,R,t){
   for(let i=0;i<8;i++){const a=i*TAU/8;
     c.fillStyle=warm?'#8f6c26':'#7f8388';
     c.beginPath();c.arc(Math.cos(a)*b.r*.86,Math.sin(a)*b.r*.86,b.r*.10,0,TAU);c.fill();}
+  /* the roller table, and the impulse jewel that drives the fork */
   c.fillStyle=warm?'#c9a34e':'#d3d7da';
-  c.beginPath();c.arc(0,0,b.r*.13,0,TAU);c.fill();
+  c.beginPath();c.arc(0,0,b.r*.20,0,TAU);c.fill();
+  c.save();c.rotate(Math.PI);   /* the roller jewel faces the lever */
+  c.fillStyle=JEWEL;
+  c.beginPath();c.arc(b.r*.145,0,b.r*.055,0,TAU);c.fill();
   c.restore();
-  jewel(c,0,0,Math.max(b.r*.10,1.2),false);
   c.restore();
-  /* the escape wheel advances one tooth per beat — the tick you can see */
-  const beats=Math.floor(t/1000*(S.vph/3600));
-  c.save();c.translate(P.esc.x,P.esc.y);c.rotate(beats*TAU/45);
-  wheel(c,0,0,P.esc.r,15,3,warm);
+  jewel(c,0,0,Math.max(b.r*.09,1.1),false);
+  c.restore();
+  /* the fourth wheel turns once a minute — the only train wheel fast enough to see */
+  const tr=P.tr[1];
+  c.save();c.translate(tr.x,tr.y);c.rotate((t/60000)*TAU);
+  wheel(c,0,0,tr.r,44,4,warm);
   c.restore();
 }
 /* ————— the room: a surface for the watch to sit on ————— */
@@ -2584,6 +3455,7 @@ function renderBase(){
     X.beginPath();X.arc(0,0,dR*.70,0,TAU);X.stroke();X.globalAlpha=1;}
   drawIndices(X,dR,D,M);
   drawComp(X,dR,INK,M);
+  drawQuote(X,dR,INK);
   drawSignature(X,dR,INK);
   X.restore(); /* dial clip */
   X.restore(); /* centre */
@@ -2675,7 +3547,7 @@ const TABS=[
   {k:'dial',n:'Dial'},{k:'index',n:'Indices'},{k:'comp',n:'Functions'},{k:'hands',n:'Hands'},
   {k:'strap',n:'Strap'},{k:'finish',n:'Finish'}
 ];
-let tab='start';
+let tab='start', advOpen=false;
 /* a technical word you can ask about, inline, without leaving the control */
 function TERM(word,term){
   return `<button class="term" type="button" data-term="${term||word}">${word}</button>`;
@@ -2765,12 +3637,26 @@ function shelfBlock(add){
     thumb(cvs,it.s);
   });
   g.appendChild(box);
-  if(a.length){
-    const cb=document.createElement('button');cb.type='button';cb.className='bigbtn ghost';
-    cb.style.marginTop='12px';
-    cb.appendChild(document.createTextNode(CMP.on?'Stop comparing':'Compare against the newest saved'));
-    cb.onclick=()=>{CMP.on?compareOff():compareWith(a[0].s);build();};
-    g.appendChild(cb);
+  const warn=document.createElement('p');warn.className='note';warn.style.marginTop='14px';
+  warn.innerHTML='These live in <b>this browser only</b>. Clearing your site data removes them — '+
+    'export the shelf to keep a copy.';
+  g.appendChild(warn);
+  const row=document.createElement('div');row.className='chips';row.style.marginTop='12px';
+  const mk=(label,fn)=>{const b=document.createElement('button');b.type='button';b.className='chip';
+    b.textContent=label;b.onclick=fn;row.appendChild(b);return b;};
+  mk(CMP.on?'Stop comparing':'Compare',()=>{
+    if(CMP.on){compareOff();build();return;}
+    /* compare against whichever design you point at, not merely the newest */
+    cmpPick=(cmpPick+1)%a.length;
+    compareWith(a[cmpPick].s,a[cmpPick].n);build();});
+  mk('Export shelf',exportShelf);
+  mk('Import shelf',importShelf);
+  g.appendChild(row);
+  if(CMP.on&&a.length>1){
+    const p2=document.createElement('p');p2.className='note';p2.style.marginTop='10px';
+    p2.innerHTML='Comparing against <b>'+(a[cmpPick]?a[cmpPick].n:'saved')+'</b>. '+
+      'Drag the seam on the watch, or press <b>Compare</b> again for the next design.';
+    g.appendChild(p2);
   }
   add(g);
 }
@@ -2811,16 +3697,38 @@ function build(){
   const B=document.getElementById('body');B.innerHTML='';
   const add=e=>B.appendChild(e);
   /* ————— what a maison would say about this combination ————— */
-  advisories().forEach(a=>{
-    const d=document.createElement('div');d.className='advice';
-    const sp=document.createElement('span');
-    sp.innerHTML=`<b style="color:var(--ink)">${a.t}.</b> ${a.b} `;
-    const btn=document.createElement('button');btn.type='button';btn.textContent=a.fix;
-    btn.onclick=()=>{snapshot();a.act();build();paint();announce(a.fix+' — done');};
-    sp.appendChild(btn);
-    const lb=document.createElement('b');lb.textContent='Note';
-    d.appendChild(lb);d.appendChild(sp);add(d);
-  });
+  const adv=advisories();
+  if(adv.length){
+    /* one note reads as guidance; four stacked notes bury the control you came
+       for — so past the first, they collapse behind a single line */
+    const shown=advOpen?adv:adv.slice(0,1);
+    shown.forEach(a=>{
+      const d=document.createElement('div');d.className='advice';
+      const sp=document.createElement('span');
+      sp.innerHTML=`<b style="color:var(--ink)">${a.t}.</b> ${a.b} `;
+      const btn=document.createElement('button');btn.type='button';btn.textContent=a.fix;
+      btn.onclick=()=>{snapshot();a.act();build();paint();announce(a.fix+' — done');};
+      sp.appendChild(btn);
+      const lb=document.createElement('b');lb.textContent='Note';
+      d.appendChild(lb);d.appendChild(sp);add(d);
+    });
+    if(adv.length>1){
+      const more=document.createElement('button');more.type='button';more.className='advmore';
+      more.setAttribute('aria-expanded',advOpen?'true':'false');
+      more.textContent=advOpen?'Hide the other notes'
+        :(adv.length-1)+' more note'+(adv.length>2?'s':'')+' about this combination';
+      more.onclick=()=>{advOpen=!advOpen;build();};
+      add(more);
+    }
+    if(adv.length>1){
+      const fixAll=document.createElement('button');fixAll.type='button';fixAll.className='advmore';
+      fixAll.textContent='Resolve all '+adv.length;
+      fixAll.onclick=()=>{snapshot();
+        for(let i=0;i<6;i++){const x=advisories();if(!x.length)break;x.forEach(y=>y.act());}
+        advOpen=false;build();paint();announce('All notes resolved');};
+      add(fixAll);
+    }
+  }else advOpen=false;
   if(tab==='start'){
     const g=document.createElement('div');g.className='grp';
     g.innerHTML='<h4>Start from a reference<em>'+PRESETS.length+' designs</em></h4>';
@@ -2972,7 +3880,7 @@ function build(){
     const art=Object.keys(TEXTURES).filter(k=>ARTDIAL[k]);
     if(!ARTDIAL[S.texture])
       add(chips('Colour',Object.keys(DIALCOL).map(k=>({v:k,n:DIALCOL[k].name,c:DIALCOL[k].base})),S.dialCol,v=>S.dialCol=v,true));
-    add(chips('Finish',plain.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v,false,{
+    add(chips('Dial finish',plain.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v,false,{
       sunray:'Brushed outward from the centre so the light moves in a fan as the watch turns.',
       matte:'No reflection at all. Everything is legibility.',
       enamel:'Grand feu: powdered glass fired onto a copper base at 800°C, four times. Any firing can crack it, which is why enamel dials cost what they do.',
@@ -2982,7 +3890,71 @@ function build(){
       grain:'A fine sandblasted tooth. Reads as a photographic print rather than a mirror.',
       tapestry:'A grid milled into the dial with a pantograph, one square at a time. Depth without colour.',
       linen:'A woven cross-hatch, pressed into the brass before the colour goes on.'}));
-    add(chips('Art dials',art.map(k=>({v:k,n:TEXTURES[k]})),S.texture,v=>S.texture=v));
+    const GROUPS=[
+      ['Cloisonné enamel',['owlWhite','owlBrown','pintail','kingfisher','crane','koi','tiger','hummingbird'],
+       'Gold wire bent by hand and laid on the dial, each cell filled with powdered enamel and fired. A Patek bird dial is about ten pieces a year.'],
+      ['Enamel landscapes',['fuji','dune','lighthouse','pines','alps'],
+       'The same technique, turned outward: a scene rather than a creature.'],
+      ['Paintings',['kandinsky','rothko','matisse','deco','memphis','mondrian','starry','wave','klimt'],
+       'A dial borrowing from a canvas. The rule is the same as on a painting — one idea, held.'],
+      ['Métiers d’art',['marquetry','straw','hobnail','barleycorn','flinque','damascus'],
+       'Wood and straw laid piece by piece; metal cut on a rose engine; translucent enamel fired over the cut.'],
+      ['Stone & mineral',['aventurine','malachite','lapis','mop','marble','tigereye','onyx','jade','obsidian','turquoise'],
+       'Sawn into wafers under half a millimetre thick. No two dials from the same block are the same dial.'],
+      ['Surfaces',['clay','grass','circuit','synth','nebula','carbon','topo','lava'],
+       'Neither painting nor stone — a surface with something to say.'],
+      ['Text',['quote'],
+       'The dial as a sentence. The words are the design, so nothing else should crowd them.']
+    ];
+    GROUPS.forEach(G=>{
+      const opts=G[1].filter(k=>TEXTURES[k]).map(k=>({v:k,n:TEXTURES[k]}));
+      if(!opts.length)return;
+      const grp=chips(G[0],opts,S.texture,v=>S.texture=v);
+      const note=document.createElement('p');note.className='note';note.style.marginTop='10px';
+      note.textContent=G[2];grp.appendChild(note);
+      add(grp);
+    });
+    if(S.texture==='quote'){
+      const q=document.createElement('div');q.className='grp';
+      q.innerHTML='<h4>What it says<em>two lines</em></h4>'+
+        '<p class="note">The top line reads along the rim; the bottom reads the other way, '+
+        'so you turn your wrist to finish the sentence. Keep each under about eighteen characters.</p>';
+      [['quoteA','Top line'],['quoteB','Bottom line']].forEach(f=>{
+        const row=document.createElement('div');row.className='row';row.style.marginTop='12px';
+        const id='q'+f[0];
+        row.innerHTML='<label for="'+id+'">'+f[1]+'</label>';
+        const inp=document.createElement('input');inp.className='tin';inp.id=id;
+        inp.style.flex='1';inp.style.fontSize='var(--fs2)';inp.style.fontStyle='normal';
+        inp.style.fontFamily='var(--grot)';inp.style.letterSpacing='.10em';
+        inp.value=S[f[0]]||'';inp.maxLength=22;
+        inp.setAttribute('aria-label',f[1]+' of the text dial');
+        let t=0;
+        inp.oninput=()=>{S[f[0]]=inp.value.toUpperCase();paint();
+          clearTimeout(t);t=setTimeout(snapshot,700);};
+        row.appendChild(inp);q.appendChild(row);
+      });
+      add(q);
+      const pre=document.createElement('div');pre.className='grp';
+      pre.innerHTML='<h4>Or borrow one</h4>';
+      const box=document.createElement('div');box.className='chips';
+      QUOTES.forEach(qq=>{
+        const b=document.createElement('button');b.type='button';b.className='chip';
+        b.textContent=qq[0]+' / '+qq[1];
+        b.setAttribute('aria-pressed',(S.quoteA===qq[0]&&S.quoteB===qq[1])?'true':'false');
+        b.onclick=()=>{snapshot();S.quoteA=qq[0];S.quoteB=qq[1];build();paint();};
+        box.appendChild(b);
+      });
+      pre.appendChild(box);add(pre);
+      add(chips('Lettering',[{v:'grot',n:'Grotesque'},{v:'cond',n:'Condensed'},{v:'serif',n:'Serif'}],
+        S.quoteFont,v=>S.quoteFont=v));
+      add(slider('Text size',70,140,5,Math.round((S.quoteSize||1)*100),' %',v=>S.quoteSize=v/100));
+    }
+    const ad=document.createElement('div');ad.className='grp';ad.style.marginTop='-18px';
+    ad.innerHTML='<p class="note">These are <b>commissions, not catalogue</b>. Everywhere else the studio '+
+      'refuses a combination that could not be built; an art dial is the one place it does not, '+
+      'because a painted or stone dial is a decision about meaning rather than mechanics. '+
+      'Held to the same standard, most of them would not survive.</p>';
+    add(ad);
     add(chips('Minute track',[{v:'railroad',n:'Railroad'},{v:'ticks',n:'Ticks'},{v:'dots',n:'Dots'},{v:'none',n:'None'}],S.track,v=>S.track=v,false,{
       railroad:'Two concentric rings with the minutes between them. The most legible track ever drawn, and the reason it survives.',
       ticks:'Plain minute strokes. Modern, quiet.',
@@ -3112,17 +4084,41 @@ function chronoReset(){
   CH.acc=0;announce('Chronograph reset to zero');buildIfTab('comp');return true;
 }
 function buildIfTab(k){if(tab===k)build();}
+/* ————— the studio speaks up —————
+   A note appears on the stage the moment a combination stops making sense,
+   with the reason and a one-click correction. It is never a block: "Keep it
+   as it is" dismisses that particular note for good. This is the whole
+   difference between a tool with taste and a tool with rules. */
+const TIP={dismissed:{},shown:null};
+function tipKey(a){return a.t;}
+function refreshTip(){
+  const el=document.getElementById('tip');if(!el)return;
+  const list=advisories().filter(a=>!TIP.dismissed[tipKey(a)]);
+  const a=list[0];
+  if(!a){el.classList.remove('on');TIP.shown=null;return;}
+  if(TIP.shown===tipKey(a)&&el.classList.contains('on'))return;
+  TIP.shown=tipKey(a);
+  document.getElementById('tipBody').innerHTML='<b>'+a.t+'.</b> '+a.b;
+  const fix=document.getElementById('tipFix');
+  fix.textContent=a.fix;
+  fix.onclick=()=>{snapshot();a.act();build();paint();announce(a.fix+' — done');};
+  const keep=document.getElementById('tipKeep');
+  keep.onclick=()=>{TIP.dismissed[tipKey(a)]=1;el.classList.remove('on');
+    TIP.shown=null;announce('Kept as it is');setTimeout(refreshTip,60);};
+  el.classList.add('on');
+}
 
 /* ————— coherence: a maison would not let you build a nonsense watch —————
    each rule is a real constraint, and each says why. */
 function advisories(){
   const a=[];
   const chrono=(S.comp==='chrono2'||S.comp==='chrono3');
-  if(S.bezel==='tachy'&&!chrono)a.push({
+  const text=(S.texture==='quote');
+  if(S.bezel==='tachy'&&!chrono&&!text)a.push({
     t:'A tachymètre needs a chronograph',
     b:'The scale converts elapsed seconds over a measured distance into speed. With no central chronograph hand to time against, it is decoration.',
     fix:'Fit a chronograph',act:()=>{S.comp='chrono2';S.date=S.date==='3'?'none':S.date;}});
-  if(S.bezel==='gmt'&&S.comp!=='gmt')a.push({
+  if(S.bezel==='gmt'&&S.comp!=='gmt'&&!text)a.push({
     t:'A 24-hour bezel needs a 24-hour hand',
     b:'The bezel exists to read a third time zone against the fourth hand. Without a GMT hand it reads nothing at all.',
     fix:'Fit a GMT hand',act:()=>{S.comp='gmt';}});
@@ -3154,6 +4150,15 @@ function advisories(){
     t:'A high-beat calibre with a long reserve',
     b:'At 36,000 A/h the escapement consumes the mainspring far faster. High-beat movements historically run 40–45 hours, not 60.',
     fix:'Set the reserve to 42 hours',act:()=>{S.pr=42;}});
+  if(S.texture==='quote'&&S.layout!=='none'&&S.track!=='none')a.push({
+    t:'A text dial with a full index set',
+    b:'The words are the design. Markers and a minute track around them leave the eye nowhere to rest, and the line stops reading as a line.',
+    fix:'Clear the dial',act:()=>{S.layout='none';S.track='none';}});
+  if(S.texture==='quote'&&S.comp!=='none'&&S.comp!=='small')a.push({
+    t:'A complication under a text dial',
+    b:'Subdials sit exactly where the two lines want to be. A text dial is a time-only dial, or at most small seconds.',
+    fix:'Make it time only',act:()=>{S.comp='none';
+      if(S.bezel==='tachy'||S.bezel==='gmt')S.bezel='smooth';}});
   if(FAMILY[S.family].slab&&['leather','rubber','canvas','nato'].includes(S.strap))a.push({
     t:'An integrated case with a strap',
     b:'An integrated case has no lugs — the bracelet is part of the case profile. A strap has nothing to attach to.',
@@ -3191,12 +4196,38 @@ function shelveCurrent(){
   a.unshift({n:S.name||'Untitled',t:Date.now(),s:JSON.parse(JSON.stringify(S))});
   saveShelf(a);announce('Saved to your shelf');buildIfTab('finish');buildIfTab('start');
 }
+function exportShelf(){
+  const blob=new Blob([JSON.stringify({semi:1,saved:loadShelf()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='semi-shelf.json';document.body.appendChild(a);a.click();a.remove();
+  announce('Shelf exported');
+}
+function importShelf(){
+  const i=document.createElement('input');i.type='file';i.accept='application/json,.json';
+  i.onchange=()=>{
+    const f=i.files&&i.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{
+      const o=JSON.parse(r.result);
+      const inc=Array.isArray(o)?o:(o.saved||[]);
+      if(!inc.length)throw 0;
+      saveShelf(inc.concat(loadShelf()));build();
+      announce(inc.length+' designs imported');
+    }catch(e){announce('That file is not a Semi shelf');}};
+    r.readAsText(f);
+  };
+  i.click();
+}
 /* ————— compare: hold one design against another ————— */
-const CMP={on:false,spec:null};
-function compareWith(spec){
+const CMP={on:false,spec:null,seam:50};
+let cmpPick=0;
+function compareWith(spec,name){
   CMP.spec=spec;CMP.on=true;
-  document.getElementById('cmp').classList.add('on');
-  drawCompare();announce('Comparing against '+(spec.name||'saved design'));
+  const el=document.getElementById('cmp');
+  el.classList.add('on');el.style.setProperty('--seam',CMP.seam+'%');
+  const tag=document.getElementById('cmpTag');if(tag)tag.textContent=name||'Saved';
+  drawCompare();announce('Comparing against '+(name||'a saved design')+
+    '. Drag the seam to move it.');
 }
 function compareOff(){CMP.on=false;document.getElementById('cmp').classList.remove('on');}
 function drawCompare(){
@@ -3237,7 +4268,7 @@ function renderInto(ctx,w,h){
   dialTexture(ctx,dR,S.texture,S.dialCol);drawTrack(ctx,dR,INK);
   if(S.chapter){ctx.strokeStyle=INK;ctx.globalAlpha=.35;ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(0,0,dR*.70,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
-  drawIndices(ctx,dR,D,M);drawComp(ctx,dR,INK,M);drawSignature(ctx,dR,INK);
+  drawIndices(ctx,dR,D,M);drawComp(ctx,dR,INK,M);drawQuote(ctx,dR,INK);drawSignature(ctx,dR,INK);
   const nw=new Date();
   ctx.save();ctx.rotate(((nw.getHours()%12)+nw.getMinutes()/60)*TAU/12);
   drawHand(ctx,S.hands,dR*.52,dR*.055,M,S.lume,S.handMat==='blued');ctx.restore();
@@ -3307,9 +4338,18 @@ const GLOSSARY=[
   ['Aventurine','Glass with copper filings suspended in it, cooled slowly so the metal crystallises — it reads as a night sky. Malachite, lapis and mother of pearl are natural stone dials cut into wafers.'],
   ['Strap','Leather, rubber or fabric. It attaches to the lugs with spring bars, and it is consumable — a leather strap is finished in about three years.'],
   ['Bracelet','Articulated metal. Three-link across is the tool-watch standard; five-link drapes and catches more light; semi-circular links are the softest against skin. Mesh has no fixed adjustment steps at all.'],
+  ['Cloisonné','Gold wire a tenth of a millimetre thick, bent by hand into every outline and fixed to the dial. Each cell is then filled with powdered enamel and fired — once per colour, five or six firings in all, any of which can crack the whole dial. A single bird dial is roughly a year of one person’s work.'],
+  ['Champlevé','The other enamel technique: instead of laying wire on, the metal is hollowed out and the pits are filled. Fewer outlines, deeper colour.'],
+  ['Flinqué','Translucent enamel fired over a guilloché pattern, so the engine-turning reads through the glass. It is the reason those dials change completely as you tilt them.'],
+  ['Marquetry','Wood, straw or stone cut into pieces and laid edge to edge on the dial. Straw marquetry uses split rye, flattened — an eighteenth-century cabinet-making craft that has ended up on watches.'],
+  ['Chatoyance','The cat’s-eye effect in tiger eye: parallel mineral fibres reflecting one moving band of light. It is why the dial changes as your wrist turns.'],
+  ['Ceramic','Zirconia powder pressed and sintered at about 1400°C, then diamond-polished. It is coloured all the way through, so a scratch shows the same colour — and it is hard enough that it barely scratches at all.'],
+  ['Text dial','A dial whose only ornament is a line of words. Rare, difficult, and unforgiving: with no markers and no track there is nothing to hide behind, so the type and the spacing are the entire design.'],
   ['Water resistance','A pressure rating, not a depth. 30 m survives rain and hand-washing; 100 m survives swimming; 300 m is a diving instrument with a screw-down crown and a gasketed back.']
 ];
+let glossReturn=null;
 function openGloss(term){
+  glossReturn=document.activeElement;
   buildGlossary(term);
   const gx=document.getElementById('gloss');
   gx.style.display='flex';requestAnimationFrame(()=>gx.classList.add('on'));
@@ -3330,6 +4370,7 @@ function showGuide(i){
 }
 function closeGuide(){
   const gv=document.getElementById('guide');
+  if(!gv.classList.contains('on')){try{localStorage.setItem('semi.seen','1');}catch(e){}return;}
   gv.classList.remove('on');setTimeout(()=>{if(!gv.classList.contains('on'))gv.style.display='';},500);
   try{localStorage.setItem('semi.seen','1');}catch(e){}
 }
@@ -3366,6 +4407,7 @@ function thumb(cvs,spec){
   drawTrack(c,dR,dialInk());
   drawIndices(c,dR,D,M);
   drawComp(c,dR,D.ink,M);
+  drawQuote(c,dR,dialInk());
   const blue=S.handMat==='blued';
   c.save();c.rotate(-.9);drawHand(c,S.hands,dR*.52,dR*.055,M,S.lume,blue);c.restore();
   c.save();c.rotate(1.4);drawHand(c,S.hands,dR*.80,dR*.042,M,S.lume,blue);c.restore();
@@ -3565,18 +4607,35 @@ function certificate(){
     ['HANDS',`${HANDS[S.hands]}${S.handMat==='blued'?', flame blued':''}`],
     ['STRAP',`${STRAPN[S.strap]}${d.lugW?' · '+d.lugW+' mm':''}${['link3','link5','linkR','mesh'].includes(S.strap)?'':' · '+BUCKLE[S.buckle].toLowerCase()}`]
   ];
-  x.font='400 20px "Archivo Narrow"';
-  rows.forEach(r=>{
-    x.textAlign='right';x.fillStyle='#8d867a';
+  /* the specification is set as a table with its own rule, not a list of pairs */
+  const LX=190, MX=560, RX=W-190;
+  let group='';
+  rows.forEach((r,i)=>{
+    const g=i<4?'MOVEMENT':(i<8?'CASE':'DIAL & FITTING');
+    if(g!==group){
+      group=g;
+      y+=i?30:0;
+      x.textAlign='left';x.fillStyle='#a79d88';
+      x.font='400 17px "Archivo Narrow"';
+      if(x.letterSpacing!==undefined)x.letterSpacing='6px';
+      x.fillText(g,LX,y);
+      x.strokeStyle='#ddd5c2';x.lineWidth=1;
+      x.beginPath();x.moveTo(LX,y+14);x.lineTo(RX,y+14);x.stroke();
+      y+=44;
+    }
+    x.textAlign='left';x.fillStyle='#8d867a';
+    x.font='400 19px "Archivo Narrow"';
     if(x.letterSpacing!==undefined)x.letterSpacing='3px';
-    x.fillText(r[0],W/2-24,y);
-    x.textAlign='left';x.fillStyle='#211d16';
+    x.fillText(r[0],LX,y);
+    x.fillStyle='#211d16';
     if(x.letterSpacing!==undefined)x.letterSpacing='0px';
-    x.font='400 21px "Archivo Narrow"';
-    x.fillText(r[1],W/2+24,y);
-    x.font='400 20px "Archivo Narrow"';
-    y+=34;
+    x.font='400 23px "Archivo Narrow"';
+    x.fillText(r[1],MX,y);
+    x.strokeStyle='#eae3d2';x.lineWidth=1;
+    x.beginPath();x.moveTo(LX,y+13);x.lineTo(RX,y+13);x.stroke();
+    y+=38;
   });
+  y+=16;
   /* a design reference, not a serial number — a serial belongs to a made object */
   const ref='SM-'+Math.abs(hashCode(encode())).toString(36).toUpperCase().slice(0,6);
   x.textAlign='center';x.fillStyle='#8d867a';x.font='400 18px "Archivo Narrow"';
@@ -3602,7 +4661,10 @@ function randomize(){
   S.bezelW=(6+Math.round(Math.random()*12))/100;
   S.dialCol=pick(Object.keys(DIALCOL));
   /* art dials are a treat, not the default */
-  S.texture=Math.random()<.22?pick(Object.keys(ARTDIAL)):pick(Object.keys(TEXTURES).filter(k=>!ARTDIAL[k]));
+  /* art dials are a treat; a text dial is a decision, so it is never rolled */
+  S.texture=Math.random()<.30
+    ?pick(Object.keys(ARTDIAL).filter(k=>k!=='quote'))
+    :pick(Object.keys(TEXTURES).filter(k=>!ARTDIAL[k]));
   S.layout=pick(Object.keys(LAYOUTS));
   S.indexMat=pick(['applied','printed']);
   S.numFont=pick(['grot','cond','serif']);
@@ -3674,6 +4736,34 @@ document.getElementById('bReset').onclick=()=>{snapshot();Object.assign(S,DEFAUL
   });
 })();
 
+/* ————— the compare seam: drag it, or move it with the keyboard ————— */
+(function(){
+  const line=document.getElementById('cmpLine'), el=document.getElementById('cmp');
+  if(!line)return;
+  line.tabIndex=0;line.setAttribute('role','separator');
+  line.setAttribute('aria-label','Comparison seam — drag it, or use the arrow keys');
+  let drag=false;
+  const put=v=>{
+    CMP.seam=Math.max(4,Math.min(96,v));
+    el.style.setProperty('--seam',CMP.seam+'%');
+    line.setAttribute('aria-valuenow',Math.round(CMP.seam));
+  };
+  const from=e=>{
+    const r=document.getElementById('stage').getBoundingClientRect();
+    put((e.clientX-r.left)/r.width*100);
+  };
+  line.addEventListener('pointerdown',e=>{drag=true;
+    line.setPointerCapture&&line.setPointerCapture(e.pointerId);e.preventDefault();});
+  addEventListener('pointermove',e=>{if(drag)from(e);});
+  addEventListener('pointerup',()=>{drag=false;});
+  line.addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'){e.preventDefault();put(CMP.seam-4);}
+    if(e.key==='ArrowRight'){e.preventDefault();put(CMP.seam+4);}
+    if(e.key==='Home'){e.preventDefault();put(10);}
+    if(e.key==='End'){e.preventDefault();put(90);}
+  });
+})();
+
 /* ————— drag the watch to turn it in the light, and press its pushers ————— */
 (function(){
   let drag=false,lx=0,ly=0,moved=0;
@@ -3722,6 +4812,7 @@ document.getElementById('bReset').onclick=()=>{snapshot();Object.assign(S,DEFAUL
 let dirty=true,baseDirty=true,hashPending=0;
 function paint(){
   dirty=true;baseDirty=true;spec();
+  refreshTip();
   /* writing the URL on every pixel of a drag is what makes a slider feel sticky */
   clearTimeout(hashPending);hashPending=setTimeout(syncHash,220);
 }
@@ -3750,8 +4841,13 @@ document.getElementById('bHelp').onclick=()=>showGuide(0);
 document.getElementById('glossX').onclick=closeGloss;
 document.getElementById('gloss').onclick=e=>{if(e.target.id==='gloss')closeGloss();};
 function closeGloss(){
-  const gx=document.getElementById('gloss');gx.classList.remove('on');
+  const gx=document.getElementById('gloss');
+  if(!gx.classList.contains('on'))return;
+  gx.classList.remove('on');
   setTimeout(()=>{if(!gx.classList.contains('on'))gx.style.display='';},450);
+  /* the keyboard goes back to whatever asked the question */
+  if(glossReturn&&glossReturn.focus&&document.contains(glossReturn))glossReturn.focus();
+  glossReturn=null;
 }
 /* keep the keyboard inside an open dialog, and give it back on close */
 addEventListener('keydown',e=>{
@@ -4010,6 +5106,12 @@ function enterStudio(){
     L.classList.add('gone');
     try{sessionStorage.setItem('semi.entered','1');}catch(e){}
     setTimeout(()=>{L.style.display='none';resize();
+      /* a first visit lands on the calibre, because that is the argument */
+      try{
+        if(!localStorage.getItem('semi.seen')&&!(typeof fromLink!=='undefined'&&fromLink)){
+          tab='movement';S.view='movement';build();paint();
+        }
+      }catch(e){}
       /* the keyboard follows the eye into the studio */
       const first=document.querySelector('#rail .rl');if(first&&first.focus)first.focus();
     },1100);
