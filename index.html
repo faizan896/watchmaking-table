@@ -120,24 +120,27 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 
 /* ————— the specification, set the way a calibre sheet is set —————
    label above, figure below, a hairline under each column. no boxes. */
+/* the widest the watch can be is about 44 mm, which reaches roughly 30% in
+   from the left edge of the stage — so the column stops short of that and
+   the specification never sits on the strap */
 #stageL{position:absolute;left:44px;bottom:38px;right:auto;
-  width:min(52%,540px);display:flex;flex-direction:column;
-  align-items:flex-start;gap:24px;pointer-events:none;z-index:6}
+  width:min(30%,340px);display:flex;flex-direction:column;
+  align-items:flex-start;gap:22px;pointer-events:none;z-index:6}
 #stageL>*{pointer-events:auto}
 #specline{width:100%;pointer-events:none}
 #specName{font-family:var(--serif);font-style:italic;font-size:var(--fs4);color:var(--cream);
   line-height:1;margin-bottom:12px;display:none}
 #specName.on{display:block}
 #specRule{width:34px;height:1px;background:rgba(239,233,220,.36);margin-bottom:16px}
-#specSheet{display:grid;gap:14px 22px;margin-bottom:18px;
-  grid-template-columns:repeat(auto-fit,minmax(74px,1fr))}
+#specSheet{display:grid;gap:13px 18px;margin-bottom:16px;
+  grid-template-columns:repeat(auto-fit,minmax(68px,1fr))}
 #specSheet div{border-top:1px solid rgba(239,233,220,.22);padding-top:8px;min-width:0}
 #specSheet dt{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;
   color:#8b8477;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #specSheet dd{font-family:var(--mono);font-size:16px;letter-spacing:.03em;color:#e4ddcd;
   font-variant-numeric:tabular-nums;line-height:1;overflow:hidden;text-overflow:ellipsis}
 #specSheet dd i{font-style:normal;font-size:10px;color:#8b8477;margin-left:2px}
-#specText{font-size:var(--fs0);letter-spacing:.18em;color:#9a9386;text-transform:uppercase;line-height:2.05}
+#specText{font-size:9px;letter-spacing:.14em;color:#9a9386;text-transform:uppercase;line-height:2}
 #specText b{color:#cfc7b6;font-weight:400}
 #stage.light #specSheet div{border-top-color:rgba(27,26,22,.20)}
 #stage.light #specSheet dt{color:#6b6558}
@@ -434,7 +437,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 @media(max-width:720px){#partRead{top:auto;bottom:12px;left:12px;right:12px;transform:none;max-width:none}
   #partRead.on{transform:none}}
 /* the studio's opinion: a card on the stage, never a wall */
-#tip{max-width:360px;background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
+#tip{max-width:100%;background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
   border-left:2px solid var(--gold);padding:16px 18px 14px;
   display:none;opacity:0;transform:translateY(8px);
   transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
@@ -814,7 +817,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
           </svg>
         </div>
         <div id="story">
-          <h2>I loved watches long before<br>I could make anything.</h2>
+          <h2>I loved watches long before I could make anything.</h2>
           <p>I knew the brands, the founders, the famous calibres. I could name them
             before I understood a single word of what I was actually looking at.</p>
           <p>Then I started watching watchmakers work. Hours of it. Someone's hands
@@ -2608,7 +2611,7 @@ function drawEmblem(c,size,ink){
     c.fillText('蝉',0,size*.06);
   }else{
     /* the house mark: small enough that it never competes with the hands */
-    drawMark(c,size*0.95,ink,Math.max(size*0.15,0.6));
+    drawMark(c,size*0.95,ink,Math.max(size*0.13,0.55));
   }
   c.restore();
   return true;
@@ -2628,9 +2631,9 @@ function drawSignature(c,dR,ink){
     c.fillText('Semi',0,yTop+dR*.05);
   }else{ /* the mark above, the name beneath — the house lockup */
     const has=(S.brand!=='none');
-    if(has){c.save();c.translate(0,yTop);drawEmblem(c,dR*.078*s,ink);c.restore();}
+    if(has){c.save();c.translate(0,yTop-dR*.012);drawEmblem(c,dR*.098*s,ink);c.restore();}
     c.fillStyle=ink;c.font=`400 ${dR*.155*s}px "Pinyon Script", ${FONTS.serif}`;
-    c.fillText('Semi',0,yTop+dR*(has?.165:.135)*s);
+    c.fillText('Semi',0,yTop+dR*(has?.190:.135)*s);
   }
   /* the line at six, only where nothing else lives */
   if(!botBusySix()){
