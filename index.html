@@ -98,12 +98,16 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #brand{position:absolute;top:32px;left:44px;pointer-events:none;display:flex;align-items:center;gap:13px}
 #kanjiLogo{font-family:'Yuji Syuku',serif;font-size:var(--fs6);line-height:1;color:var(--cream);display:none}
 #brand.k #kanjiLogo{display:block}
+#stageMark{display:block;width:30px;height:30px;flex:none}
+#stageMark svg{display:block;width:30px;height:30px}
+#brand.k #stageMark{display:none}
 #brand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs6);display:block;line-height:.9;
   letter-spacing:.01em;font-weight:400;color:var(--cream);text-transform:none}
 #brand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:#a49b89;
   text-transform:uppercase;display:block;margin-top:6px}
 /* the stage adapts: on a pale backdrop the maison turns to ink */
 #stage.light #brand b,#stage.light #kanjiLogo,#stage.light #specName{color:#1b1a16}
+#stage.light #stageMark svg g{stroke:#1b1a16}
 #stage.light #brand span{color:#5c5749}
 #stage.light #specRule{background:rgba(27,26,22,.38)}
 #stage.light #specText{color:#4f4b42}
@@ -246,6 +250,20 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .note{font-size:var(--fs1);color:var(--ink2);line-height:1.8;margin-top:-4px}
 .note b{color:var(--ink);font-weight:600}
 
+/* a family of dials, closed until you ask for it */
+.fam{display:flex;width:100%;align-items:baseline;justify-content:space-between;gap:12px;
+  background:none;border:0;border-bottom:1px solid var(--rule2);font-family:inherit;
+  padding:13px 0;cursor:pointer;text-align:left;min-width:0;
+  transition:border-color var(--dur2) var(--ease-mech)}
+.fam span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
+  color:var(--ink3);transition:color var(--dur2) var(--ease-mech)}
+.fam em{font-family:var(--serif);font-style:italic;font-size:var(--fs2);color:var(--ink3);
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fam:hover span,.fam:hover em{color:var(--ink)}
+.fam.open{border-bottom-color:var(--gold)}
+.fam.open span{color:var(--ink)}
+.fam.open em{color:var(--ink)}
+.fam+.grp{margin-top:14px}
 /* a quiet correction: shown when a choice is not how watches are built */
 .advice{display:flex;gap:11px;align-items:flex-start;margin:-6px 0 var(--s4);min-width:0;
   padding:12px 14px;background:rgba(138,108,50,.07);border-left:2px solid var(--gold)}
@@ -386,7 +404,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   #pSpec{grid-template-columns:1fr}
 }
 /* the exploration just made, stated plainly */
-#exp{position:absolute;top:36px;right:44px;width:min(320px,26vw);text-align:right;z-index:5;
+#exp{position:absolute;top:84px;right:44px;width:min(320px,26vw);text-align:right;z-index:5;
   pointer-events:none;opacity:0;transform:translateY(-6px);
   transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
 #exp.on{opacity:1;transform:none}
@@ -557,11 +575,13 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   justify-content:space-between;gap:30px;padding:28px 0 16px;
   background:linear-gradient(#efe9dc 68%,rgba(239,233,220,0));
   border-bottom:1px solid rgba(34,32,26,.10)}
-#lbrand{display:block;text-decoration:none}
+#lbrand{display:flex;align-items:center;gap:14px;text-decoration:none}
+#lbrand .lmark{display:block;width:34px;height:34px;flex:none}
+#lbrand .lmark svg{display:block;width:34px;height:34px}
 #lbrand b{font-family:'Pinyon Script',var(--serif);font-size:var(--fs6);line-height:.85;
   color:#22201a;display:block;font-weight:400}
-#lbrand span{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
-  color:#655e4e;display:block;margin-top:7px}
+#lbrand em{font-style:normal;font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);
+  text-transform:uppercase;color:#655e4e;display:block;margin-top:7px}
 #lnav nav{display:flex;align-items:center;gap:30px;padding-bottom:5px}
 #lnav nav a{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;
   color:#655e4e;text-decoration:none;padding-bottom:4px;border-bottom:1px solid transparent;
@@ -605,7 +625,26 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .lsec h2{font-family:var(--serif);font-style:italic;font-weight:600;
   font-size:clamp(26px,3.1vw,40px);line-height:1.16;color:#22201a;margin-bottom:26px}
 .lsec p{font-size:var(--fs2);line-height:1.9;color:#514b41;margin-bottom:16px;max-width:44ch}
-.lart{opacity:.92}
+/* ————— the drawing —————
+   These were lost when the landing was rebuilt: without them every pencil
+   path fell back to a solid black fill and the sketch became a blot. */
+.lart{opacity:.94}
+#sketch{width:100%;height:auto;display:block}
+#sk path,#sk line,#sk circle,#sk ellipse,#sk polyline{
+  fill:none;stroke:#2b2823;stroke-linecap:round;stroke-linejoin:round}
+#skFine path,#skFine line,#skFine circle,#skFine polyline{
+  fill:none;stroke:#4d4740;stroke-linecap:round}
+
+/* ————— the story column ————— */
+#story{max-width:52ch}
+#story p{font-size:var(--fs2);line-height:1.9;color:#514b41;margin-bottom:15px;max-width:46ch}
+.ssign{font-family:'Pinyon Script',var(--serif);font-size:var(--fs5);color:#22201a;
+  margin-top:26px !important;margin-bottom:0 !important;line-height:1}
+.snote{margin-top:30px;padding-top:20px;border-top:1px solid rgba(34,32,26,.16);
+  display:flex;gap:18px;align-items:flex-start}
+.snote b{flex:none;font-family:'Yuji Syuku',serif;font-size:var(--fs4);color:#22201a;
+  font-weight:400;line-height:1.1}
+.snote span{font-size:var(--fs1);line-height:1.85;color:#5f5849;max-width:40ch}
 .lspecs{align-self:start}
 .lspecs div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;
   border-top:1px solid rgba(34,32,26,.14);padding:15px 0}
@@ -711,8 +750,8 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <!-- the only navigation there is -->
     <header id="lnav">
       <a href="#top" id="lbrand">
-        <b>Semi</b>
-        <span>Watch design studio · est. 2025</span>
+        <span class="lmark" id="lmark"></span>
+        <span class="lwords"><b>Semi</b><em>Watch design studio · est. 2025</em></span>
       </a>
       <nav aria-label="Sections">
         <a href="#idea">The idea</a>
@@ -852,6 +891,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     </div>
     <div id="brand" aria-hidden="true">
       <div id="kanjiLogo">蝉</div>
+      <span id="stageMark"></span>
       <div><b>Semi</b><span>Watch design studio</span></div>
     </div>
     <!-- one stack down the left: the note first, the specification under it,
@@ -964,6 +1004,41 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 const cv=document.getElementById('cv'),X=cv.getContext('2d');
 let DPR=Math.min(devicePixelRatio||1,2);
 const TAU=Math.PI*2;
+
+/* ============================================================
+   THE MARK
+   Not a letter with a serif on it. A balance wheel seen from
+   above, with its hairspring drawn through the middle — and the
+   spring happens to make an S. It is a real part, so it engraves
+   at one millimetre on a movement and still reads.
+   ============================================================ */
+function markPath(c,R){
+  /* the rim, broken at nine and three where the arms cross */
+  c.beginPath();
+  c.arc(0,0,R,-Math.PI*0.42,Math.PI*0.42);
+  c.moveTo(Math.cos(Math.PI*0.58)*R,Math.sin(Math.PI*0.58)*R);
+  c.arc(0,0,R,Math.PI*0.58,Math.PI*1.42);
+  /* the hairspring: two half turns, the classic S of a coil */
+  const r=R*0.46;
+  c.moveTo(R*0.46,-R*0.92);
+  c.arc(0,-r,r,-Math.PI*0.0,-Math.PI,true);
+  c.arc(0, r,r, Math.PI,  0,      true);
+  return c;
+}
+function drawMark(c,R,col,lw){
+  c.save();
+  c.strokeStyle=col;c.lineWidth=lw||Math.max(R*0.135,0.8);
+  c.lineCap='round';c.lineJoin='round';
+  markPath(c,R);
+  c.stroke();
+  c.restore();
+}
+const MARK_SVG=(stroke,w)=>'<svg viewBox="-12 -12 24 24" width="'+(w||18)+'" height="'+(w||18)+'" aria-hidden="true" focusable="false">'+
+  '<g fill="none" stroke="'+stroke+'" stroke-width="1.5" stroke-linecap="round">'+
+  '<path d="M 9.1 -4.1 A 10 10 0 0 1 9.1 4.1"/>'+
+  '<path d="M -9.1 4.1 A 10 10 0 0 1 -9.1 -4.1"/>'+
+  '<path d="M 4.6 -9.2 A 4.6 4.6 0 1 0 0 -4.6 A 4.6 4.6 0 1 1 -4.6 9.2"/>'+
+  '</g></svg>';
 
 /* ————— the design ————— */
 const S={
@@ -2525,12 +2600,16 @@ function sigPlan(){
 }
 /* the emblem: two orbits, or 蝉 — the character that means axis */
 function drawEmblem(c,size,ink){
-  /* the house has no device — only its name, and sometimes its character */
-  if(S.brand!=='kanji')return false;
+  if(S.brand==='none')return false;
   c.save();
-  c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
-  c.font=`400 ${size*2.05}px "Yuji Syuku", "Cormorant Garamond", serif`;
-  c.fillText('蝉',0,size*.06);
+  if(S.brand==='kanji'){
+    c.fillStyle=ink;c.textAlign='center';c.textBaseline='middle';
+    c.font=`400 ${size*2.05}px "Yuji Syuku", "Cormorant Garamond", serif`;
+    c.fillText('蝉',0,size*.06);
+  }else{
+    /* the house mark: small enough that it never competes with the hands */
+    drawMark(c,size*0.95,ink,Math.max(size*0.15,0.6));
+  }
   c.restore();
   return true;
 }
@@ -2542,16 +2621,16 @@ function drawSignature(c,dR,ink){
   /* on a painted dial the signature needs its own separation from the art */
   if(art){c.shadowColor='rgba(0,0,0,.55)';c.shadowBlur=dR*.05;}
   const yTop=dR*p.y, s=p.scale;
-  if(p.variant==='mark'&&S.brand==='kanji'){
+  if(p.variant==='mark'&&S.brand!=='none'){
     c.save();c.translate(0,yTop+dR*.045);drawEmblem(c,dR*.115*s,ink);c.restore();
   }else if(p.variant==='name'||p.variant==='mark'){
     c.fillStyle=ink;c.font=`400 ${dR*.20*s}px "Pinyon Script", ${FONTS.serif}`;
     c.fillText('Semi',0,yTop+dR*.05);
-  }else{ /* the character above, the name beneath */
-    const kan=(S.brand==='kanji');
-    if(kan){c.save();c.translate(0,yTop);drawEmblem(c,dR*.092*s,ink);c.restore();}
-    c.fillStyle=ink;c.font=`400 ${dR*.165*s}px "Pinyon Script", ${FONTS.serif}`;
-    c.fillText('Semi',0,yTop+dR*(kan?.185:.145)*s);
+  }else{ /* the mark above, the name beneath — the house lockup */
+    const has=(S.brand!=='none');
+    if(has){c.save();c.translate(0,yTop);drawEmblem(c,dR*.078*s,ink);c.restore();}
+    c.fillStyle=ink;c.font=`400 ${dR*.155*s}px "Pinyon Script", ${FONTS.serif}`;
+    c.fillText('Semi',0,yTop+dR*(has?.165:.135)*s);
   }
   /* the line at six, only where nothing else lives */
   if(!botBusySix()){
@@ -3922,7 +4001,7 @@ const TABS=[
   {k:'dial',n:'Dial'},{k:'index',n:'Indices'},{k:'comp',n:'Functions'},{k:'hands',n:'Hands'},
   {k:'strap',n:'Strap'},{k:'finish',n:'Finish'}
 ];
-let tab='start', advOpen=false;
+let tab='start', advOpen=false, dialOpen=null;
 /* a technical word you can ask about, inline, without leaving the control */
 function TERM(word,term){
   return `<button class="term" type="button" data-term="${term||word}">${word}</button>`;
@@ -4281,11 +4360,26 @@ function build(){
       ['Text',['quote'],
        'The dial as a sentence. The words are the design, so nothing else should crowd them.']
     ];
-    GROUPS.forEach(G=>{
+    /* fifty-six dials shown at once is a wall. One family opens at a time,
+       and the family holding the current dial opens itself. */
+    const cur0=GROUPS.findIndex(G=>G[1].includes(S.texture));
+    if(dialOpen===null)dialOpen=cur0>=0?cur0:-1;
+    GROUPS.forEach((G,gi)=>{
       const opts=G[1].filter(k=>TEXTURES[k]).map(k=>({v:k,n:TEXTURES[k]}));
       if(!opts.length)return;
-      const grp=chips(G[0],opts,S.texture,v=>S.texture=v);
-      const note=document.createElement('p');note.className='note';note.style.marginTop='10px';
+      const open=(gi===dialOpen);
+      const head=document.createElement('button');
+      head.type='button';head.className='fam'+(open?' open':'');
+      head.setAttribute('aria-expanded',open?'true':'false');
+      const mine=G[1].includes(S.texture);
+      head.innerHTML='<span>'+G[0]+'</span><em>'+(mine?TEXTURES[S.texture]:opts.length+'')+'</em>';
+      head.onclick=()=>{dialOpen=open?-1:gi;build();};
+      add(head);
+      if(!open)return;
+      const grp=chips('',opts,S.texture,v=>S.texture=v);
+      grp.querySelector('h4').remove();
+      grp.style.margin='0 0 var(--s4)';
+      const note=document.createElement('p');note.className='note';note.style.marginTop='11px';
       note.textContent=G[2];grp.appendChild(note);
       add(grp);
     });
@@ -4338,7 +4432,10 @@ function build(){
     add(chips('Rehaut ring',[{v:true,n:'Yes'},{v:false,n:'No'}],S.chapter,v=>S.chapter=v,false,{
       true:'A fine inner flange between the numerals and the minute track. Not the '+TERM('chapter ring','Chapter ring')+' — that is the ring the markings sit on.',
       false:'The dial runs uninterrupted to the track.'}));
-    add(chips('Emblem',[{v:'orbit',n:'Name only'},{v:'kanji',n:'蝉 above the name'}],S.brand,v=>S.brand=v));
+    add(chips('House mark',[{v:'orbit',n:'Mark above the name'},{v:'kanji',n:'蝉 above the name'},{v:'none',n:'Name only'}],S.brand,v=>S.brand=v,false,{
+      orbit:'A balance wheel with its hairspring drawn through it. The spring makes the S, which is where the name comes from.',
+      kanji:'The cicada character instead. Quieter, and it suits an enamel or a stone dial.',
+      none:'Just the name, in script. What most dress watches actually do.'}));
     add(chips('Signature',[{v:'auto',n:'Automatic'},{v:'full',n:'Mark + name'},{v:'mark',n:'Mark only'},{v:'name',n:'Name only'},{v:'none',n:'Unsigned'}],S.sig,v=>S.sig=v));
   }
   else if(tab==='index'){
@@ -5125,9 +5222,10 @@ function certificate(){
   x.fillText(dt.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase(),W/2,fy-18);
   sheetText(x,'','400 16px "Archivo Narrow"',SHEET_GREY,4,'right');
   x.fillText('REF. '+designRef(),W-M,fy-18);
-  /* the house character, small, where a stamp would be */
-  sheetText(x,'','400 40px "Yuji Syuku",serif','rgba(154,123,63,.5)',0,'center');
-  x.fillText('蝉',W/2,fy-84);
+  /* the house mark, small, where a stamp would be */
+  x.save();x.translate(W/2,fy-96);
+  drawMark(x,26,'rgba(154,123,63,.85)',3);
+  x.restore();
 
   const a=document.createElement('a');
   a.href=c.toDataURL('image/png');
@@ -5739,6 +5837,19 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   });
 })();
 
+/* the mark is drawn once into every place the house signs itself */
+(function(){
+  const put=(id,col)=>{const e=document.getElementById(id);if(e)e.innerHTML=MARK_SVG(col,e===document.getElementById('lmark')?34:30);};
+  put('lmark','#22201a');
+  put('stageMark','#efe9dc');
+  /* and the tab icon */
+  const ico=document.querySelector('link[rel*=icon]');
+  if(ico)ico.href='data:image/svg+xml,'+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -14 28 28"><rect x="-14" y="-14" width="28" height="28" fill="#121110"/>'+
+    '<g fill="none" stroke="#e9e4d8" stroke-width="1.7" stroke-linecap="round">'+
+    '<path d="M 9.1 -4.1 A 10 10 0 0 1 9.1 4.1"/><path d="M -9.1 4.1 A 10 10 0 0 1 -9.1 -4.1"/>'+
+    '<path d="M 4.6 -9.2 A 4.6 4.6 0 1 0 0 -4.6 A 4.6 4.6 0 1 1 -4.6 9.2"/></g></svg>');
+}());
 /* ————— the hero: a real movement, turning, on the front page —————
    It is the same engine the studio uses, rendered into its own canvas at a
    fixed specification, so the first thing on the page is the actual product. */
