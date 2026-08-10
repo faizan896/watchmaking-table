@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Semi — design a mechanical watch, movement first</title>
-<meta name="description" content="Semi is a watch design studio. Specify a mechanical watch the way a maison does — calibre and finishing, case and bezel, dial and indices, hands and strap — with every combination checked against how watches are actually built.">
+<meta name="description" content="Design a mechanical watch, starting with the movement. Pick the calibre, build the case around it, choose a dial and hands, and get told when a combination would not work in metal.">
 <meta name="theme-color" content="#0d0d0c">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Semi">
 <meta property="og:title" content="Semi — design a mechanical watch, movement first">
-<meta property="og:description" content="Nine chapters, from the calibre to the strap. Every control is a real decision a watchmaker makes.">
+<meta property="og:description" content="Ten chapters, from the movement out to the strap. Every control is a real decision a watchmaker makes.">
 <meta property="og:image" content="https://watchmaking-table.vercel.app/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121110'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='%23e9e4d8' stroke-width='3'/%3E%3Cpath d='M32 18v14l9 5' fill='none' stroke='%23e9e4d8' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -84,7 +84,10 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(--grot);overflow:hidden;
   -webkit-font-smoothing:antialiased}
-#app{display:grid;grid-template-columns:1fr 392px;height:100%}
+/* minmax(0,…) everywhere: a grid track defaults to min-content, so one long
+   chip label was making the panel wider than the window and pushing the
+   right-hand edge off screen */
+#app{display:grid;grid-template-columns:minmax(0,1fr) 392px;height:100%;overflow:hidden}
 
 /* ————————————————————— the stage ————————————————————— */
 #stage{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
@@ -113,17 +116,22 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 
 /* ————— the specification, set the way a calibre sheet is set —————
    label above, figure below, a hairline under each column. no boxes. */
-#specline{position:absolute;bottom:38px;left:44px;pointer-events:none;max-width:520px}
+#stageL{position:absolute;left:44px;bottom:38px;right:auto;
+  width:min(52%,540px);display:flex;flex-direction:column;
+  align-items:flex-start;gap:24px;pointer-events:none;z-index:6}
+#stageL>*{pointer-events:auto}
+#specline{width:100%;pointer-events:none}
 #specName{font-family:var(--serif);font-style:italic;font-size:var(--fs4);color:var(--cream);
   line-height:1;margin-bottom:12px;display:none}
 #specName.on{display:block}
 #specRule{width:34px;height:1px;background:rgba(239,233,220,.36);margin-bottom:16px}
-#specSheet{display:grid;grid-template-columns:repeat(6,minmax(0,auto));gap:0 26px;margin-bottom:18px}
-#specSheet div{border-top:1px solid rgba(239,233,220,.22);padding-top:8px}
-#specSheet dt{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
-  color:#8b8477;margin-bottom:5px;white-space:nowrap}
+#specSheet{display:grid;gap:14px 22px;margin-bottom:18px;
+  grid-template-columns:repeat(auto-fit,minmax(74px,1fr))}
+#specSheet div{border-top:1px solid rgba(239,233,220,.22);padding-top:8px;min-width:0}
+#specSheet dt{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:#8b8477;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #specSheet dd{font-family:var(--mono);font-size:16px;letter-spacing:.03em;color:#e4ddcd;
-  font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1}
+  font-variant-numeric:tabular-nums;line-height:1;overflow:hidden;text-overflow:ellipsis}
 #specSheet dd i{font-style:normal;font-size:10px;color:#8b8477;margin-left:2px}
 #specText{font-size:var(--fs0);letter-spacing:.18em;color:#9a9386;text-transform:uppercase;line-height:2.05}
 #specText b{color:#cfc7b6;font-weight:400}
@@ -153,7 +161,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #stage.light .bgs i{border-color:rgba(27,26,22,.34)}
 
 /* ————————————————————— the catalogue ————————————————————— */
-#panel{background:var(--paper);display:grid;grid-template-columns:74px 1fr;min-height:0;position:relative}
+#panel{background:var(--paper);display:grid;grid-template-columns:74px minmax(0,1fr);min-height:0;min-width:0;position:relative}
 #panel:before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:rgba(0,0,0,.5)}
 
 /* numbered index, the way a chapter list reads */
@@ -169,15 +177,16 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   width:1px;height:20px;background:var(--gold)}
 .rl b{display:block;font-weight:400;font-size:var(--fs0)}
 
-#panelMain{display:flex;flex-direction:column;min-height:0}
-#secHead{padding:32px 34px 20px;border-bottom:1px solid var(--rule2);flex:none}
+#panelMain{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+#secHead{padding:32px 30px 20px;border-bottom:1px solid var(--rule2);flex:none;min-width:0}
 #secNum{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:var(--gold);text-transform:uppercase;margin-bottom:11px}
 #secTitle{font-family:var(--serif);font-style:italic;font-weight:600;font-size:var(--fs5);line-height:1;
   color:var(--ink);margin-bottom:13px}
 #secHelp{font-size:var(--fs1);line-height:1.8;color:var(--ink2);max-width:34ch}
 
-#body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;padding:var(--s4) 34px var(--s5)}
+#body{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;scroll-behavior:smooth;padding:var(--s4) 30px var(--s5)}
+#body>*{min-width:0;max-width:100%}
 #body::-webkit-scrollbar{width:3px}
 #body::-webkit-scrollbar-thumb{background:var(--rule)}
 
@@ -186,10 +195,12 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);color:var(--ink3);text-transform:uppercase;font-weight:400;
   margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--rule2)}
 .grp h4 em{font-family:var(--serif);font-style:italic;font-size:var(--fs2);color:var(--ink);
-  letter-spacing:0;text-transform:none;white-space:nowrap}
+  letter-spacing:0;text-transform:none;text-align:right;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* options: hairline outlines, filled only when chosen */
-.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;min-width:0}
+.chip{max-width:100%}
 .chip{border:1px solid var(--rule);background:transparent;color:var(--ink2);font-family:inherit;
   padding:9px 13px;min-height:34px;cursor:pointer;user-select:none;font-size:var(--fs1);line-height:1.3;
   transition:border-color var(--dur2) var(--ease),color var(--dur2) var(--ease),background var(--dur2) var(--ease)}
@@ -211,8 +222,9 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   margin-top:-5.5px;background:var(--ink);cursor:pointer;transition:transform var(--dur1) var(--ease)}
 .row input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.3)}
 .row input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--ink);cursor:pointer}
+.row{min-width:0}
 .row output{font-family:var(--serif);font-style:italic;font-size:var(--fs2);color:var(--ink);
-  width:64px;text-align:right;font-variant-numeric:tabular-nums}
+  width:58px;flex:none;text-align:right;font-variant-numeric:tabular-nums}
 
 /* the reference designs, as catalogue plates */
 .presets{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -235,8 +247,9 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .note b{color:var(--ink);font-weight:600}
 
 /* a quiet correction: shown when a choice is not how watches are built */
-.advice{display:flex;gap:11px;align-items:flex-start;margin:-6px 0 var(--s4);
+.advice{display:flex;gap:11px;align-items:flex-start;margin:-6px 0 var(--s4);min-width:0;
   padding:12px 14px;background:rgba(138,108,50,.07);border-left:2px solid var(--gold)}
+.advice span{min-width:0;overflow-wrap:anywhere}
 .advice b{flex:none;font-size:var(--fs0);letter-spacing:.2em;text-transform:uppercase;
   color:var(--gold);font-weight:400;padding-top:2px}
 .advice span{font-size:var(--fs1);line-height:1.75;color:var(--ink2)}
@@ -274,7 +287,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   transition:opacity var(--dur1) var(--ease)}
 .shelf figure:hover .del,.shelf .del:focus-visible{opacity:1}
 
-#foot{border-top:1px solid var(--rule);padding:0 34px;display:flex;gap:26px;flex:none;align-items:center}
+#foot{border-top:1px solid var(--rule);padding:0 30px;display:flex;gap:22px;flex:none;align-items:center;min-width:0}
 #foot button{font-size:var(--fs0);letter-spacing:.24em;text-transform:uppercase;font-family:inherit;
   padding:19px 0;cursor:pointer;user-select:none;color:var(--ink3);background:none;border:0;
   transition:color var(--dur2) var(--ease)}
@@ -373,7 +386,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
   #pSpec{grid-template-columns:1fr}
 }
 /* the exploration just made, stated plainly */
-#exp{position:absolute;top:36px;right:44px;max-width:330px;text-align:right;z-index:5;
+#exp{position:absolute;top:36px;right:44px;width:min(320px,26vw);text-align:right;z-index:5;
   pointer-events:none;opacity:0;transform:translateY(-6px);
   transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
 #exp.on{opacity:1;transform:none}
@@ -388,7 +401,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 @media(max-width:720px){#exp{top:auto;bottom:96px;left:12px;right:12px;max-width:none;text-align:left}}
 /* the part under the cursor, named at the top of the stage */
 #partRead{position:absolute;top:36px;left:50%;transform:translateX(-50%) translateY(-6px);
-  max-width:420px;text-align:center;pointer-events:none;z-index:5;
+  width:min(420px,38vw);text-align:center;pointer-events:none;z-index:5;
   opacity:0;transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
 #partRead.on{opacity:1;transform:translateX(-50%)}
 #partRead figcaption{display:flex;align-items:baseline;justify-content:center;gap:12px;
@@ -403,12 +416,11 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 @media(max-width:720px){#partRead{top:auto;bottom:12px;left:12px;right:12px;transform:none;max-width:none}
   #partRead.on{transform:none}}
 /* the studio's opinion: a card on the stage, never a wall */
-#tip{position:absolute;left:44px;bottom:150px;max-width:330px;z-index:6;
-  background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
+#tip{max-width:360px;background:rgba(18,17,15,.90);backdrop-filter:blur(6px);
   border-left:2px solid var(--gold);padding:16px 18px 14px;
-  opacity:0;transform:translateY(8px);pointer-events:none;
-  transition:opacity var(--dur2) var(--ease),transform var(--dur2) var(--ease)}
-#tip.on{opacity:1;transform:none;pointer-events:auto}
+  display:none;opacity:0;transform:translateY(8px);
+  transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
+#tip.on{display:block;opacity:1;transform:none}
 #tip b{display:block;font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);
   text-transform:uppercase;color:var(--gold);font-weight:400;margin-bottom:9px}
 #tip p{font-size:var(--fs1);line-height:1.75;color:#d8d2c4;margin-bottom:13px}
@@ -561,19 +573,21 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .lprime:hover{color:var(--gold)}
 
 /* ————— first screen ————— */
-.lhero{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
-  gap:0 70px;align-items:center;min-height:calc(100vh - 116px);padding:40px 0 56px}
-.lhead{max-width:30ch}
+.lhero{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:0 64px;align-items:center;align-content:center;
+  min-height:min(calc(100vh - 116px),820px);padding:36px 0 52px}
+.lhead{max-width:min(100%,540px);min-width:0}
 .skey{font-size:var(--fs0);letter-spacing:var(--tr-eyebrow);text-transform:uppercase;
   color:#726a58;margin-bottom:26px}
-.lhead h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.4vw,60px);
-  line-height:1.08;color:#22201a;letter-spacing:-.012em;margin-bottom:24px}
+.lhead h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,3.5vw,50px);
+  line-height:1.1;color:#22201a;letter-spacing:-.012em;margin-bottom:22px;
+  text-wrap:balance;overflow-wrap:break-word}
 .lhead h1 i{font-style:italic;color:#3a352b}
-.lsub{font-size:var(--fs2);line-height:1.9;color:#514b41;max-width:38ch}
+.lsub{font-size:var(--fs2);line-height:1.85;color:#514b41;max-width:44ch}
 .lstage{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
-#heroCv{width:100%;max-width:520px;height:auto;display:block;
+#heroCv{width:100%;max-width:min(100%,460px);height:auto;display:block;
   filter:drop-shadow(0 30px 60px rgba(40,32,18,.22))}
-.lstage figcaption{width:100%;max-width:520px}
+.lstage figcaption{width:100%;max-width:min(100%,460px)}
 #heroSpec{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 22px}
 #heroSpec div{border-top:1px solid rgba(34,32,26,.18);padding-top:8px}
 #heroSpec dt{font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
@@ -696,11 +710,11 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <!-- ————— first screen: the movement, and one sentence ————— -->
     <section id="top" class="lhero">
       <div class="lhead">
-        <p class="skey">Semi · a digital atelier</p>
+        <p class="skey">Semi &middot; a small workshop, online</p>
         <h1>Design a mechanical watch.<br><i>Movement first.</i></h1>
-        <p class="lsub">Begin with the calibre. Everything else follows —
-          the case is sized around it, the dial is drawn over it, and the hands
-          are set by a wheel that turns once a minute.</p>
+        <p class="lsub">Pick the movement first. The case gets built around it,
+          the dial sits on top of it, and the hands are turned by one of its wheels.
+          Do it the other way round and the numbers stop making sense.</p>
       </div>
       <figure class="lstage">
         <canvas id="heroCv" width="900" height="900"
@@ -747,13 +761,18 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
         </div>
         <div id="story">
           <h2>I loved watches long before<br>I could make anything.</h2>
-          <p>I read the histories. Every maison, every founder, every calibre that mattered — I knew the stories before I knew the words for what I was looking at.</p>
-          <p>Then I started watching the watchmakers. Hours of it. A pair of hands under a lamp, seating a bridge, driving a screw a quarter turn and stopping. I could tell you what an escapement does. I had never made one thing.</p>
-          <p>That is the gap this studio is for. I had the eye and no hands — no CAD, no drawing, no bench. So I built the bench instead.</p>
+          <p>I knew the brands, the founders, the famous calibres. I could name them
+            before I understood a single word of what I was actually looking at.</p>
+          <p>Then I started watching watchmakers work. Hours of it. Someone's hands
+            under a lamp, setting a bridge, turning a screw a quarter turn and stopping.
+            I could explain what an escapement does. I had still never made anything.</p>
+          <p>That's the gap this is for. I had the eye but no hands, no CAD, no bench.
+            So I built the bench.</p>
           <p class="ssign">Faizan</p>
           <div class="snote">
             <b>蝉</b>
-            <span>The cicada waits underground for years and comes out exactly on time. Of every creature, it is the one that keeps a calendar. The house took its name.</span>
+            <span>A cicada spends years underground and still comes out on schedule.
+              Nothing else in nature keeps time that well. That's where the name came from.</span>
           </div>
         </div>
       </div>
@@ -764,20 +783,20 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <p class="lnum">02 &mdash; The calibre</p>
       <div class="lgrid lgrid-r">
         <div class="lcol">
-          <h2>A watch is an argument<br>made in metal.</h2>
-          <p>Every dimension a collector asks for is decided before the dial exists.
-            A full rotor adds about a millimetre of height. A hand-wound calibre lets
-            the case be thin. The beat rate decides whether the seconds hand steps five
-            times a second or ten — and a smooth sweep means it is not mechanical at all.</p>
-          <p>So the studio refuses to start at the dial. Chapter 02 is the movement,
-            and the nine chapters after it are consequences.</p>
+          <h2>Everything you ask about<br>a watch is decided here.</h2>
+          <p>How thick is it? That depends on the winding. A full rotor adds about a
+            millimetre. Hand-wound and it can be properly thin. How does the seconds
+            hand move? That's the beat rate: five steps a second, or ten. If it glides
+            smoothly, it isn't mechanical at all.</p>
+          <p>So the movement is Chapter 02, not an afterthought. The nine chapters
+            after it are all downstream of what you choose here.</p>
         </div>
         <dl class="lspecs">
-          <div><dt>Architecture</dt><dd>4 &mdash; bridges, three-quarter, full plate, skeletonised</dd></div>
-          <div><dt>Winding</dt><dd>4 &mdash; full, micro, peripheral, hand-wound</dd></div>
+          <div><dt>Architecture</dt><dd>Separate bridges, three-quarter plate, full plate, skeletonised</dd></div>
+          <div><dt>Winding</dt><dd>Full rotor, micro-rotor, peripheral, or hand-wound</dd></div>
           <div><dt>Frequency</dt><dd>18,000 &middot; 21,600 &middot; 28,800 &middot; 36,000 vph</dd></div>
-          <div><dt>Finishing</dt><dd>Côtes de Genève, perlage, frosted, graining</dd></div>
-          <div><dt>Derived</dt><dd>Thickness, lug-to-lug, water resistance</dd></div>
+          <div><dt>Finishing</dt><dd>Côtes de Genève, perlage, frosted, straight graining</dd></div>
+          <div><dt>Worked out for you</dt><dd>Thickness, lug-to-lug, water resistance</dd></div>
         </dl>
       </div>
     </section>
@@ -786,22 +805,21 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     <section id="process" class="lsec">
       <p class="lnum">03 &mdash; The process</p>
       <ol class="lsteps">
-        <li><b>Choose the calibre.</b><span>Architecture, winding, beat, finishing. The height of the watch is now decided.</span></li>
-        <li><b>Size the case around it.</b><span>Shape, diameter, crystal. Watch the lug-to-lug figure — that is what decides fit.</span></li>
-        <li><b>Draw the dial over it.</b><span>Fifty-six of them: enamel, stone, marquetry, painted, or a sentence.</span></li>
-        <li><b>Set the hands.</b><span>The first thing anyone looks at, and the last thing you should decide.</span></li>
-        <li><b>Take the sheet.</b><span>A calibre presentation sheet, an image, or a link that rebuilds the exact watch.</span></li>
+        <li><b>Pick the movement.</b><span>Architecture, winding, beat rate, finishing. That settles how thick the watch can be.</span></li>
+        <li><b>Build the case round it.</b><span>Shape, size, crystal. Keep an eye on lug-to-lug: that's the number that decides whether it fits you.</span></li>
+        <li><b>Put a dial on it.</b><span>Fifty-six to choose from. Enamel, stone, marquetry, painted, or just a sentence.</span></li>
+        <li><b>Choose the hands.</b><span>First thing anyone notices. Worth leaving until you can see everything else.</span></li>
+        <li><b>Take it with you.</b><span>A spec sheet, a big image, or a link that rebuilds the exact watch for whoever opens it.</span></li>
       </ol>
     </section>
 
     <!-- ————— the atelier ————— -->
     <section id="atelier" class="lsec lend">
       <p class="lnum">04 &mdash; The atelier</p>
-      <h2>A place to try movements<br>that no one has ordered.</h2>
-      <p class="lclose">Nothing here is for sale. It is a bench: every real decision a
-        watchmaker makes, laid out so that anyone who loves this can finally make
-        something of their own — and be told, quietly, when a choice is not how
-        watches are built.</p>
+      <h2>Somewhere to try movements<br>nobody asked for.</h2>
+      <p class="lclose">Nothing here is for sale. It's a bench. Every real decision a
+        watchmaker makes, laid out so you can actually make something. If you pick a
+        combination that wouldn't work in metal, it'll tell you why. You can ignore it.</p>
       <button type="button" class="lprime lbig" id="navCreate2">Enter the atelier</button>
       <p class="lfoot">Semi &middot; designed and built by Faizan &middot; 2026</p>
     </section>
@@ -821,11 +839,23 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <div id="kanjiLogo">蝉</div>
       <div><b>Semi</b><span>Watch design studio</span></div>
     </div>
-    <div id="specline">
-      <div id="specName"></div>
-      <div id="specRule" aria-hidden="true"></div>
-      <dl id="specSheet"></dl>
-      <div id="specText"></div>
+    <!-- one stack down the left: the note first, the specification under it,
+         so the two can never sit on top of each other -->
+    <div id="stageL">
+      <div id="tip" role="status">
+        <b>Worth knowing</b>
+        <p id="tipBody"></p>
+        <div class="tiprow">
+          <button id="tipFix" type="button" class="tipprime"></button>
+          <button id="tipKeep" type="button">Leave it</button>
+        </div>
+      </div>
+      <div id="specline">
+        <div id="specName"></div>
+        <div id="specRule" aria-hidden="true"></div>
+        <dl id="specSheet"></dl>
+        <div id="specText"></div>
+      </div>
     </div>
     <div id="stageBtns">
       <button class="gbtn" id="bRand" type="button">Surprise me</button>
@@ -836,7 +866,7 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
     </div>
     <!-- what was just explored, and why -->
     <aside id="exp" role="status">
-      <b>Exploration</b>
+      <b>Just tried</b>
       <p><span id="expN"></span> — <em id="expD"></em></p>
     </aside>
     <!-- what the cursor is resting on -->
@@ -844,15 +874,6 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <figcaption><span id="partN"></span><em id="partR"></em></figcaption>
       <p id="partD"></p>
     </figure>
-    <!-- the studio's opinion, offered and never enforced -->
-    <div id="tip" role="status">
-      <b>A note on this piece</b>
-      <p id="tipBody"></p>
-      <div class="tiprow">
-        <button id="tipFix" type="button" class="tipprime"></button>
-        <button id="tipKeep" type="button">Keep it as it is</button>
-      </div>
-    </div>
   </main>
   <nav id="panel" aria-label="Design controls">
     <div id="rail" role="tablist" aria-orientation="vertical" aria-label="Chapters"></div>
@@ -3593,25 +3614,25 @@ function palletFork(c,ex,ey,er,bx,by,br,tilt,warm){
    part should tell you what it is doing, in the fewest words that are true. */
 const PARTS={
   balance:{n:'Balance wheel',
-    d:'The oscillator. A weighted wheel on a hairspring, swinging about 260° each way. Its rate is the watch’s accuracy, and it is the only part that never stops.'},
+    d:'This is what keeps time. A weighted wheel on a fine spring, swinging back and forth about 260° each way. It never stops while the watch is running.'},
   escape :{n:'Escape wheel',
-    d:'Released one tooth at a time by the lever. It is the last wheel of the train and the first part of the escapement — the point where continuous power becomes a count.'},
+    d:'The lever lets it past one tooth at a time. This is where steady power from the spring gets turned into a count you can read.'},
   lever  :{n:'Pallet lever',
-    d:'Two ruby stones on an arm. It locks the escape wheel, then unlocks it and passes the impulse to the balance. Everything a mechanical watch is arguing for happens here.'},
+    d:'An arm with two ruby stones on it. It holds the escape wheel still, then lets go and gives the balance a push. This is the heart of the whole thing.'},
   barrel :{n:'Mainspring barrel',
-    d:'A coiled spring in a toothed drum. It is the entire power source, and how big it is decides the power reserve.'},
+    d:'A coiled spring inside a toothed drum. All the power comes from here, and how big it is decides how long the watch runs.'},
   centre :{n:'Centre wheel',
-    d:'One turn an hour. The minute hand is fixed to it, which is why it sits at the middle of the plate.'},
+    d:'Turns once an hour. The minute hand is attached to it, which is why it sits in the middle.'},
   fourth :{n:'Fourth wheel',
-    d:'One turn a minute. Where the seconds are read from — at the centre for a sweep, or off-axis for small seconds.'},
+    d:'Turns once a minute, so this is where the seconds come from. In the middle for a sweeping hand, off to one side for small seconds.'},
   rotor  :{n:'Winding rotor',
-    d:'A weight that winds the mainspring as the wrist moves. A full rotor hides half the movement; a micro-rotor keeps the calibre thin and visible.'},
+    d:'A weight that winds the spring as you move your arm. A full one covers half the movement. A micro-rotor tucks into the plate so you can still see everything.'},
   bridge :{n:'Bridges',
-    d:'The metal that carries the upper pivots. Their outline is the single largest aesthetic decision in a movement, and the chamfered edges are where finishing is judged.'},
+    d:'The metal holding the tops of the wheels in place. Their shape is the biggest look decision in a movement, and the polished edges are what people judge.'},
   jewel  :{n:'Jewel',
-    d:'A synthetic ruby bearing where steel would otherwise wear steel. Hard, smooth, and it holds oil exactly where it is needed.'},
+    d:'A synthetic ruby bearing, used where steel would otherwise grind against steel. Hard, smooth, and it keeps the oil where it needs to be.'},
   screw  :{n:'Screw',
-    d:'Blued by heat to about 290°C. The colour is an oxide film a few atoms thick — decoration and rust-proofing at once.'}
+    d:'Heated to about 290°C until it turns blue. That colour is a very thin oxide layer, and it stops the steel rusting as well as looking good.'}
 };
 /* where each part sits on screen, rebuilt whenever the movement is drawn */
 let PARTHIT=[];
@@ -3932,16 +3953,16 @@ function slider(title,min,max,step,val,unit,cb){
   g.appendChild(i);g.appendChild(o);return g;
 }
 const SECTION={
-  start:{n:'The commission',h:'Begin from a reference design, choose how you wish to view it, and give the piece a name.'},
-  movement:{n:'The movement',h:'The calibre everything else is built around. Choose it first — its height, its rotor and its beat decide what the case can be.'},
-  case:{n:'The case',h:'The body of the watch. Shape and diameter set its character; the metal and its finish set the mood.'},
-  bezel:{n:'The bezel',h:'The ring that frames the crystal. Plain for a dress watch, a working scale for an instrument.'},
-  dial:{n:'The dial',h:'The face. Colour and texture — or an art dial, which arrives with its own palette.'},
-  index:{n:'The indices',h:'The hour markers, and how they are made: separate pieces of metal set onto the dial, or printed flat.'},
-  comp:{n:'The complications',h:'Everything the movement does beyond telling the hour.'},
-  hands:{n:'The hands',h:'What the eye finds first. Each pattern balances the dial differently.'},
-  strap:{n:'The strap & bracelet',h:'How the watch meets the wrist. Hide and fabric are straps; articulated metal is a bracelet.'},
-  finish:{n:'The delivery',h:'Name the piece, keep it on your shelf, then take it with you — as an image, a certificate, or a link.'}
+  start:{n:'Where to start',h:'Start from a finished design and change what you want. Or start from nothing, if you already know what you are after.'},
+  movement:{n:'The movement',h:'The engine. Choose this first, because how thick the watch can be and how the seconds hand moves are both decided right here.'},
+  case:{n:'The case',h:'The body of the watch. Shape and size give it its character. The metal and the way it is finished set the mood.'},
+  bezel:{n:'The bezel',h:'The ring around the crystal. Plain on a dress watch. On a tool watch it usually has a job to do.'},
+  dial:{n:'The dial',h:'The face. Pick a colour and a finish, or go straight to an art dial, which brings its own colours with it.'},
+  index:{n:'The markers',h:'The hour markers, and how they are made. Separate pieces of metal set into the dial, or printed flat onto it.'},
+  comp:{n:'What it does',h:'Anything the watch does beyond telling you the hour and the minute.'},
+  hands:{n:'The hands',h:'The first thing anyone looks at. Each shape sits differently on the dial, so it is worth trying a few.'},
+  strap:{n:'The strap',h:'How it meets your wrist. Leather and fabric are straps. Metal links are a bracelet. They wear very differently.'},
+  finish:{n:'Take it with you',h:'Give it a name, keep it on your shelf, then export it as a spec sheet, an image, or a link.'}
 };
 function bigbtn(label,fn,ghost){
   const b=document.createElement('button');b.type='button';
@@ -4465,53 +4486,53 @@ function advisories(){
   const chrono=(S.comp==='chrono2'||S.comp==='chrono3');
   const text=(S.texture==='quote');
   if(S.bezel==='tachy'&&!chrono&&!text)a.push({
-    t:'A tachymètre needs a chronograph',
-    b:'The scale converts elapsed seconds over a measured distance into speed. With no central chronograph hand to time against, it is decoration.',
+    t:'This bezel has nothing to time',
+    b:'That scale only works if you have a chronograph hand to time with. Without one it is just printing.',
     fix:'Fit a chronograph',act:()=>{S.comp='chrono2';S.date=S.date==='3'?'none':S.date;}});
   if(S.bezel==='gmt'&&S.comp!=='gmt'&&!text)a.push({
-    t:'A 24-hour bezel needs a 24-hour hand',
-    b:'The bezel exists to read a third time zone against the fourth hand. Without a GMT hand it reads nothing at all.',
+    t:'This bezel has nothing to point at',
+    b:'A 24-hour bezel is meant to be read against a 24-hour hand. There is no such hand on this watch, so it has nothing to point at.',
     fix:'Fit a GMT hand',act:()=>{S.comp='gmt';}});
   if(S.bezel==='dive'&&(S.thick==='slim'||S.strap==='mesh'))a.push({
-    t:'A dive bezel on a dress case',
-    b:'A timing bezel belongs on a case thick enough to carry a screw-down crown and a gasket. On a slim case or a mesh bracelet it is a costume.',
+    t:'A dive bezel on a dress watch',
+    b:'A dive bezel needs a case thick enough to seal properly. On a slim case, or on a mesh bracelet, it is fancy dress.',
     fix:'Give it a sport case',act:()=>{S.thick='sport';if(S.strap==='mesh')S.strap='rubber';}});
   if(S.comp==='moon'&&S.date==='none')a.push({
-    t:'A moonphase without a date',
-    b:'The moonphase is a calendar complication — it is driven off the date wheel. A watch that tracks the moon but not the day is unusual to the point of being an error.',
+    t:'A moonphase with no date',
+    b:'A moonphase runs off the date wheel. Tracking the moon but not the date is so unusual it reads as a mistake.',
     fix:'Add a date at 3',act:()=>{S.date='3';}});
   if(S.texture==='enamel'&&S.indexMat==='applied')a.push({
-    t:'Applied markers on grand feu enamel',
-    b:'Enamel is fired at 800°C after the dial feet are set; drilling a fired dial for markers is how enamel dials crack. Printed or transferred markers are the traditional answer.',
+    t:'Metal markers on enamel',
+    b:'Enamel gets fired at 800°C. Drilling holes in it afterwards for markers is how enamel dials crack. Printing them on is the usual answer.',
     fix:'Print the markers',act:()=>{S.indexMat='printed';}});
   if(S.lume&&(S.texture==='enamel'||S.metal==='yellow'&&S.thick==='slim'&&S.strap==='leather')&&S.handMat==='blued')a.push({
     t:'Lume on a dress watch',
-    b:'Luminous compound is a tool-watch feature. On a fired enamel dial with blued hands it fights everything else the watch is saying.',
+    b:'Lume belongs on a tool watch. On enamel with blued hands it fights everything else going on.',
     fix:'Remove the lume',act:()=>{S.lume=false;}});
   if(S.arch==='skeleton'&&S.bezel==='dive')a.push({
-    t:'A skeletonised calibre in a diver',
-    b:'Skeletonising removes the metal that keeps water and pressure out. A 300 m rating and an open-worked plate do not go in the same watch.',
+    t:'A skeleton movement in a diver',
+    b:'Skeletonising takes out the metal that keeps water and pressure out. You cannot really have that and a 300 m rating.',
     fix:'Close the movement',act:()=>{S.arch='bridges';}});
   if(S.rotor!=='manual'&&S.thick==='slim'&&S.size<=36)a.push({
-    t:'An automatic in a very slim, very small case',
-    b:'A full rotor adds about 1.3 mm and needs the diameter to swing in. Under 36 mm and slim, this is a hand-wound watch.',
+    t:'An automatic in a very small, thin case',
+    b:'A full rotor adds about 1.3 mm and needs room to swing. Under 36 mm and slim, this wants to be hand-wound.',
     fix:'Make it hand-wound',act:()=>{S.rotor='manual';}});
   if(S.vph===36000&&S.pr>50)a.push({
-    t:'A high-beat calibre with a long reserve',
-    b:'At 36,000 A/h the escapement consumes the mainspring far faster. High-beat movements historically run 40–45 hours, not 60.',
+    t:'High beat and a long reserve',
+    b:'At 36,000 beats an hour the spring runs down much faster. High-beat movements usually manage 40 to 45 hours, not 60.',
     fix:'Set the reserve to 42 hours',act:()=>{S.pr=42;}});
   if(S.texture==='quote'&&S.layout!=='none'&&S.track!=='none')a.push({
-    t:'A text dial with a full index set',
-    b:'The words are the design. Markers and a minute track around them leave the eye nowhere to rest, and the line stops reading as a line.',
+    t:'A text dial with markers too',
+    b:'The words are the design here. Add markers and a track around them and there is nowhere for your eye to rest.',
     fix:'Clear the dial',act:()=>{S.layout='none';S.track='none';}});
   if(S.texture==='quote'&&S.comp!=='none'&&S.comp!=='small')a.push({
-    t:'A complication under a text dial',
-    b:'Subdials sit exactly where the two lines want to be. A text dial is a time-only dial, or at most small seconds.',
+    t:'A subdial under the text',
+    b:'A subdial sits exactly where the second line wants to go. Text dials work best with just hours and minutes.',
     fix:'Make it time only',act:()=>{S.comp='none';
       if(S.bezel==='tachy'||S.bezel==='gmt')S.bezel='smooth';}});
   if(FAMILY[S.family].slab&&['leather','rubber','canvas','nato'].includes(S.strap))a.push({
     t:'An integrated case with a strap',
-    b:'An integrated case has no lugs — the bracelet is part of the case profile. A strap has nothing to attach to.',
+    b:'An integrated case has no lugs. The bracelet is part of the case shape, so a strap has nothing to attach to.',
     fix:'Fit the bracelet',act:()=>{S.strap='link3';}});
   return a;
 }
@@ -4647,15 +4668,15 @@ function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
    ============================================================ */
 const GUIDE=[
   {t:'Start with the movement',
-   b:'A watch is built outward from its calibre. The rotor decides a millimetre of case height, the beat rate decides whether the seconds hand steps or glides, and the architecture decides whether the caseback is worth opening. <b>Chapter 02</b> is where you begin.'},
-  {t:'Place the essential parts',
-   b:'Switch the view to <b>Movement</b> and hover anything — balance, lever, escape wheel, barrel, rotor. Each part says what it is for. The balance beats at exactly the rate you chose; count it against a second hand.'},
-  {t:'Establish the architecture',
-   b:'Separate bridges, a three-quarter plate, a full plate, or skeletonised. Then the finishing: <b>Côtes de Genève</b>, perlage, frosted, graining. This is the decision a collector judges first.'},
-  {t:'Refine the proportions',
-   b:'<b>Chapters 03 to 09</b> size the case, draw the dial, set the hands. Thickness, lug-to-lug and water resistance are calculated, never typed. If a choice is not how watches are built, a note appears — with the reason, and a way out. You may ignore it.'},
-  {t:'Export the calibre',
-   b:'<b>Chapter 10</b> gives you a presentation sheet, a high-resolution image, or a link that rebuilds the exact watch. Press <b>R</b> to explore an architecture, <b>M</b> for the movement, <b>S</b> to save, <b>⌘Z</b> to undo.'}
+   b:'Go to <b>Chapter 02</b> first. What you pick there decides how thick the watch can be and how the seconds hand moves. Everything else is built on top of it, so doing it in this order actually saves you time.'},
+  {t:'Have a look at the parts',
+   b:'Switch the view to <b>Movement</b> and move your cursor over anything — the balance, the lever, the barrel, the rotor. It will tell you what that piece does. The balance really is beating at the rate you chose, so you can count it.'},
+  {t:'Choose how it is put together',
+   b:'Separate bridges, a three-quarter plate, a full plate, or cut away to a skeleton. Then how it is finished: <b>Côtes de Genève</b>, perlage, frosted, or straight graining. This is the first thing a collector looks at.'},
+  {t:'Get the proportions right',
+   b:'<b>Chapters 03 to 09</b> are the case, the dial and the hands. Thickness, lug-to-lug and water resistance are worked out for you. If something would not work in metal, a short note explains why and offers to fix it. You can ignore it.'},
+  {t:'Take it with you',
+   b:'<b>Chapter 10</b> gives you a spec sheet, a big image, or a link. Shortcuts: <b>R</b> tries a new direction, <b>M</b> flips to the movement, <b>S</b> saves it, <b>⌘Z</b> undoes.'}
 ];
 const GLOSSARY=[
   ['Movement','The mechanism. Also called the calibre. Everything else on the watch — height, diameter, where the seconds sit — is decided by it first.'],
@@ -5109,52 +5130,52 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
    idea, and leaves the rest free — so every result is arguable. */
 const EXPLORE=[
   {n:'Traditional Swiss',
-   d:'Separate bridges, Côtes de Genève, a full rotor and 28,800 A/h. The layout nearly every Swiss house settled on, and the one everything else is measured against.',
+   d:'Separate bridges, Côtes de Genève, full rotor, 28,800 beats an hour. This is roughly what most Swiss makers settled on, and what everything else gets compared to.',
    m:{arch:'bridges',mvFinish:'geneva',rotor:'full',vph:28800,screws:'blued',jewels:27,pr:48},
    c:{thick:'std',family:'round',metal:'steel',finish:'polish'},
    dial:['sunray','matte','guilloche'],hands:['dauphine','baton','leaf']},
   {n:'Glashütte school',
-   d:'A three-quarter plate, frosted and gilt, hand-wound. Rigid, austere, and much harder to regulate than it looks.',
+   d:'A three-quarter plate, frosted finish, hand-wound. Very solid, very plain, and harder to adjust than it looks because so much is hidden under the plate.',
    m:{arch:'threeq',mvFinish:'frosted',rotor:'manual',vph:21600,screws:'blued',jewels:19,pr:44},
    c:{thick:'slim',family:'round',metal:'white',finish:'polish'},
    dial:['enamel','matte','sector'],hands:['alpha','leaf','breguet']},
   {n:'Thin as possible',
-   d:'A micro-rotor sunk into the plate so the calibre stays visible and the case stays under 8 mm. The most difficult constraint in watchmaking that is not a complication.',
+   d:'A micro-rotor dropped into the plate so you can still see the movement and the case stays under 8 mm. Making a watch thin is genuinely hard.',
    m:{arch:'bridges',mvFinish:'geneva',rotor:'micro',vph:21600,screws:'blued',jewels:29,pr:40},
    c:{thick:'slim',family:'round',metal:'rose',finish:'polish',bezelW:.06,crystal:'flat'},
    dial:['guilloche','sunray','flinque'],hands:['baton','leaf','dauphine']},
   {n:'Open architecture',
-   d:'Skeletonised: every plate cut back to the load path, then engraved. Structural jewellery, and it gives up water resistance to get there.',
+   d:'Everything cut away except the metal actually holding things up, then engraved. It looks incredible and you give up most of the water resistance for it.',
    m:{arch:'skeleton',mvFinish:'grained',rotor:'peri',vph:28800,screws:'steel',jewels:33,pr:55},
    c:{thick:'std',family:'tonneau',metal:'titan',finish:'sand'},
    dial:['carbon','circuit','matte'],hands:['sword','syringe','baton']},
   {n:'High beat',
-   d:'36,000 A/h — ten steps a second, nearly a sweep. It spends the mainspring faster and asks for servicing sooner, which is the trade.',
+   d:'36,000 beats an hour, so ten steps a second. Almost a smooth sweep. It runs down the spring quicker and needs servicing sooner.',
    m:{arch:'bridges',mvFinish:'perlage',rotor:'full',vph:36000,screws:'steel',jewels:31,pr:42},
    c:{thick:'std',family:'cushion',metal:'steel',finish:'brush'},
    dial:['grain','matte','tapestry'],hands:['baton','sword','syringe']},
   {n:'Central seconds',
-   d:'The fourth wheel driven to the centre so the seconds hand shares the axis. Everything is symmetrical, and the dial has nothing to hide behind.',
+   d:'The seconds hand moved to the middle with the others. Everything lines up, which also means any mistake in the proportions shows.',
    m:{arch:'bridges',mvFinish:'geneva',rotor:'full',vph:28800,screws:'blued',jewels:25,pr:50},
    c:{thick:'std',family:'round',metal:'steel',finish:'polish'},
    comp:'none',dial:['sunray','matte','linen'],hands:['dauphine','baton','alpha']},
   {n:'Small seconds',
-   d:'The seconds left where the fourth wheel actually sits, off-axis. An artefact of the train, kept for a century because it looks right.',
+   d:'The seconds left where the wheel actually is, off to one side. It started as a side effect of the layout and stuck around because people liked it.',
    m:{arch:'threeq',mvFinish:'geneva',rotor:'manual',vph:18000,screws:'blued',jewels:18,pr:42},
    c:{thick:'slim',family:'round',metal:'yellow',finish:'polish',crystal:'box'},
    comp:'small',dial:['sector','enamel','guilloche'],hands:['leaf','breguet','alpha']},
   {n:'Instrument',
-   d:'Built to be read in bad light and survive being knocked. Matte everything, a sealed case, and no ornament that is not information.',
+   d:'Built to be read in bad light and survive being knocked about. Matte everything, sealed case, nothing on the dial that is not useful.',
    m:{arch:'bridges',mvFinish:'perlage',rotor:'full',vph:28800,screws:'steel',jewels:25,pr:50},
    c:{thick:'sport',family:'round',metal:'black',finish:'sand',bezel:'dive',bezelW:.13,crystal:'flat'},
    dial:['matte','grain'],hands:['circlebar','syringe','sword'],lume:true},
   {n:'The house style',
-   d:'Blue ceramic, an integrated case, a milled dial grid. The 1970s idea that a sports watch could cost more than a dress watch.',
+   d:'Blue ceramic, integrated bracelet, a milled grid on the dial. The 1970s idea that a sports watch could cost more than a dress watch.',
    m:{arch:'bridges',mvFinish:'geneva',rotor:'peri',vph:21600,screws:'blued',jewels:38,pr:40},
    c:{thick:'slim',family:'octagon',metal:'cerBlue',finish:'polish',bezel:'screws',bezelW:.13,crystal:'flat'},
    dial:['tapestry','linen'],hands:['baton'],strap:'link3'},
   {n:'Métier d’art',
-   d:'The calibre steps back and the dial becomes the whole piece — enamel, stone or marquetry, and a movement quiet enough to let it.',
+   d:'Here the dial is the whole point. Enamel, stone or inlaid wood, with a movement quiet enough to stay out of its way.',
    m:{arch:'bridges',mvFinish:'geneva',rotor:'micro',vph:21600,screws:'blued',jewels:29,pr:45},
    c:{thick:'slim',family:'cushion',metal:'white',finish:'polish',crystal:'domed'},
    dial:['owlWhite','owlBrown','pintail','kingfisher','crane','koi','fuji','marquetry','straw','tigereye','jade'],
