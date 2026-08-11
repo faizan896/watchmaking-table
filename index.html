@@ -95,7 +95,13 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 #cv{max-width:100%;max-height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-touch-callout:none;will-change:transform}
 
-#brand{position:absolute;top:32px;left:44px;pointer-events:none;display:flex;align-items:center;gap:13px}
+#brand{position:absolute;top:32px;left:44px;display:flex;align-items:center;gap:13px;
+  background:none;border:0;padding:0;font-family:inherit;text-align:left;cursor:pointer;z-index:7}
+#brand em{position:absolute;left:0;top:100%;margin-top:7px;font-style:normal;
+  font-size:var(--fs0);letter-spacing:.22em;text-transform:uppercase;color:var(--brass);
+  white-space:nowrap;opacity:0;transform:translateY(-3px);pointer-events:none;
+  transition:opacity var(--dur2) var(--ease-mech),transform var(--dur2) var(--ease-mech)}
+#brand:hover em,#brand:focus-visible em{opacity:1;transform:none}
 #kanjiLogo{font-family:'Yuji Syuku',serif;font-size:var(--fs6);line-height:1;color:var(--cream);display:none}
 #brand.k #kanjiLogo{display:block}
 #stageMark{display:block;width:30px;height:30px;flex:none}
@@ -565,13 +571,11 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 /* ————————————————————————————————————————————————
    THE FRONT PAGE
    ———————————————————————————————————————————————— */
+/* one flat cream, everywhere. Any texture here has to be painted behind the
+   sticky nav as well, and the nav only spans the centre column — which is what
+   produced a lighter band down the middle of the page. */
 #landing{position:fixed;inset:0;z-index:80;overflow-y:auto;overflow-x:hidden;
-  background-color:#efe9dc;
-  background-image:
-    radial-gradient(circle at 22% 12%,rgba(160,140,105,.055) 0,transparent 46%),
-    radial-gradient(circle at 82% 78%,rgba(150,130,95,.05) 0,transparent 48%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E");
-  background-attachment:fixed,fixed,fixed;
+  background:#efe9dc;
   -webkit-overflow-scrolling:touch;transition:opacity .9s var(--ease),transform 1.1s var(--ease)}
 #landing.gone{opacity:0;transform:translateY(-3vh) scale(.985);pointer-events:none}
 /* the paper tooth belongs to the page itself. As a separate blended layer it
@@ -583,8 +587,11 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 /* ————— navigation: a name, three words, one door ————— */
 #lnav{position:sticky;top:0;z-index:20;display:flex;align-items:flex-end;
   justify-content:space-between;gap:30px;padding:28px 0 16px;
-  background:linear-gradient(#efe9dc 68%,rgba(239,233,220,0));
-  border-bottom:1px solid rgba(34,32,26,.10)}
+  background:#efe9dc;border-bottom:1px solid rgba(34,32,26,.10)}
+/* the bar has to reach both edges of the window, not just the column */
+#lnav:before{content:'';position:absolute;top:0;bottom:-1px;left:50%;width:100vw;
+  transform:translateX(-50%);background:#efe9dc;
+  border-bottom:1px solid rgba(34,32,26,.10);z-index:-1}
 #lbrand{display:flex;align-items:center;gap:14px;text-decoration:none}
 #lbrand .lmark{display:block;width:34px;height:34px;flex:none}
 #lbrand .lmark svg{display:block;width:34px;height:34px}
@@ -899,11 +906,12 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
       <div id="cmpTag">Saved</div>
       <div id="cmpTagB">This design</div>
     </div>
-    <div id="brand" aria-hidden="true">
-      <div id="kanjiLogo">蝉</div>
-      <span id="stageMark"></span>
+    <button id="brand" type="button" title="Back to the front page">
+      <div id="kanjiLogo" aria-hidden="true">蝉</div>
+      <span id="stageMark" aria-hidden="true"></span>
       <div><b>Semi</b><span>Watch design studio</span></div>
-    </div>
+      <em>Back to the front page</em>
+    </button>
     <!-- one stack down the left: the note first, the specification under it,
          so the two can never sit on top of each other -->
     <div id="stageL">
@@ -4761,7 +4769,7 @@ const GUIDE=[
   {t:'Get the proportions right',
    b:'<b>Chapters 03 to 09</b> are the case, the dial and the hands. Thickness, lug-to-lug and water resistance are worked out for you. If something would not work in metal, a short note explains why and offers to fix it. You can ignore it.'},
   {t:'Take it with you',
-   b:'<b>Chapter 10</b> gives you a spec sheet, a big image, or a link. Shortcuts: <b>R</b> tries a new direction, <b>M</b> flips to the movement, <b>S</b> saves it, <b>⌘Z</b> undoes.'}
+   b:'<b>Chapter 10</b> gives you a spec sheet, a big image, or a link. Shortcuts: <b>R</b> tries a new direction, <b>M</b> flips to the movement, <b>S</b> saves it, <b>⌘Z</b> undoes, <b>H</b> goes back to the front page — as does clicking <b>Semi</b> at the top left.'}
 ];
 const GLOSSARY=[
   ['Movement','The mechanism. Also called the calibre. Everything else on the watch — height, diameter, where the seconds sit — is decided by it first.'],
@@ -5585,6 +5593,7 @@ addEventListener('keydown',e=>{
     announce(S.view==='movement'?'Movement view':'Dial side');}
   if(e.key==='0'){S.tiltX=0;S.tiltY=0;paint();}
   if(e.key==='g'||e.key==='G')openGloss();
+  if(e.key==='h'||e.key==='H')exitStudio();
   if(e.key==='?')showGuide(0);
 });
 addEventListener('resize',resize);
@@ -5872,12 +5881,28 @@ const HERO={
   addEventListener('resize',()=>{sizeIt();});
   /* once the studio is open the hero stops drawing — nothing runs unseen */
   window.__heroStop=()=>{running=false;};
+  window.__heroStart=()=>{if(!running){running=true;sizeIt();requestAnimationFrame(frame);}};
 })();
 /* both doors lead to the same room */
 ['navCreate','navCreate2'].forEach(id=>{
   const b=document.getElementById(id);
   if(b)b.onclick=()=>enterStudio();
 });
+document.getElementById('brand').onclick=exitStudio;
+/* the door swings both ways */
+function exitStudio(){
+  const L=document.getElementById('landing');
+  compareOff();
+  L.style.display='';
+  requestAnimationFrame(()=>{
+    L.classList.remove('gone');
+    L.scrollTop=0;
+    if(window.__heroStart)window.__heroStart();
+  });
+  try{sessionStorage.removeItem('semi.entered');}catch(e){}
+  announce('Back to the front page');
+  const b=document.getElementById('navCreate');if(b&&b.focus)b.focus();
+}
 function enterStudio(){
   const L=document.getElementById('landing');
   setTimeout(()=>{
