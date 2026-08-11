@@ -13,6 +13,8 @@
 <meta property="og:image" content="https://watchmaking-table.vercel.app/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12.4 -12.4 24.8 24.8'%3E%3Crect x='-12.4' y='-12.4' width='24.8' height='24.8' fill='%23121110'/%3E%3Cpath d='M 10 0 A 10 10 0 1 1 -10 0 A 10 10 0 1 1 10 0 M 0 -7.2 A 4.6 3.6 0 0 1 0 0 A 4.6 3.6 0 0 0 0 7.2' fill='none' stroke='%23e9e4d8' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-16 -16 32 32'%3E%3Crect x='-16' y='-16' width='32' height='32' fill='%23121110'/%3E%3Cpath d='M 10 0 A 10 10 0 1 1 -10 0 A 10 10 0 1 1 10 0 M 0 -7.2 A 4.6 3.6 0 0 1 0 0 A 4.6 3.6 0 0 0 0 7.2' fill='none' stroke='%23e9e4d8' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-title" content="Semi">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- the interface fonts block; the two display faces do not, so the page paints
@@ -259,6 +261,10 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 .note{font-size:var(--fs1);color:var(--ink2);line-height:1.8;margin-top:-4px}
 .note b{color:var(--ink);font-weight:600}
 
+/* how much is left in the barrel */
+.pwbar{height:2px;background:var(--rule);margin-top:16px;overflow:hidden}
+.pwbar i{display:block;height:100%;background:var(--gold);
+  transition:width var(--dur2) linear}
 /* a family of dials, closed until you ask for it */
 .fam{display:flex;width:100%;align-items:baseline;justify-content:space-between;gap:12px;
   background:none;border:0;border-bottom:1px solid var(--rule2);font-family:inherit;
@@ -753,6 +759,10 @@ html,body{height:100%;background:var(--stage);color:var(--ink);font-family:var(-
 }
 
 </style>
+<!-- Vercel's own analytics: first-party, no cookies, no third party.
+     It does nothing until Analytics is switched on for the project. -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
 </head>
 <body>
 <!-- ————————————————————————————————————————————————
@@ -3468,6 +3478,19 @@ function drawMovement(c,R,fam,M){
   /* the going train, seen through whatever the architecture leaves open */
   if(S.arch!=='full'){
     wheel(c,P.barr.x,P.barr.y,P.barr.r*.92,64,0,warm);
+    /* the mainspring inside the barrel, wound tight or run down */
+    c.save();
+    c.beginPath();c.arc(P.barr.x,P.barr.y,P.barr.r*.80,0,TAU);c.clip();
+    const turns=3+PWR.level*7, gap=P.barr.r*.66/turns;
+    c.strokeStyle=warm?'rgba(70,48,14,.55)':'rgba(40,44,50,.55)';
+    c.lineWidth=Math.max(P.barr.r*.045,.7);
+    c.beginPath();
+    for(let i=0;i<=340;i++){
+      const k=i/340, a=k*TAU*turns, rr=P.barr.r*.14+k*(P.barr.r*.62);
+      const x=P.barr.x+Math.cos(a)*rr, y=P.barr.y+Math.sin(a)*rr;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();c.restore();
     /* the third wheel is effectively static; the fourth wheel and the whole
        escapement are drawn live, over the cached base */
     wheel(c,P.tr[0].x,P.tr[0].y,P.tr[0].r,52,4,warm);
@@ -3722,6 +3745,9 @@ function partAt(x,y){
 function drawBalance(c,R,t){
   const P=mvPlan(R), warm=(S.metal==='yellow'||S.metal==='rose');
   const b=P.bal, E=P.esc;
+  /* no power, no motion — the wheel comes to rest where it stopped */
+  if(!running())t=PWR.stoppedAt||(PWR.stoppedAt=t);
+  else PWR.stoppedAt=0;
   const ph=escapePhase(t);
   const hz=S.vph/7200;                       /* full oscillations per second */
   const amp=Math.PI*1.45;                    /* ±260°, a healthy amplitude */
@@ -3784,6 +3810,90 @@ function drawBalance(c,R,t){
   c.save();c.translate(tr.x,tr.y);c.rotate((t/60000)*TAU);
   wheel(c,0,0,tr.r,44,4,warm);
   c.restore();
+}
+/* ============================================================
+   THE MAINSPRING
+   A power reserve that is only a number on a sheet is a claim.
+   This one actually runs down, and the balance stops when it does.
+   Real time would take sixty hours to show anything, so the barrel
+   is run on a demonstration clock and the panel says so.
+   ============================================================ */
+const PWR={level:1, last:Date.now(), demo:1800};   /* 1800× — a 60 h reserve empties in two minutes */
+function powerTick(){
+  const now=Date.now(), dt=(now-PWR.last)/1000;
+  PWR.last=now;
+  if(dt<0||dt>5)return;                       /* a tab that was asleep does not drain */
+  const hours=dt*PWR.demo/3600;
+  PWR.level=Math.max(0,PWR.level-hours/Math.max(S.pr,1));
+}
+function wind(amount){
+  PWR.level=Math.min(1,PWR.level+amount);
+  if(PWR.level>0.02&&!TICK.running)TICK.resume();
+}
+/* the balance only swings while there is something driving it */
+function running(){return PWR.level>0.001;}
+
+/* ————— the sound —————
+   Synthesised, never a file: one short burst shaped like an escapement
+   letting a tooth go. Off until you ask for it. */
+const TICK={on:false,ctx:null,buf:null,next:0,timer:0,running:false};
+function tickInit(){
+  if(TICK.ctx)return true;
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return false;
+  TICK.ctx=new AC();
+  const sr=TICK.ctx.sampleRate, len=Math.floor(sr*0.035);
+  const b=TICK.ctx.createBuffer(1,len,sr), d=b.getChannelData(0);
+  let seedv=12345;
+  const rr=()=>{seedv=(seedv*1103515245+12345)&0x7fffffff;return seedv/0x7fffffff*2-1;};
+  for(let i=0;i<len;i++){
+    const t=i/sr;
+    /* a hard click, then the case ringing very briefly around 4 kHz */
+    const click=rr()*Math.exp(-t*900);
+    const ring=Math.sin(TAU*4200*t)*Math.exp(-t*260)*0.5
+              +Math.sin(TAU*7100*t)*Math.exp(-t*420)*0.25;
+    d[i]=(click*0.8+ring*0.5)*0.20;
+  }
+  TICK.buf=b;
+  return true;
+}
+function tickSchedule(){
+  if(!TICK.on||!TICK.ctx)return;
+  const ctx=TICK.ctx, bps=S.vph/3600;
+  const ahead=ctx.currentTime+0.20;
+  if(TICK.next<ctx.currentTime)TICK.next=ctx.currentTime+0.05;
+  while(TICK.next<ahead){
+    if(running()){
+      const src=ctx.createBufferSource();src.buffer=TICK.buf;
+      const g=ctx.createGain();
+      /* the two pallets are not identical, so a watch ticks tick-TOCK */
+      g.gain.value=(Math.round(TICK.next*bps)%2)?0.72:1;
+      src.connect(g);g.connect(ctx.destination);
+      src.start(TICK.next);
+    }
+    TICK.next+=1/bps;
+  }
+}
+TICK.resume=function(){
+  if(!TICK.on)return;
+  if(TICK.ctx&&TICK.ctx.state==='suspended')TICK.ctx.resume();
+  TICK.running=true;
+};
+function tickToggle(on){
+  TICK.on=on;
+  try{localStorage.setItem('semi.tick',on?'1':'0');}catch(e){}
+  if(on){
+    if(!tickInit()){TICK.on=false;announce('This browser will not play sound');return;}
+    if(TICK.ctx.state==='suspended')TICK.ctx.resume();
+    TICK.next=TICK.ctx.currentTime+0.05;
+    TICK.running=true;
+    clearInterval(TICK.timer);TICK.timer=setInterval(tickSchedule,60);
+    announce('Sound on — '+S.vph.toLocaleString('en-US')+' beats an hour');
+  }else{
+    clearInterval(TICK.timer);TICK.timer=0;TICK.running=false;
+    if(TICK.ctx&&TICK.ctx.suspend)TICK.ctx.suspend();
+    announce('Sound off');
+  }
 }
 /* ————— the room: a surface for the watch to sit on ————— */
 function drawRoom(c,w,h,R,L){
@@ -4228,7 +4338,30 @@ function build(){
       blued:'Steel heated to about 290°C until it turns cornflower. The colour is an oxide layer a few atoms thick, and it is also rust-proofing.',
       steel:'Left bright and mirror-polished. Far less forgiving of a slipped screwdriver.'}));
     add(slider('Jewels',17,41,1,S.jewels,'',v=>S.jewels=v));
-    add(slider('Reserve',36,120,1,S.pr,' h',v=>S.pr=v));
+    add(slider('Reserve',36,120,1,S.pr,' h',v=>{S.pr=v;}));
+    const pw=document.createElement('div');pw.className='grp';
+    pw.innerHTML='<h4>The mainspring<em>'+Math.round(PWR.level*100)+'%</em></h4>'+
+      '<p class="note">This actually runs down. Sixty hours would be a long wait, so the barrel is '+
+      'shown at <b>1,800×</b> — a full reserve empties in about two minutes. When it reaches zero the '+
+      'balance stops, because there is nothing left to drive it.</p>';
+    const bar=document.createElement('div');bar.className='pwbar';
+    bar.innerHTML='<i style="width:'+(PWR.level*100).toFixed(1)+'%"></i>';
+    pw.appendChild(bar);
+    const wr=document.createElement('div');wr.className='chips';wr.style.marginTop='12px';
+    const wb=document.createElement('button');wb.type='button';wb.className='chip';
+    wb.textContent=S.rotor==='manual'?'Wind the crown':'Wind it by hand';
+    wb.onclick=()=>{wind(0.34);build();};
+    wr.appendChild(wb);
+    if(S.rotor!=='manual'){
+      const nb=document.createElement('button');nb.type='button';nb.className='chip';
+      nb.textContent='It winds itself as you move';nb.disabled=true;
+      nb.title='Move the pointer across the movement and the rotor swings';
+      wr.appendChild(nb);
+    }
+    pw.appendChild(wr);add(pw);
+    add(chips('Sound',[{v:true,n:'On'},{v:false,n:'Off'}],TICK.on,v=>tickToggle(v),false,{
+      true:'A synthesised escapement at the rate you chose. The two pallet stones are not identical, which is why a watch goes tick-tock rather than tick-tick.',
+      false:'Silent. Most people leave it here.'}));
     const t=document.createElement('div');t.className='grp';
     t.innerHTML='<h4>What this calibre is<em>'+d.hz+' Hz</em></h4>'+
       '<p class="note">'+S.jewels+' jewels · '+S.vph.toLocaleString('en-US')+' A/h · '+S.pr+' hours · '+
@@ -4252,7 +4385,8 @@ function build(){
     add(bigbtn('Save to my shelf',()=>{shelveCurrent();build();}));
     add(bigbtn('The vocabulary',()=>openGloss(),true));
     const b3=bigbtn('Copy shareable link',()=>{
-      navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
+      const u=shareURL();
+      navigator.clipboard&&navigator.clipboard.writeText(u).catch(()=>{});
       b3.firstChild.textContent='Link copied';announce('Link copied to your clipboard');
       setTimeout(()=>{b3.firstChild.textContent='Copy shareable link';},1600);},true);
     add(b3);
@@ -4263,7 +4397,7 @@ function build(){
     const mail=document.createElement('a');mail.className='bigbtn';mail.style.textDecoration='none';
     mail.textContent='Send this design to the studio';
     mail.href='mailto:33fazirana@gmail.com?subject='+encodeURIComponent('Semi — '+(S.name||'a design'))+
-      '&body='+encodeURIComponent('Design: '+location.href+'\n\nSpecification:\n'+specPlain()+'\n\nWhat it is for:\n');
+      '&body='+encodeURIComponent('Design: '+shareURL()+'\n\nSpecification:\n'+specPlain()+'\n\nWhat it is for:\n');
     c.appendChild(mail);add(c);
   }
   else if(tab==='case'){
@@ -4527,6 +4661,11 @@ function spec(){
 /* ============================================================
    SYSTEMS — the things that make this a tool rather than a toy
    ============================================================ */
+/* a handful of moments worth counting, so you can tell whether anyone is
+   actually building anything rather than just looking at the front page */
+function count(name,data){
+  try{if(window.va)window.va('event',Object.assign({name:name},data||{}));}catch(e){}
+}
 function announce(msg){
   const el=document.getElementById('live');
   if(el){el.textContent='';setTimeout(()=>{el.textContent=msg;},30);}
@@ -4656,6 +4795,7 @@ function applySnapshot(j){
 function loadShelf(){try{return JSON.parse(localStorage.getItem('semi.shelf')||'[]');}catch(e){return [];}}
 function saveShelf(a){try{localStorage.setItem('semi.shelf',JSON.stringify(a.slice(0,12)));}catch(e){}}
 function shelveCurrent(){
+  count('saved a design',{calibre:calibre()});
   const a=loadShelf();
   a.unshift({n:S.name||'Untitled',t:Date.now(),s:JSON.parse(JSON.stringify(S))});
   saveShelf(a);announce('Saved to your shelf');buildIfTab('finish');buildIfTab('start');
@@ -4743,18 +4883,76 @@ function renderInto(ctx,w,h){
   ctx.restore();
 }
 /* ————— shareable designs ————— */
+/* ————— sharing a design —————
+   The whole design used to go into the address bar as base64 JSON on every
+   keystroke: about 1,100 characters of noise, always visible. Now only the
+   values that differ from the defaults are written, each as its index in
+   base 36, and the URL stays clean until you actually ask to share. */
+const KEYS=()=>Object.keys(DEFAULTS);
 function encode(){
-  try{return btoa(unescape(encodeURIComponent(JSON.stringify(S)))).replace(/=+$/,'');}catch(e){return '';}
+  try{
+    const K=KEYS(), out=[];
+    K.forEach((k,i)=>{
+      const v=S[k], d=DEFAULTS[k];
+      if(v===d)return;
+      let t;
+      if(v===true)t='1'; else if(v===false)t='0';
+      else if(typeof v==='number')t=String(+v.toFixed(3));
+      else t=encodeURIComponent(String(v));
+      out.push(i.toString(36)+'.'+t);
+    });
+    return out.join('~');
+  }catch(e){return '';}
 }
 function decode(){
   try{
-    const h=location.hash.slice(1);if(!h)return false;
-    const o=JSON.parse(decodeURIComponent(escape(atob(h))));
-    Object.keys(S).forEach(k=>{if(o[k]!==undefined)S[k]=o[k];});
+    let h=location.hash.slice(1);
+    if(!h)return false;
+    /* links shared before this change carried base64 JSON — still honoured */
+    if(h.indexOf('~')<0&&h.indexOf('.')<0){
+      const o=JSON.parse(decodeURIComponent(escape(atob(h))));
+      Object.keys(S).forEach(k=>{if(o[k]!==undefined)S[k]=o[k];});
+      return true;
+    }
+    const K=KEYS();
+    h.split('~').forEach(pair=>{
+      const dot=pair.indexOf('.');if(dot<1)return;
+      const k=K[parseInt(pair.slice(0,dot),36)];
+      if(k===undefined)return;
+      const raw=pair.slice(dot+1), d=DEFAULTS[k];
+      if(typeof d==='boolean')S[k]=(raw==='1');
+      else if(typeof d==='number')S[k]=parseFloat(raw);
+      else S[k]=decodeURIComponent(raw);
+    });
     return true;
   }catch(e){return false;}
 }
-function syncHash(){try{history.replaceState(null,'','#'+encode());}catch(e){}}
+/* the address bar is left alone while you work; the design is kept in the tab
+   instead, so a refresh does not lose it and the URL does not fill with noise */
+function syncHash(){try{sessionStorage.setItem('semi.current',encode());}catch(e){}}
+function shareURL(){
+  count('copied a share link');
+  const u=location.origin+location.pathname+'#'+encode();
+  try{history.replaceState(null,'',u);}catch(e){}
+  return u;
+}
+function restoreSession(){
+  try{
+    const h=sessionStorage.getItem('semi.current');
+    if(!h)return false;
+    const K=KEYS();
+    h.split('~').forEach(pair=>{
+      const dot=pair.indexOf('.');if(dot<1)return;
+      const k=K[parseInt(pair.slice(0,dot),36)];
+      if(k===undefined)return;
+      const raw=pair.slice(dot+1), d=DEFAULTS[k];
+      if(typeof d==='boolean')S[k]=(raw==='1');
+      else if(typeof d==='number')S[k]=parseFloat(raw);
+      else S[k]=decodeURIComponent(raw);
+    });
+    return true;
+  }catch(e){return false;}
+}
 /* ============================================================
    THE GUIDE — for people who love watches and have never
    designed one. No jargon without an explanation.
@@ -5208,6 +5406,7 @@ function certificate(){
   drawMark(x,26,'rgba(154,123,63,.85)',3);
   x.restore();
 
+  count('downloaded the calibre sheet');
   const a=document.createElement('a');
   a.href=c.toDataURL('image/png');
   a.download=(S.name?S.name.replace(/[^\w-]+/g,'-').toLowerCase():'semi')+'-calibre-sheet.png';
@@ -5278,6 +5477,7 @@ const EXPLORE=[
 let exIdx=-1;
 function explore(which){
   const E=(which!=null)?EXPLORE[which]:EXPLORE[exIdx=(exIdx+1)%EXPLORE.length];
+  count('explored',{direction:E.n});
   snapshot();
   Object.assign(S,E.m);
   Object.assign(S,E.c);
@@ -5378,7 +5578,8 @@ document.getElementById('bRand').onclick=()=>{
 document.getElementById('bPng').onclick=download;
 document.getElementById('bUndo').onclick=undo;
 document.getElementById('bSave').onclick=()=>{
-  navigator.clipboard&&navigator.clipboard.writeText(location.href).catch(()=>{});
+  const u=shareURL();
+  navigator.clipboard&&navigator.clipboard.writeText(u).catch(()=>{});
   const b=document.getElementById('bSave'),t=b.textContent;
   b.textContent='Link copied';announce('Link copied to your clipboard');
   setTimeout(()=>b.textContent=t,1600);
@@ -5445,6 +5646,16 @@ document.getElementById('bReset').onclick=()=>{snapshot();Object.assign(S,DEFAUL
     });
   });
   cv.addEventListener('pointerleave',()=>show(null));
+  /* a rotor is wound by movement; across the caseback, the pointer is the wrist */
+  let lastX=null,lastY=null;
+  cv.addEventListener('pointermove',e=>{
+    if(S.view!=='movement'||S.rotor==='manual')return;
+    if(lastX!==null){
+      const d=Math.hypot(e.clientX-lastX,e.clientY-lastY);
+      if(d>2)wind(Math.min(d,60)*0.00012);
+    }
+    lastX=e.clientX;lastY=e.clientY;
+  });
   /* touch: a tap names the part and keeps it named */
   cv.addEventListener('click',e=>{
     if(S.view!=='movement')return;
@@ -5536,6 +5747,7 @@ function paint(){
 }
 let last=0;
 function loop(t){
+  powerTick();
   /* the hands layer costs ~0.02 ms, so there is no reason to throttle it —
      and a balance beating at 36,000 A/h needs every frame it can get.
      requestAnimationFrame already stops when the tab is hidden. */
@@ -5598,8 +5810,15 @@ addEventListener('keydown',e=>{
 });
 addEventListener('resize',resize);
 /* a hidden tab is not worth a single pixel */
-addEventListener('visibilitychange',()=>{if(!document.hidden){dirty=true;drawCompare();}});
+addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(TICK.ctx&&TICK.ctx.suspend)TICK.ctx.suspend();}
+  else{dirty=true;drawCompare();PWR.last=Date.now();TICK.resume();}
+});
+try{if(localStorage.getItem('semi.tick')==='1')addEventListener('pointerdown',function once(){
+  removeEventListener('pointerdown',once);tickToggle(true);},{once:true});}catch(e){}
 const fromLink=decode();
+/* no link, but this tab was working on something before the refresh */
+if(!fromLink)restoreSession();
 resize();build();snapshot();
 /* first visit gets the guide; a shared design opens straight into the watch */
 /* the guide is opened by enterStudio(), once the studio is on screen */
@@ -5609,7 +5828,7 @@ window.CAL={S,render,randomize,build,paint,setTab:t=>{tab=t;build();},
   renderBase:()=>{baseDirty=true;render();},
   png:()=>cv.toDataURL('image/png').length,
   dims,calibre,advisories,undo,redo,snapshot,
-  link:()=>location.href};
+  link:shareURL,encode,decode};
 
 /* ============================================================
    THE DRAWING — one page from a sketchbook.
@@ -5908,6 +6127,7 @@ function enterStudio(){
   setTimeout(()=>{
     L.classList.add('gone');
     try{sessionStorage.setItem('semi.entered','1');}catch(e){}
+    count('entered studio');
     setTimeout(()=>{L.style.display='none';resize();
       if(window.__heroStop)window.__heroStop();
       /* a first visit lands on the calibre, because that is the argument */
@@ -5935,6 +6155,7 @@ function enterStudio(){
   L.classList.add('gone');L.style.display='none';
   if(window.__heroStop)window.__heroStop();
   P.hidden=false;
+  count('opened a shared design');
 
   const d=dims();
   document.getElementById('pCal').textContent=calibre();
